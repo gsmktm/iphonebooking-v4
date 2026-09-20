@@ -1,0 +1,1732 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  permissions String[]
+  users       User[]
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String
+  passwordHash  String
+  roleId        String?
+  role          Role?           @relation(fields: [roleId], references: [id])
+  createdAt     DateTime        @default(now())
+  sessions      UserSession[]
+  addresses     Address[]
+  orders        Order[]
+  devices       Device[]
+  repairs       Repair[]
+  tradeIns      TradeIn[]
+  tickets       SupportTicket[]
+  notifications Notification[]
+  wishlist      Wishlist[]
+  cart          CartItem[]
+  appointments  Appointment[]
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userAgent String?
+
+  @@index([userId])
+}
+
+model Address {
+  id           String  @id @default(cuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id])
+  label        String
+  province     String
+  district     String
+  municipality String
+  ward         String
+  area         String
+  landmark     String?
+  phone        String
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String
+  image       String
+  products    Product[]
+}
+
+model Product {
+  id                  String                   @id @default(cuid())
+  slug                String                   @unique
+  name                String
+  tagline             String
+  description         String
+  categoryId          String
+  category            Category                 @relation(fields: [categoryId], references: [id])
+  image               String
+  gallery             String[]
+  specs               Json
+  badge               String?
+  active              Boolean                  @default(true)
+  featured            Boolean                  @default(false)
+  createdAt           DateTime                 @default(now())
+  variants            ProductVariant[]
+  wishlist            Wishlist[]
+  compatibleWith      AccessoryCompatibility[] @relation("Accessory")
+  accessories         AccessoryCompatibility[] @relation("CompatibleDevice")
+  deviceIdentities    DeviceIdentity[]
+  partCompatibilities PartCompatibility[]
+}
+
+model ProductVariant {
+  id               String           @id @default(cuid())
+  productId        String
+  product          Product          @relation(fields: [productId], references: [id])
+  sku              String           @unique
+  color            String
+  colorHex         String
+  storage          String
+  region           String           @default("International")
+  price            Int
+  comparePrice     Int?
+  deposit          Int
+  image            String?
+  preorder         Boolean          @default(false)
+  stock            InventoryStock[]
+  units            InventoryUnit[]
+  orderItems       OrderItem[]
+  cart             CartItem[]
+  deviceIdentities DeviceIdentity[]
+}
+
+model AccessoryCompatibility {
+  accessoryId String
+  deviceId    String
+  accessory   Product @relation("Accessory", fields: [accessoryId], references: [id])
+  device      Product @relation("CompatibleDevice", fields: [deviceId], references: [id])
+
+  @@id([accessoryId, deviceId])
+}
+
+model Store {
+  id       String           @id @default(cuid())
+  slug     String           @unique
+  name     String
+  address  String
+  hours    String
+  phone    String
+  services String[]
+  stocks   InventoryStock[]
+}
+
+model InventoryStock {
+  id        String            @id @default(cuid())
+  variantId String
+  variant   ProductVariant    @relation(fields: [variantId], references: [id])
+  storeId   String
+  store     Store             @relation(fields: [storeId], references: [id])
+  available Int               @default(0)
+  reserved  Int               @default(0)
+  ledger    InventoryLedger[]
+  units     InventoryUnit[]
+
+  @@unique([variantId, storeId])
+}
+
+model InventoryLedger {
+  id        String         @id @default(cuid())
+  stockId   String
+  stock     InventoryStock @relation(fields: [stockId], references: [id])
+  type      String
+  quantity  Int
+  reference String
+  createdAt DateTime       @default(now())
+}
+
+model InventoryUnit {
+  grnId       String?
+  grn         GoodsReceivedNote? @relation(fields: [grnId], references: [id], onDelete: Restrict)
+  cost        Int?
+  stockId     String?
+  stock       InventoryStock?    @relation(fields: [stockId], references: [id])
+  identity    DeviceIdentity?
+  id          String             @id @default(cuid())
+  variantId   String
+  variant     ProductVariant     @relation(fields: [variantId], references: [id])
+  serialHash  String             @unique
+  serialLast4 String
+  status      String             @default("AVAILABLE")
+  device      Device?
+  allocation  BookingAllocation?
+}
+
+model CartItem {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  quantity  Int
+
+  @@unique([userId, variantId])
+}
+
+model Wishlist {
+  userId    String
+  productId String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@id([userId, productId])
+}
+
+model Order {
+  moneyEntries     OrderMoneyEntry[]
+  id               String               @id @default(cuid())
+  number           String               @unique
+  userId           String?
+  user             User?                @relation(fields: [userId], references: [id])
+  email            String
+  name             String
+  phone            String
+  address          Json
+  fulfillment      String
+  status           String               @default("PLACED")
+  total            Int
+  dueNow           Int
+  currency         String               @default("NPR")
+  trackingHash     String               @unique
+  idempotencyKey   String               @unique
+  expiresAt        DateTime
+  createdAt        DateTime             @default(now())
+  items            OrderItem[]
+  history          OrderStatusHistory[]
+  booking          Booking?
+  payments         Payment[]
+  devices          Device[]
+  tradeInId        String?              @unique
+  tradeIn          TradeIn?             @relation(fields: [tradeInId], references: [id])
+  allocations      BookingAllocation[]
+  policyAcceptance PolicyAcceptance?
+  organization     Organization?        @relation(fields: [organizationId], references: [id])
+  organizationId   String?
+
+  @@index([userId, createdAt])
+  @@index([status, expiresAt])
+}
+
+model OrderItem {
+  id        String         @id @default(cuid())
+  orderId   String
+  order     Order          @relation(fields: [orderId], references: [id])
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  quantity  Int
+  unitPrice Int
+  stockId   String
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  status    String
+  note      String
+  createdAt DateTime @default(now())
+}
+
+model Booking {
+  id         String   @id @default(cuid())
+  orderId    String   @unique
+  order      Order    @relation(fields: [orderId], references: [id])
+  status     String   @default("PENDING_PAYMENT")
+  preference String?
+  createdAt  DateTime @default(now())
+}
+
+model Payment {
+  moneyEntries OrderMoneyEntry[]
+  id           String            @id @default(cuid())
+  orderId      String
+  order        Order             @relation(fields: [orderId], references: [id])
+  provider     String
+  externalId   String?           @unique
+  amount       Int
+  status       String            @default("PENDING")
+  createdAt    DateTime          @default(now())
+  refunds      Refund[]
+}
+
+model Refund {
+  id        String   @id @default(cuid())
+  paymentId String
+  payment   Payment  @relation(fields: [paymentId], references: [id])
+  amount    Int
+  status    String   @default("REQUESTED")
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model Device {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  orderId       String
+  order         Order         @relation(fields: [orderId], references: [id])
+  unitId        String        @unique
+  unit          InventoryUnit @relation(fields: [unitId], references: [id])
+  warrantyUntil DateTime
+  createdAt     DateTime      @default(now())
+  repairs       Repair[]
+  tradeIns      TradeIn[]
+}
+
+model TradeInRule {
+  id             String  @id @default(cuid())
+  model          String  @unique
+  baseValue      Int
+  goodPercent    Int     @default(85)
+  fairPercent    Int     @default(65)
+  damagedPercent Int     @default(30)
+  active         Boolean @default(true)
+}
+
+model TradeIn {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id])
+  deviceId      String?
+  device        Device?        @relation(fields: [deviceId], references: [id])
+  kind          String         @default("TRADE_IN")
+  model         String
+  storage       String
+  condition     String
+  answers       Json
+  estimate      Int
+  finalValue    Int?
+  status        String         @default("SUBMITTED")
+  createdAt     DateTime       @default(now())
+  order         Order?
+  tradeInQuotes TradeInQuote[]
+
+  @@index([userId, createdAt])
+}
+
+model Repair {
+  partMovements  PartMovement[]
+  id             String                @id @default(cuid())
+  userId         String
+  user           User                  @relation(fields: [userId], references: [id])
+  deviceId       String?
+  device         Device?               @relation(fields: [deviceId], references: [id])
+  model          String
+  issue          String
+  description    String
+  method         String
+  appointment    DateTime?
+  status         String                @default("REQUESTED")
+  technician     String?
+  createdAt      DateTime              @default(now())
+  history        RepairStatusHistory[]
+  quotes         RepairQuote[]
+  part           Part?                 @relation(fields: [partId], references: [id])
+  partId         String?
+  repairQCs      RepairQC[]
+  repairWarranty RepairWarranty?
+
+  @@index([userId, createdAt])
+}
+
+model RepairStatusHistory {
+  id        String   @id @default(cuid())
+  repairId  String
+  repair    Repair   @relation(fields: [repairId], references: [id])
+  status    String
+  note      String
+  createdAt DateTime @default(now())
+}
+
+model RepairQuote {
+  id           String    @id @default(cuid())
+  repairId     String
+  repair       Repair    @relation(fields: [repairId], references: [id])
+  diagnosis    String
+  parts        Int
+  labor        Int
+  total        Int
+  warrantyDays Int
+  status       String    @default("PENDING")
+  decidedAt    DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+model SupportTicket {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id])
+  subject   String
+  status    String          @default("OPEN")
+  createdAt DateTime        @default(now())
+  messages  TicketMessage[]
+}
+
+model TicketMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id])
+  body      String
+  internal  Boolean       @default(false)
+  staff     Boolean       @default(false)
+  createdAt DateTime      @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model CMSPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  blocks      Json
+  published   Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  action    String
+  entity    String
+  entityId  String
+  before    Json?
+  after     Json?
+  requestId String
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+}
+
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  externalId  String
+  payloadHash String
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([provider, externalId])
+}
+
+model Job {
+  id        String   @id @default(cuid())
+  type      String
+  payload   Json
+  key       String   @unique
+  attempts  Int      @default(0)
+  status    String   @default("PENDING")
+  runAt     DateTime @default(now())
+  lastError String?
+  createdAt DateTime @default(now())
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  name      String
+  entityId  String?
+  createdAt DateTime @default(now())
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model BookingAllocation {
+  id        String        @id @default(cuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id])
+  unitId    String        @unique
+  unit      InventoryUnit @relation(fields: [unitId], references: [id])
+  createdAt DateTime      @default(now())
+
+  @@index([orderId])
+}
+
+model PolicyAcceptance {
+  id             String   @id @default(cuid())
+  orderId        String   @unique
+  order          Order    @relation(fields: [orderId], references: [id])
+  policySlug     String
+  policyVersion  String
+  policySnapshot Json
+  acceptedAt     DateTime @default(now())
+}
+
+// ── SECTION 92: Universal Device Identity Graph ────────────────────
+model DeviceIdentity {
+  unitId             String?             @unique
+  unit               InventoryUnit?      @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  id                 String              @id @default(cuid())
+  canonicalId        String              @unique @default(dbgenerated("'DEVICE-IB-' || nextval('device_identity_number_seq')::text"))
+  productId          String?
+  product            Product?            @relation(fields: [productId], references: [id])
+  variantId          String?
+  variant            ProductVariant?     @relation(fields: [variantId], references: [id])
+  primaryImei        String?
+  primarySerial      String?
+  status             String              @default("IN_SUPPLY_CHAIN")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  links              IdentityLink[]
+  events             DeviceEvent[]
+  provenance         DeviceProvenance[]
+  riskChecks         DeviceRiskCheck[]
+  passports          DevicePassport[]
+  refurbished        RefurbishedDevice?
+  replacedBy         DeviceReplacement[] @relation("replacedBy")
+  replaces           DeviceReplacement[] @relation("replaces")
+  conditionEvidences ConditionEvidence[]
+  conditionSnapshots ConditionSnapshot[]
+
+  @@index([canonicalId])
+  @@index([status])
+}
+
+model IdentityLink {
+  id         String         @id @default(cuid())
+  deviceId   String
+  device     DeviceIdentity @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  type       String
+  valueHash  String
+  valueLast4 String
+  verified   Boolean        @default(false)
+  verifiedAt DateTime?
+  source     String?
+  createdAt  DateTime       @default(now())
+
+  @@unique([deviceId, type, valueHash])
+  @@unique([type, valueHash])
+  @@index([type, valueHash])
+}
+
+// ── SECTION 93: Device Event Ledger ────────────────────────────────
+model DeviceEvent {
+  eventKey        String?        @unique
+  customerVisible Boolean        @default(false)
+  id              String         @id @default(cuid())
+  deviceId        String
+  device          DeviceIdentity @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  eventType       String
+  timestamp       DateTime       @default(now())
+  actor           String
+  location        String?
+  reference       String?
+  metadata        Json
+
+  @@index([deviceId, timestamp])
+  @@index([eventType])
+}
+
+// ── SECTION 94: Device Passport ────────────────────────────────────
+model DevicePassport {
+  id                String         @id @default(cuid())
+  deviceId          String
+  device            DeviceIdentity @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  generatedAt       DateTime       @default(now())
+  version           Int            @default(1)
+  productName       String?
+  model             String?
+  storage           String?
+  color             String?
+  purchaseDate      DateTime?
+  seller            String?
+  invoiceNo         String?
+  warrantyUntil     DateTime?
+  conditionGrade    String?
+  repairHistory     Json?
+  ownershipHistory  Json?
+  tradeInEligible   Boolean?
+  accessoriesCompat Json?
+  permittedFields   String[]
+}
+
+// ── SECTION 96: Device Provenance ──────────────────────────────────
+model DeviceProvenance {
+  id                 String         @id @default(cuid())
+  deviceId           String
+  device             DeviceIdentity @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  supplier           String?
+  purchaseOrder      String?
+  invoiceRef         String?
+  importSource       String?
+  receivedDate       DateTime?
+  warehouse          String?
+  inspection         Json?
+  ownershipFrom      String?
+  ownershipDate      DateTime?
+  repairIntervention Json?
+  tradeInInspection  Json?
+  refurbishment      Json?
+  resaleDate         DateTime?
+  inventoryClass     String         @default("NEW")
+  createdAt          DateTime       @default(now())
+}
+
+// ── SECTION 97: Device Trust & Risk Check ─────────────────────────
+model DeviceRiskCheck {
+  id          String         @id @default(cuid())
+  deviceId    String
+  device      DeviceIdentity @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  checkType   String
+  result      String
+  details     Json?
+  performedAt DateTime       @default(now())
+  operator    String?
+  expiresAt   DateTime?
+
+  @@index([deviceId, performedAt])
+}
+
+// ── SECTION 98: Condition Evidence Engine ─────────────────────────
+model ConditionEvidence {
+  id           String         @id @default(cuid())
+  deviceId     String
+  device       DeviceIdentity @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  inspectionId String
+  tradeInId    String?
+  repairId     String?
+  type         String
+  fileName     String
+  fileUrl      String
+  category     String
+  capturedAt   DateTime       @default(now())
+  inspector    String?
+  location     String?
+  metadata     Json?
+}
+
+model ConditionSnapshot {
+  id                  String         @id @default(cuid())
+  deviceId            String
+  device              DeviceIdentity @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  version             Int            @default(1)
+  snapshotDate        DateTime       @default(now())
+  condition           String
+  batteryHealth       Float?
+  screenCondition     String?
+  bodyCondition       String?
+  cameraCondition     String?
+  biometrics          String?
+  diagnosticResult    Json?
+  technicianNotes     String?
+  customerDeclaration Json?
+  inspector           String?
+  location            String?
+}
+
+// ── SECTION 99: Trade-in Quote Versioning ─────────────────────────
+model TradeInQuote {
+  id            String    @id @default(cuid())
+  tradeInId     String
+  tradeIn       TradeIn?  @relation(fields: [tradeInId], references: [id])
+  version       String
+  stage         String
+  previousValue Int?
+  newValue      Int
+  difference    Int?
+  reasonCodes   String[]
+  evidenceIds   String[]
+  approver      String?
+  approvedAt    DateTime?
+  status        String    @default("DRAFT")
+  createdAt     DateTime  @default(now())
+
+  @@unique([tradeInId, version])
+}
+
+// ── SECTION 102: Refurbished Device Engine ────────────────────────
+model RefurbishedDevice {
+  id               String         @id @default(cuid())
+  deviceId         String         @unique
+  device           DeviceIdentity @relation(fields: [deviceId], references: [id])
+  grade            String
+  conditionReport  Json
+  batteryCondition String?
+  screenCondition  String?
+  bodyCondition    String?
+  cameraCondition  String?
+  biometrics       String?
+  partsReplaced    String[]
+  qcResult         String?
+  technician       String?
+  warrantyStart    DateTime?
+  warrantyEnd      DateTime?
+  sellingPrice     Int?
+  status           String         @default("GRADING")
+  createdAt        DateTime       @default(now())
+}
+
+// ── SECTION 105: Repair Parts System ──────────────────────────────
+model Part {
+  movements       PartMovement[]
+  id              String              @id @default(cuid())
+  sku             String              @unique
+  name            String
+  category        String?
+  description     String?
+  cost            Int?
+  supplierId      String?
+  supplier        PartSupplier?       @relation(fields: [supplierId], references: [id])
+  stock           Int                 @default(0)
+  binLocation     String?
+  warranty        String?
+  batchLot        String?
+  active          Boolean             @default(true)
+  createdAt       DateTime            @default(now())
+  compatibilities PartCompatibility[]
+  repairBOMs      RepairBOM[]
+  repairJobs      Repair[]
+  repairBOMItems  RepairBOMItem[]
+}
+
+model PartSupplier {
+  id                 String              @id @default(cuid())
+  name               String
+  contact            String?
+  email              String?
+  phone              String?
+  parts              Part[]
+  rating             Float?
+  active             Boolean             @default(true)
+  purchaseOrders     PurchaseOrder[]
+  supplierScorecards SupplierScorecard[]
+}
+
+model PartCompatibility {
+  id       String  @id @default(cuid())
+  partId   String
+  part     Part    @relation(fields: [partId], references: [id], onDelete: Cascade)
+  deviceId String
+  device   Product @relation(fields: [deviceId], references: [id])
+
+  @@unique([partId, deviceId])
+}
+
+// ── SECTION 106: Repair BOM ───────────────────────────────────────
+model RepairBOM {
+  id                 String          @id @default(cuid())
+  code               String          @unique
+  name               String
+  description        String?
+  category           String?
+  parts              RepairBOMItem[]
+  laborMinutes       Int             @default(0)
+  diagnosticRequired Boolean         @default(false)
+  qcChecklist        String[]
+  active             Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  part               Part?           @relation(fields: [partId], references: [id])
+  partId             String?
+}
+
+model RepairBOMItem {
+  id       String    @id @default(cuid())
+  bomId    String
+  bom      RepairBOM @relation(fields: [bomId], references: [id], onDelete: Cascade)
+  partId   String
+  part     Part      @relation(fields: [partId], references: [id])
+  quantity Int       @default(1)
+  unit     String    @default("unit")
+}
+
+// ── SECTION 107: Repair QC ────────────────────────────────────────
+model RepairQC {
+  id         String              @id @default(cuid())
+  repairId   String
+  repair     Repair              @relation(fields: [repairId], references: [id])
+  checkedBy  String
+  approvedBy String?
+  status     String              @default("PENDING")
+  checkedAt  DateTime            @default(now())
+  approvedAt DateTime?
+  notes      String?
+  checklist  RepairQCCheckItem[]
+}
+
+model RepairQCCheckItem {
+  id       String   @id @default(cuid())
+  qcId     String
+  qc       RepairQC @relation(fields: [qcId], references: [id], onDelete: Cascade)
+  category String
+  name     String
+  passed   Boolean
+  detail   String?
+}
+
+// ── SECTION 108: Repair Warranty ──────────────────────────────────
+model RepairWarranty {
+  id           String   @id @default(cuid())
+  repairId     String   @unique
+  repair       Repair   @relation(fields: [repairId], references: [id])
+  coveredPart  String?
+  startDate    DateTime
+  expiryDate   DateTime
+  terms        String?
+  status       String   @default("ACTIVE")
+  claimHistory Json[]
+}
+
+// ── SECTION 109: Express Replacement ──────────────────────────────
+model DeviceReplacement {
+  id          String         @id @default(cuid())
+  oldDeviceId String
+  newDeviceId String
+  oldDevice   DeviceIdentity @relation("replaces", fields: [oldDeviceId], references: [id])
+  newDevice   DeviceIdentity @relation("replacedBy", fields: [newDeviceId], references: [id])
+  reason      String
+  createdAt   DateTime       @default(now())
+  orderId     String?
+  status      String         @default("PROCESSING")
+}
+
+// ── SECTION 110: Store POS ────────────────────────────────────────
+model POSSession {
+  id           String    @id @default(cuid())
+  storeId      String
+  staffId      String
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
+  totalNPR     Int?
+  paymentCount Int       @default(0)
+  status       String    @default("OPEN")
+}
+
+// ── SECTION 112: Scanner Mode ─────────────────────────────────────
+model ScanLog {
+  id         String   @id @default(cuid())
+  staffId    String
+  type       String
+  valueHash  String
+  valueLast4 String?
+  result     Json?
+  location   String?
+  scannedAt  DateTime @default(now())
+}
+
+// ── SECTION 113: Digital Receipt / Document Center ────────────────
+model Document {
+  id             String            @id @default(cuid())
+  entityType     String
+  entityId       String
+  documentType   String
+  title          String
+  currentVersion Int               @default(1)
+  status         String            @default("DRAFT")
+  createdAt      DateTime          @default(now())
+  versions       DocumentVersion[]
+}
+
+model DocumentVersion {
+  id          String    @id @default(cuid())
+  documentId  String
+  document    Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  version     Int
+  content     Json
+  generatedBy String?
+  approvedBy  String?
+  approvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([documentId, version])
+}
+
+// ── SECTION 114: Appointment Engine ───────────────────────────────
+model Appointment {
+  id              String   @id @default(cuid())
+  customerId      String?
+  customer        User?    @relation(fields: [customerId], references: [id])
+  location        String
+  service         String
+  staffId         String?
+  duration        Int
+  capacity        Int      @default(1)
+  bookedSlots     Int      @default(0)
+  status          String   @default("SCHEDULED")
+  preferredDate   DateTime
+  preferredTime   String?
+  rescheduleCount Int      @default(0)
+  remindersSent   Int      @default(0)
+  checkedIn       Boolean  @default(false)
+  completed       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+// ── SECTION 115: Store Queue ──────────────────────────────────────
+model QueueToken {
+  id            String    @id @default(cuid())
+  storeId       String
+  category      String
+  service       String
+  tokenNumber   String
+  assignedDesk  String?
+  estimatedWait Int?
+  status        String    @default("WAITING")
+  checkedInAt   DateTime?
+  calledAt      DateTime?
+  completedAt   DateTime?
+  missed        Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+}
+
+// ── SECTION 117: Fulfillment Promise ──────────────────────────────
+model FulfillmentPromise {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  promise   String
+  reason    String?
+  location  String?
+  cutoffMet Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ── SECTION 118: Order Orchestration ──────────────────────────────
+model FulfillmentUnit {
+  id              String   @id @default(cuid())
+  orderId         String
+  fulfillmentType String
+  status          String   @default("PENDING")
+  location        String?
+  carrier         String?
+  trackingNo      String?
+  createdAt       DateTime @default(now())
+}
+
+// ── SECTION 119: Reverse Logistics ────────────────────────────────
+model ReverseLogistics {
+  id         String    @id @default(cuid())
+  orderId    String
+  type       String
+  status     String    @default("REQUESTED")
+  reason     String?
+  pickupDate DateTime?
+  carrier    String?
+  trackingNo String?
+  createdAt  DateTime  @default(now())
+}
+
+// ── SECTION 120: Courier Abstraction ──────────────────────────────
+model CourierProvider {
+  id               String            @id @default(cuid())
+  name             String
+  apiKey           String?
+  status           String            @default("ACTIVE")
+  config           Json?
+  createdAt        DateTime          @default(now())
+  courierShipments CourierShipment[]
+}
+
+model CourierShipment {
+  id             String          @id @default(cuid())
+  providerId     String
+  provider       CourierProvider @relation(fields: [providerId], references: [id])
+  orderId        String?
+  shipmentNo     String?
+  status         String          @default("CREATED")
+  labelUrl       String?
+  trackingEvents Json[]
+  createdAt      DateTime        @default(now())
+}
+
+// ── SECTION 121: Launch Command Center ────────────────────────────
+model LaunchConfig {
+  id        String    @id @default(cuid())
+  name      String
+  productId String?
+  startDate DateTime
+  endDate   DateTime?
+  config    Json
+  status    String    @default("PLANNING")
+  createdAt DateTime  @default(now())
+}
+
+// ── SECTION 122: Allocation Engine ────────────────────────────────
+model AllocationRule {
+  id         String   @id @default(cuid())
+  productId  String?
+  ruleType   String
+  criteria   Json
+  allocation Json
+  priority   Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model AllocationEntry {
+  id          String    @id @default(cuid())
+  ruleId      String
+  orderId     String
+  unitId      String?
+  status      String    @default("PENDING")
+  allocatedAt DateTime?
+  allocatedBy String?
+  reason      String?
+  createdAt   DateTime  @default(now())
+}
+
+// ── SECTION 123: Waitlist Engine ──────────────────────────────────
+model WaitlistEntry {
+  id                String    @id @default(cuid())
+  productId         String?
+  variantId         String?
+  customerId        String
+  location          String?
+  fulfillment       String?
+  status            String    @default("JOINED")
+  invitedAt         DateTime?
+  reservationExpiry DateTime?
+  createdAt         DateTime  @default(now())
+}
+
+// ── SECTION 124: Anti-Bot Launch Protection ───────────────────────
+model BotSignal {
+  id          String   @id @default(cuid())
+  sessionId   String
+  fingerprint String?
+  eventType   String
+  score       Float
+  flags       Json[]
+  createdAt   DateTime @default(now())
+}
+
+// ── SECTION 125: Procurement ──────────────────────────────────────
+model PurchaseRequest {
+  id         String    @id @default(cuid())
+  supplierId String?
+  status     String    @default("DRAFT")
+  items      Json
+  totalNPR   Int?
+  approvedBy String?
+  approvedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model PurchaseOrder {
+  createdBy          String?
+  id                 String              @id @default(cuid())
+  poNumber           String              @unique
+  supplierId         String
+  supplier           PartSupplier        @relation(fields: [supplierId], references: [id])
+  status             String              @default("CREATED")
+  items              Json
+  orderedQty         Int
+  receivedQty        Int                 @default(0)
+  pendingQty         Int
+  costNPR            Int
+  taxNPR             Int
+  freightNPR         Int
+  currency           String              @default("NPR")
+  paymentStatus      String              @default("UNPAID")
+  invoiceRef         String?
+  approvedBy         String?
+  createdAt          DateTime            @default(now())
+  goodsReceivedNotes GoodsReceivedNote[]
+}
+
+// ── SECTION 126: Goods Received Note ──────────────────────────────
+model GoodsReceivedNote {
+  units       InventoryUnit[]
+  id          String          @id @default(cuid())
+  poId        String
+  po          PurchaseOrder   @relation(fields: [poId], references: [id])
+  grnNumber   String          @unique
+  status      String          @default("PROCESSING")
+  damageFound Boolean         @default(false)
+  discrepancy Json?
+  receivedBy  String?
+  createdAt   DateTime        @default(now())
+}
+
+// ── SECTION 127: Supplier Performance ─────────────────────────────
+model SupplierScorecard {
+  id                  String       @id @default(cuid())
+  supplierId          String
+  supplier            PartSupplier @relation(fields: [supplierId], references: [id])
+  period              String
+  deliveryAccuracy    Float?
+  avgLeadTime         Int?
+  priceVariance       Float?
+  defectRate          Float?
+  returnRate          Float?
+  orderCompletionRate Float?
+  createdAt           DateTime     @default(now())
+}
+
+// ── SECTION 128: Inventory Bin Management ─────────────────────────
+model InventoryBin {
+  id         String  @id @default(cuid())
+  locationId String
+  zone       String
+  rack       String
+  shelf      String
+  bin        String
+  variantId  String?
+  storeId    String?
+  note       String?
+
+  @@unique([locationId, zone, rack, shelf, bin])
+}
+
+// ── SECTION 129: Stocktake / Cycle Count ──────────────────────────
+model StocktakeSession {
+  id           String   @id @default(cuid())
+  storeId      String
+  variantId    String?
+  expectedQty  Int?
+  scannedQty   Int      @default(0)
+  variance     Int      @default(0)
+  reason       String?
+  approvedBy   String?
+  status       String   @default("OPEN")
+  hideExpected Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+// ── SECTION 130: Inventory Aging ──────────────────────────────────
+model InventoryAging {
+  id        String   @id @default(cuid())
+  variantId String
+  unitId    String?
+  bucket    String
+  daysOld   Int
+  qty       Int
+  createdAt DateTime @default(now())
+}
+
+// ── SECTION 131: Price Intelligence ───────────────────────────────
+model PriceIntelligence {
+  id            String   @id @default(cuid())
+  productId     String?
+  source        String
+  sourceUrl     String?
+  observedPrice Int?
+  observedAt    DateTime
+  availability  String?
+  confidence    Float    @default(0.8)
+  trend         Json[]
+  active        Boolean  @default(true)
+}
+
+// ── SECTION 132: Pricing Guardrails ───────────────────────────────
+model PricingGuardrail {
+  id                  String  @id @default(cuid())
+  productId           String?
+  minMargin           Float?
+  minPrice            Int?
+  targetMargin        Float?
+  maxCampaignDiscount Float?
+  dealerPriceLimit    Int?
+  stackingRules       Json?
+  active              Boolean @default(true)
+}
+
+// ── SECTION 133: Promotion Simulator ──────────────────────────────
+model PromotionSimulation {
+  id              String   @id @default(cuid())
+  name            String
+  discountPercent Float?
+  projectedMargin Float?
+  inventoryImpact Json?
+  stackingResult  Json?
+  negativeMargin  Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+// ── SECTION 134: Bundles ──────────────────────────────────────────
+model Bundle {
+  id           String       @id @default(cuid())
+  code         String       @unique
+  name         String
+  description  String?
+  bundlePrice  Int?
+  discountType String?
+  active       Boolean      @default(true)
+  startDate    DateTime?
+  endDate      DateTime?
+  items        BundleItem[]
+  eligibility  Json?
+  createdAt    DateTime     @default(now())
+}
+
+model BundleItem {
+  id        String @id @default(cuid())
+  bundleId  String
+  bundle    Bundle @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  productId String
+  quantity  Int    @default(1)
+  type      String @default("PRODUCT")
+}
+
+// ── SECTION 146: B2B / Corporate Portal ───────────────────────────
+model Organization {
+  id           String       @id @default(cuid())
+  name         String
+  legalName    String?
+  taxId        String?
+  contactEmail String?
+  status       String       @default("ACTIVE")
+  creditLimit  Int?
+  createdAt    DateTime     @default(now())
+  contacts     B2BContact[]
+  orders       Order[]
+  bulkQuotes   BulkQuote[]
+}
+
+model B2BContact {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  email          String
+  role           String
+  isAuthorized   Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+}
+
+model BulkQuote {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  status         String       @default("DRAFT")
+  items          Json
+  versions       Int          @default(1)
+  createdAt      DateTime     @default(now())
+}
+
+// ── SECTION 148: Retailer / Dealer Network ────────────────────────
+model Retailer {
+  id               String   @id @default(cuid())
+  code             String   @unique
+  name             String
+  contactName      String?
+  contactEmail     String?
+  region           String?
+  commissionRate   Float?
+  creditLimit      Int?
+  settlementPeriod String?
+  status           String   @default("ACTIVE")
+  createdAt        DateTime @default(now())
+}
+
+model RetailerSettlement {
+  id             String    @id @default(cuid())
+  retailerId     String
+  period         String
+  saleTotalNPR   Int
+  commissionNPR  Int
+  discountNPR    Int
+  paymentNPR     Int?
+  creditNPR      Int       @default(0)
+  debitNPR       Int       @default(0)
+  refundNPR      Int       @default(0)
+  adjustmentNPR  Int       @default(0)
+  settlementDate DateTime?
+  status         String    @default("PENDING")
+  createdAt      DateTime  @default(now())
+}
+
+// ── SECTION 151: Financial Subledger ──────────────────────────────
+model FinancialLedger {
+  id          String   @id @default(cuid())
+  entityType  String
+  entityId    String
+  entryType   String
+  amountNPR   Int
+  balanceNPR  Int
+  reference   String?
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model ReconciliationMismatch {
+  id          String   @id @default(cuid())
+  orderId     String?
+  gatewayTxId String?
+  type        String
+  description String
+  amount      Int
+  status      String   @default("OPEN")
+  flaggedAt   DateTime @default(now())
+}
+
+// ── SECTION 154: EMI / Financing ──────────────────────────────────
+model FinancingApplication {
+  id          String    @id @default(cuid())
+  orderId     String?
+  provider    String
+  status      String    @default("APPLICATION_CREATED")
+  customerId  String?
+  amount      Int
+  tenure      Int?
+  submittedAt DateTime?
+  approvedAt  DateTime?
+  rejectedAt  DateTime?
+  fundedAt    DateTime?
+  notes       Json?
+  createdAt   DateTime  @default(now())
+}
+
+// ── SECTION 160: AI Shopping Concierge ────────────────────────────
+model AIConversation {
+  id         String   @id @default(cuid())
+  customerId String?
+  sessionId  String
+  messages   Json[]
+  context    Json?
+  createdAt  DateTime @default(now())
+}
+
+// ── SECTION 166: Mission Control Workflow Engine ──────────────────
+model WorkflowDefinition {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  trigger      String
+  steps        Json
+  approvals    Json[]
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  workflowRuns WorkflowRun[]
+}
+
+model WorkflowRun {
+  id                String             @id @default(cuid())
+  definitionId      String
+  definition        WorkflowDefinition @relation(fields: [definitionId], references: [id])
+  entityType        String
+  entityId          String
+  status            String             @default("RUNNING")
+  triggeredBy       String
+  startedAt         DateTime           @default(now())
+  completedAt       DateTime?
+  workflowSteps     WorkflowStep[]
+  workflowEvents    WorkflowEvent[]
+  workflowTasks     WorkflowTask[]
+  workflowApprovals WorkflowApproval[]
+}
+
+model WorkflowStep {
+  id          String      @id @default(cuid())
+  runId       String
+  run         WorkflowRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  stepIndex   Int
+  name        String
+  status      String      @default("PENDING")
+  startedAt   DateTime?
+  completedAt DateTime?
+  output      Json?
+  error       String?
+}
+
+model WorkflowEvent {
+  id        String      @id @default(cuid())
+  runId     String
+  run       WorkflowRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  eventType String
+  payload   Json
+  createdAt DateTime    @default(now())
+}
+
+model WorkflowTask {
+  id        String      @id @default(cuid())
+  runId     String
+  run       WorkflowRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  title     String
+  assignee  String?
+  status    String      @default("OPEN")
+  priority  String      @default("MEDIUM")
+  dueAt     DateTime?
+  createdAt DateTime    @default(now())
+}
+
+model WorkflowApproval {
+  id        String      @id @default(cuid())
+  runId     String
+  run       WorkflowRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  stepId    String
+  approver  String
+  status    String      @default("PENDING")
+  decidedAt DateTime?
+  decision  String?
+  createdAt DateTime    @default(now())
+}
+
+// ── SECTION 167: Human Approval Gates ─────────────────────────────
+model ApprovalRequest {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  action     String
+  details    Json
+  makerId    String
+  checkerId  String?
+  status     String   @default("MAKER_PENDING")
+  reason     String?
+  createdAt  DateTime @default(now())
+}
+
+// ── SECTION 168: Operations Inbox ─────────────────────────────────
+model OpsAlert {
+  id             String    @id @default(cuid())
+  category       String
+  severity       String
+  title          String
+  description    String?
+  entityType     String?
+  entityId       String?
+  assignee       String?
+  status         String    @default("OPEN")
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([severity, status, createdAt])
+}
+
+// ── SECTION 169: SLA Engine ───────────────────────────────────────
+model SLAConfig {
+  id             String   @id @default(cuid())
+  name           String
+  serviceType    String
+  targetMinutes  Int
+  warningMinutes Int
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+}
+
+model SLATracking {
+  id          String    @id @default(cuid())
+  slaConfigId String
+  entityType  String
+  entityId    String
+  startedAt   DateTime
+  targetMetAt DateTime?
+  status      String    @default("RUNNING")
+  breached    Boolean   @default(false)
+}
+
+// ── SECTION 170: Escalation Engine ────────────────────────────────
+model EscalationPolicy {
+  id        String   @id @default(cuid())
+  workflow  String
+  levels    Json
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ── SECTION 171: Feature Flags ────────────────────────────────────
+model FeatureFlag {
+  id             String   @id @default(cuid())
+  key            String   @unique
+  name           String
+  description    String?
+  enabled        Boolean  @default(false)
+  targets        Json?
+  rolloutPercent Int      @default(0)
+  createdAt      DateTime @default(now())
+}
+
+// ── SECTION 172: Experimentation ──────────────────────────────────
+model Experiment {
+  id               String    @id @default(cuid())
+  name             String
+  description      String?
+  variantA         Json
+  variantB         Json
+  metrics          Json[]
+  guardrailMetrics Json[]
+  status           String    @default("DRAFT")
+  startDate        DateTime?
+  endDate          DateTime?
+  createdAt        DateTime  @default(now())
+}
+
+model ExperimentVariant {
+  id           String   @id @default(cuid())
+  experimentId String
+  variantName  String
+  exposureId   String
+  converted    Boolean  @default(false)
+  revenue      Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+// ── SECTION 174: Search Intelligence ──────────────────────────────
+model SearchLog {
+  id           String   @id @default(cuid())
+  query        String
+  resultsCount Int
+  hasResults   Boolean
+  device       String?
+  location     String?
+  timestamp    DateTime @default(now())
+}
+
+// ── SECTION 177: Data Quality Center ──────────────────────────────
+model DataQualityIssue {
+  id           String   @id @default(cuid())
+  entityType   String
+  entityId     String
+  issueType    String
+  severity     String
+  description  String?
+  repairAction Json?
+  status       String   @default("OPEN")
+  detectedAt   DateTime @default(now())
+}
+
+// ── SECTION 180: Sync Review Queue ────────────────────────────────
+model SyncChange {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  field      String
+  oldValue   Json?
+  newValue   Json?
+  source     String
+  confidence Float
+  status     String   @default("PENDING")
+  reviewedBy String?
+  decision   String?
+  createdAt  DateTime @default(now())
+}
+
+// ── SECTION 181: Integration Hub ──────────────────────────────────
+model IntegrationConfig {
+  id          String    @id @default(cuid())
+  provider    String
+  name        String
+  status      String    @default("DISCONNECTED")
+  config      Json?
+  lastSuccess DateTime?
+  lastFailure DateTime?
+  error       String?
+  createdAt   DateTime  @default(now())
+}
+
+model IntegrationLog {
+  id            String   @id @default(cuid())
+  integrationId String
+  direction     String
+  payload       Json
+  status        String
+  responseCode  Int?
+  durationMs    Int?
+  error         String?
+  createdAt     DateTime @default(now())
+}
+
+// ── SECTION 182: Webhook Control Center ───────────────────────────
+model WebhookLog {
+  id               String   @id @default(cuid())
+  provider         String
+  event            String
+  receivedAt       DateTime
+  signatureStatus  String
+  processingStatus String
+  attempts         Int      @default(0)
+  entityType       String?
+  entityId         String?
+  error            String?
+  replayed         Boolean  @default(false)
+}
+
+// ── SECTION 183: API Client Portal ────────────────────────────────
+model APIClient {
+  id             String    @id @default(cuid())
+  name           String
+  description    String?
+  keyHash        String    @unique
+  keyPrefix      String
+  scopes         String[]
+  rateLimitRPM   Int       @default(60)
+  rateLimitDPM   Int       @default(1000)
+  allowedOrigins String[]
+  expiresAt      DateTime?
+  revoked        Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+}
+
+// ── SECTION 184: Business Event Bus ───────────────────────────────
+model OutboxMessage {
+  id        String   @id @default(cuid())
+  eventType String
+  payload   Json
+  status    String   @default("PENDING")
+  attempts  Int      @default(0)
+  lastError String?
+  createdAt DateTime @default(now())
+}
+
+// ── SECTION 187: Forecasting ──────────────────────────────────────
+model Forecast {
+  id         String   @id @default(cuid())
+  type       String
+  entityId   String?
+  period     String
+  predicted  Json
+  confidence Float?
+  actual     Json?
+  createdAt  DateTime @default(now())
+}
+
+// ── SECTION 188: What-If Planning ─────────────────────────────────
+model Simulation {
+  id        String   @id @default(cuid())
+  name      String
+  scenario  Json
+  results   Json?
+  createdAt DateTime @default(now())
+}
+
+// ── SECTION 189: Status & Incident System ─────────────────────────
+model ServiceStatus {
+  id         String    @id @default(cuid())
+  service    String    @unique
+  status     String    @default("OPERATIONAL")
+  degradedAt DateTime?
+  resolvedAt DateTime?
+  message    String?
+  createdAt  DateTime  @default(now())
+}
+
+model Incident {
+  id          String    @id @default(cuid())
+  severity    String
+  title       String
+  description String?
+  status      String    @default("DETECTED")
+  service     String?
+  startedAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+}
+
+// ── SECTION 192: Migration Safety ─────────────────────────────────
+model MigrationRun {
+  id           String    @id @default(cuid())
+  version      String
+  name         String
+  direction    String
+  durationMs   Int?
+  rowsAffected Int?
+  checksum     String?
+  status       String    @default("PENDING")
+  executedAt   DateTime?
+  rollbackPlan Json?
+}
+
+// ── Section 154: Warranty Entitlement Engine ──────────────────────
+model WarrantyEntitlement {
+  id           String   @id @default(cuid())
+  deviceId     String?
+  orderId      String?
+  type         String
+  startDate    DateTime
+  expiryDate   DateTime
+  terms        Json?
+  status       String   @default("ACTIVE")
+  claimHistory Json[]
+}
+
+// ── Section 143: Loyalty Ledger ────────────────────────────────────
+model LoyaltyLedgerEntry {
+  id         String    @id @default(cuid())
+  customerId String
+  action     String
+  amount     Int
+  balance    Int
+  expiryDate DateTime?
+  reference  String?
+  reason     String?
+  createdAt  DateTime  @default(now())
+}
+
+// ── Section 144: Referral Engine ──────────────────────────────────
+model Referral {
+  id              String    @id @default(cuid())
+  referrerId      String
+  refereeId       String
+  campaign        String?
+  qualifyingEvent String?
+  rewardAmount    Int?
+  rewardStatus    String    @default("PENDING")
+  fraudFlags      Json[]
+  reversedAt      DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+// ── Section 136: Accessory Fit Guarantee ──────────────────────────
+model AccessoryFitCheck {
+  id          String   @id @default(cuid())
+  customerId  String
+  accessoryId String
+  deviceId    String?
+  compatible  Boolean
+  warning     String?
+  checkedAt   DateTime @default(now())
+}
+
+model PartMovement {
+  id        String   @id @default(cuid())
+  partId    String
+  part      Part     @relation(fields: [partId], references: [id], onDelete: Restrict)
+  repairId  String?
+  repair    Repair?  @relation(fields: [repairId], references: [id], onDelete: Restrict)
+  type      String
+  quantity  Int
+  unitCost  Int
+  reference String   @unique
+  actorId   String
+  createdAt DateTime @default(now())
+
+  @@index([partId, createdAt])
+}
+
+model OrderMoneyEntry {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  paymentId String?
+  payment   Payment? @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  kind      String
+  amount    Int
+  currency  String   @default("NPR")
+  eventKey  String   @unique
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([orderId, createdAt])
+}

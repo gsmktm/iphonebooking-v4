@@ -1,0 +1,11 @@
+node_modules
+dist
+package-lock.json
+public/images
+prisma/migrations
+AGENT.md
+CLAUDE.md
+.jetro
+.env
+playwright-report
+test-results

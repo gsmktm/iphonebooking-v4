@@ -1,0 +1,28 @@
+export const messages = {
+  en: {
+    store: 'Store',
+    tradeIn: 'Trade In',
+    repair: 'Repair',
+    support: 'Support',
+    shopAll: 'Explore the collection',
+    addToBag: 'Add to bag',
+    buyNow: 'Buy now',
+    from: 'From',
+    loading: 'Finding something great…',
+    retry: 'Try again',
+    empty: 'Nothing here just yet.',
+    brandLine: 'FROM THE HIMALAYAS',
+    heroTitle: 'Great things.\nAhead of you.',
+    heroText: 'Meet iPhone 16 Pro. A new perspective on everything you do.',
+    heroCta: 'Find your iPhone',
+    discover: 'Discover what’s possible',
+    collectionTitle: 'Your world. Upgraded.',
+    collectionText: 'The devices you love. The possibilities you haven’t imagined.',
+    new: 'A NEW PERSPECTIVE',
+    account: 'Your account',
+    compare: 'Compare',
+    wishlist: 'Wishlist',
+    bag: 'Shopping bag',
+  },
+} as const;
+export const t = (key: keyof typeof messages.en) => messages.en[key];

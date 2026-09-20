@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-server
+.env
+.env.*
+.git
+.jetro
+test-results
+playwright-report
+public/images/*-original.png
+AGENT.md
+CLAUDE.md
+
+docs/assets
