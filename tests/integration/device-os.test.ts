@@ -19,7 +19,7 @@ let admin: string,
   identityId: string,
   repairId: string,
   partId: string;
-function call(method: 'get' | 'post' | 'patch' | 'delete', path: string, cookie?: string) {
+function call(method: 'get' | 'post' | 'patch' | 'delete' | 'put', path: string, cookie?: string) {
   const req = request(app)[method](`/api/v1${path}`).set('X-Requested-With', 'iPhoneBooking');
   return cookie ? req.set('Cookie', cookie) : req;
 }
@@ -445,5 +445,39 @@ describe.sequential('Device OS domain integrity', () => {
       ).status,
     ).toBe(200);
     expect((await call('get', '/admin/roles', managerCookie)).status).toBe(401);
+  });
+  it('syncs account-scoped cart and wishlist with revision conflict protection', async () => {
+    const saved = await call('get', '/account/shop-state', customer);
+    expect(saved.status).toBe(200);
+    expect(saved.body.accountId).toBe(userId);
+    const data = {
+      accountId: userId,
+      revision: saved.body.revision,
+      cart: [{ variantId, quantity: 1 }],
+      wishlist: [productId],
+    };
+    expect(
+      (await call('put', '/account/shop-state', customer).send({ ...data, accountId: adminId }))
+        .status,
+    ).toBe(409);
+    const writes = await Promise.all([
+      call('put', '/account/shop-state', customer).send(data),
+      call('put', '/account/shop-state', customer).send({ ...data, cart: [] }),
+    ]);
+    expect(writes.map((r) => r.status).sort()).toEqual([200, 409]);
+    const next = await call('get', '/account/shop-state', customer);
+    expect(next.body.revision).toBe(data.revision + 1);
+    expect(next.body.wishlist).toEqual([productId]);
+    expect(
+      (await call('put', '/account/shop-state', customer).send({ ...data, cart: [], wishlist: [] }))
+        .status,
+    ).toBe(409);
+    expect((await call('get', '/account/shop-state', admin)).body.wishlist).toEqual([]);
+    expect((await call('post', '/account/wishlist', customer).send({ productId })).status).toBe(
+      200,
+    );
+    expect((await call('get', '/account/shop-state', customer)).body.revision).toBe(
+      next.body.revision + 1,
+    );
   });
 });

@@ -42,7 +42,7 @@ export function Shell() {
     queryKey: ['me'],
     queryFn: () => api<User | null>('/auth/me'),
   });
-  useCustomerSync(user);
+  const accountSync = useCustomerSync(user);
   const { data: config } = useQuery({
     queryKey: ['config'],
     queryFn: () => api<{ developmentData: boolean }>('/config'),
@@ -145,6 +145,19 @@ export function Shell() {
           </nav>
         )}
       </header>
+      {accountSync.error && (
+        <div className="container sync-notice" role="status">
+          <p>{accountSync.error.message}</p>
+          <div className="button-row">
+            <button className="button secondary" onClick={accountSync.keepLocal}>
+              Keep this device’s selection
+            </button>
+            <button className="text-button" onClick={accountSync.loadSaved}>
+              Replace with saved selection
+            </button>
+          </div>
+        </div>
+      )}
       <main id="main">
         <Outlet />
       </main>

@@ -15,6 +15,9 @@ export interface CartLine {
   quantity: number;
 }
 interface Shop {
+  ownerId: string | null;
+  revision: number | null;
+  dirty: boolean;
   cart: CartLine[];
   compare: string[];
   wishlist: string[];
@@ -23,16 +26,19 @@ interface Shop {
   clear: () => void;
   toggleCompare: (id: string) => void;
   toggleWishlist: (id: string) => void;
-  mergeCart: (items: CartLine[]) => void;
 }
 export const useShop = create<Shop>()(
   persist(
     (set) => ({
+      ownerId: null,
+      revision: null,
+      dirty: false,
       cart: [],
       compare: [],
       wishlist: [],
       add: (p, v) =>
         set((s) => ({
+          dirty: true,
           cart: s.cart.some((i) => i.variantId === v.id)
             ? s.cart.map((i) =>
                 i.variantId === v.id ? { ...i, quantity: Math.min(5, i.quantity + 1) } : i,
@@ -56,12 +62,13 @@ export const useShop = create<Shop>()(
         })),
       quantity: (id, n) =>
         set((s) => ({
+          dirty: true,
           cart:
             n <= 0
               ? s.cart.filter((i) => i.variantId !== id)
               : s.cart.map((i) => (i.variantId === id ? { ...i, quantity: Math.min(5, n) } : i)),
         })),
-      clear: () => set({ cart: [] }),
+      clear: () => set({ cart: [], dirty: true }),
       toggleCompare: (id) =>
         set((s) => ({
           compare: s.compare.includes(id)
@@ -70,16 +77,10 @@ export const useShop = create<Shop>()(
         })),
       toggleWishlist: (id) =>
         set((s) => ({
+          dirty: true,
           wishlist: s.wishlist.includes(id)
             ? s.wishlist.filter((x) => x !== id)
             : [...s.wishlist, id],
-        })),
-      mergeCart: (items) =>
-        set((s) => ({
-          cart: [
-            ...s.cart,
-            ...items.filter((i) => !s.cart.some((c) => c.variantId === i.variantId)),
-          ],
         })),
     }),
     { name: 'iphonebooking-shop-v2' },

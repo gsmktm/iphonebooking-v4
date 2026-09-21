@@ -49,7 +49,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
 export const post = <T>(path: string, data: unknown) =>
   api<T>(path, { method: 'POST', body: JSON.stringify(data) });
 export const money = (value: number) =>
-  `NPR ${new Intl.NumberFormat('en-NP', { maximumFractionDigits: 0 }).format(value / 100)}`;
+  `NPR ${new Intl.NumberFormat('en-NP', { minimumFractionDigits: value % 100 === 0 ? 0 : 2, maximumFractionDigits: 2 }).format(value / 100)}`;
 export const human = (value: string) =>
   value
     .toLowerCase()

@@ -84,12 +84,28 @@ test('staff can open operational modules and edit dialogs', async ({ page }) => 
     'content',
     'roles',
     'audit-logs',
+    'device-identity',
+    'device-event',
+    'parts',
+    'repair-qc',
+    'repair-warranty',
+    'suppliers',
+    'purchase-orders',
+    'receipts',
+    'order-ledger',
+    'reconciliation',
   ]) {
     await page.goto(`/admin/${path}`);
     await expect(page.locator('.admin-page-heading h1')).toBeVisible();
     await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
   }
+  await page.goto('/admin/roles');
+  await page.getByRole('button', { name: 'Create role', exact: true }).click();
+  const roleDialog = page.getByRole('dialog', { name: 'Create role' });
+  await expect(roleDialog.getByLabel('Role name', { exact: true })).toBeVisible();
+  await expect(roleDialog.locator('input[type="checkbox"]')).not.toHaveCount(0);
+  await page.keyboard.press('Escape');
   await page.goto('/admin/products');
   await page.getByRole('button', { name: 'View', exact: true }).first().click();
   await page.getByRole('button', { name: 'Edit product', exact: true }).click();

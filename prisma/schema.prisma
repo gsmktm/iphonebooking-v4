@@ -15,6 +15,7 @@ model Role {
 }
 
 model User {
+  shopRevision  Int             @default(0)
   id            String          @id @default(cuid())
   email         String          @unique
   name          String

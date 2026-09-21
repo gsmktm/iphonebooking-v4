@@ -1169,3 +1169,19 @@
     grid-template-columns: 1fr 2fr;
   }
 }
+.sync-notice {
+  padding: 1rem;
+  margin-block: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+}
+.role-permission-group {
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  min-width: 0;
+}
+.role-permission-group legend {
+  padding-inline: 0.5rem;
+  font-weight: 600;
+}

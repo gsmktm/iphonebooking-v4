@@ -18,6 +18,7 @@ import { api, money, date } from '../../services/api';
 import type { User } from '../../services/types';
 import { ErrorNotice, Loading, Dialog, Status } from '../../components/ui';
 import { resources, actionsFor, createAction, getValue, type Row, type Action } from './resources';
+import RoleEditor from './RoleEditor';
 import RepairQCForm from './RepairQCForm';
 export default function ResourcePage({ resource, user }: { resource: string; user: User }) {
   const config = resources[resource];
@@ -293,81 +294,92 @@ export default function ResourcePage({ resource, user }: { resource: string; use
         }}
         title={action?.label ?? 'Update record'}
       >
-        {action && (
-          <form
-            key={action.label}
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              setError(null);
-              try {
-                const fd = new FormData(e.currentTarget);
-                const data: Row = {};
-                for (const f of action.fields) {
-                  const raw = fd.get(f.key);
-                  data[f.key] =
-                    f.type === 'checkbox'
-                      ? raw === 'on'
-                      : f.type === 'number'
-                        ? Number(raw)
-                        : f.type === 'json'
-                          ? JSON.parse(String(raw))
-                          : String(raw ?? '');
-                }
-                await api(action.path, { method: action.method, body: JSON.stringify(data) });
+        {action &&
+          (resource === 'roles' ? (
+            <RoleEditor
+              key={action.path}
+              action={action}
+              onComplete={async () => {
                 await qc.invalidateQueries({ queryKey: ['admin'] });
                 setAction(null);
                 setSelected(null);
-              } catch (e) {
-                setError(e as Error);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            {action.help && <p className="notice">{action.help}</p>}
-            {action.fields.map((f) =>
-              f.type === 'checkbox' ? (
-                <label className="checkbox-label" key={f.key}>
-                  <input
-                    name={f.key}
-                    type="checkbox"
-                    defaultChecked={Boolean(action.initial?.[f.key])}
-                  />
-                  {f.label}
-                </label>
-              ) : (
-                <label key={f.key}>
-                  {f.label}
-                  {f.type === 'textarea' || f.type === 'json' ? (
-                    <textarea
-                      name={f.key}
-                      required={f.required}
-                      rows={f.type === 'json' ? 12 : 4}
-                      defaultValue={
-                        f.type === 'json'
-                          ? JSON.stringify(action.initial?.[f.key] ?? [], null, 2)
-                          : String(action.initial?.[f.key] ?? '')
-                      }
-                    />
-                  ) : (
+              }}
+            />
+          ) : (
+            <form
+              key={action.label}
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setBusy(true);
+                setError(null);
+                try {
+                  const fd = new FormData(e.currentTarget);
+                  const data: Row = {};
+                  for (const f of action.fields) {
+                    const raw = fd.get(f.key);
+                    data[f.key] =
+                      f.type === 'checkbox'
+                        ? raw === 'on'
+                        : f.type === 'number'
+                          ? Number(raw)
+                          : f.type === 'json'
+                            ? JSON.parse(String(raw))
+                            : String(raw ?? '');
+                  }
+                  await api(action.path, { method: action.method, body: JSON.stringify(data) });
+                  await qc.invalidateQueries({ queryKey: ['admin'] });
+                  setAction(null);
+                  setSelected(null);
+                } catch (e) {
+                  setError(e as Error);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              {action.help && <p className="notice">{action.help}</p>}
+              {action.fields.map((f) =>
+                f.type === 'checkbox' ? (
+                  <label className="checkbox-label" key={f.key}>
                     <input
                       name={f.key}
-                      required={f.required}
-                      type={f.type === 'number' ? 'number' : 'text'}
-                      defaultValue={String(action.initial?.[f.key] ?? '')}
+                      type="checkbox"
+                      defaultChecked={Boolean(action.initial?.[f.key])}
                     />
-                  )}
-                </label>
-              ),
-            )}
-            {error && <ErrorNotice error={error} />}
-            <button className="button" disabled={busy}>
-              {busy ? 'Saving…' : 'Save changes'}
-              <ArrowRight size={16} />
-            </button>
-          </form>
-        )}
+                    {f.label}
+                  </label>
+                ) : (
+                  <label key={f.key}>
+                    {f.label}
+                    {f.type === 'textarea' || f.type === 'json' ? (
+                      <textarea
+                        name={f.key}
+                        required={f.required}
+                        rows={f.type === 'json' ? 12 : 4}
+                        defaultValue={
+                          f.type === 'json'
+                            ? JSON.stringify(action.initial?.[f.key] ?? [], null, 2)
+                            : String(action.initial?.[f.key] ?? '')
+                        }
+                      />
+                    ) : (
+                      <input
+                        name={f.key}
+                        required={f.required}
+                        type={f.type === 'number' ? 'number' : 'text'}
+                        defaultValue={String(action.initial?.[f.key] ?? '')}
+                      />
+                    )}
+                  </label>
+                ),
+              )}
+              {error && <ErrorNotice error={error} />}
+              <button className="button" disabled={busy}>
+                {busy ? 'Saving…' : 'Save changes'}
+                <ArrowRight size={16} />
+              </button>
+            </form>
+          ))}
       </Dialog>
     </>
   );

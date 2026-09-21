@@ -66,18 +66,23 @@ account.get('/wishlist', async (req, res) =>
   ),
 );
 account.post('/wishlist', async (req, res) => {
-  const { productId } = z.object({ productId: z.string() }).parse(req.body);
-  res.json(
-    await db.wishlist.upsert({
+  const { productId } = z.object({ productId: z.string().min(1) }).parse(req.body);
+  const row = await db.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: req.user!.id }, data: { shopRevision: { increment: 1 } } });
+    return tx.wishlist.upsert({
       where: { userId_productId: { userId: req.user!.id, productId } },
       create: { userId: req.user!.id, productId },
       update: {},
-    }),
-  );
+    });
+  });
+  res.json(row);
 });
 account.delete('/wishlist/:id', async (req, res) => {
-  await db.wishlist.deleteMany({
-    where: { userId: req.user!.id, productId: String(req.params.id) },
+  await db.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: req.user!.id }, data: { shopRevision: { increment: 1 } } });
+    await tx.wishlist.deleteMany({
+      where: { userId: req.user!.id, productId: String(req.params.id) },
+    });
   });
   res.json({ ok: true });
 });
@@ -111,6 +116,7 @@ account.put('/cart', async (req, res) => {
     })
     .parse(req.body);
   await db.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: req.user!.id }, data: { shopRevision: { increment: 1 } } });
     await tx.cartItem.deleteMany({ where: { userId: req.user!.id } });
     await tx.cartItem.createMany({ data: items.map((i) => ({ ...i, userId: req.user!.id })) });
   });
