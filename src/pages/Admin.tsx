@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, NavLink, useParams, useSearchParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link, NavLink, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard,
   Package,
@@ -11,27 +11,14 @@ import {
   FileText,
   Users,
   ShieldCheck,
-  Search,
   ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
   Menu,
-  Download,
-  Plus,
-  ArrowRight,
 } from 'lucide-react';
-import { api, money, date } from '../services/api';
+import { api } from '../services/api';
 import type { User } from '../services/types';
-import { Brand, ErrorNotice, Loading, Empty, Dialog, Status } from '../components/ui';
+import { Brand, ErrorNotice, Loading, Empty } from '../components/ui';
 import { SignIn } from './Account';
-import {
-  resources,
-  actionsFor,
-  createAction,
-  getValue,
-  type Row,
-  type Action,
-} from './admin/resources';
+import { resources } from './admin/resources';
 import Dashboard from './admin/Dashboard';
 import ResourcePage from './admin/ResourcePage';
 const groups = [
@@ -64,62 +51,12 @@ const groups = [
       ['device-risk-check', 'Device risk checks'],
       ['parts', 'Repair parts'],
       ['part-movements', 'Part movements'],
-      ['device-passport', 'Device passports'],
-      ['device-provenance', 'Provenance'],
-      ['condition-evidence', 'Condition evidence'],
-      ['condition-snapshot', 'Condition snapshots'],
       ['trade-in-quote', 'Trade-in quotes'],
-      ['refurbished-device', 'Refurbished stock'],
-      ['repair-bom', 'Repair BOM'],
       ['repair-qc', 'Repair QC'],
       ['repair-warranty', 'Repair warranty'],
-      ['pos-session', 'POS sessions'],
-      ['scan-log', 'Scan log'],
-      ['document', 'Documents'],
-      ['appointment', 'Appointments'],
-      ['fulfillment-promise', 'Fulfillment'],
-      ['reverse-logistics', 'Reverse logistics'],
-      ['courier-provider', 'Couriers'],
-      ['courier-shipment', 'Shipments'],
-      ['allocation-rule', 'Allocation rules'],
-      ['allocation-entry', 'Allocation'],
       ['suppliers', 'Supplier directory'],
       ['purchase-orders', 'Supplier purchases'],
       ['receipts', 'Receiving & QC'],
-      ['purchase-request', 'Purchase requests'],
-      ['purchase-order', 'Purchase orders'],
-      ['goods-received-note', 'GRN'],
-      ['supplier-scorecard', 'Suppliers'],
-      ['inventory-bin', 'Bins'],
-      ['stocktake-session', 'Stocktake'],
-      ['inventory-aging', 'Inventory aging'],
-      ['price-intelligence', 'Pricing'],
-      ['pricing-guardrail', 'Price guards'],
-      ['promotion-simulation', 'Promotions'],
-      ['bundle', 'Bundles'],
-      ['organization', 'Orgs'],
-      ['bulk-quote', 'Bulk quotes'],
-      ['financial-ledger', 'Ledger'],
-      ['reconciliation-mismatch', 'Reconciliations'],
-      ['financing-application', 'Financing'],
-      ['ai-conversation', 'AI convos'],
-      ['workflow-run', 'Workflows'],
-      ['ops-alert', 'Alerts'],
-      ['sla-tracking', 'SLA'],
-      ['feature-flag', 'Flags'],
-      ['experiment', 'Experiments'],
-      ['search-log', 'Search log'],
-      ['sync-change', 'Sync'],
-      ['integration-config', 'Integrations'],
-      ['webhook-log', 'Webhooks'],
-      ['outbox-message', 'Outbox'],
-      ['forecast', 'Forecast'],
-      ['service-status', 'Status'],
-      ['incident', 'Incidents'],
-      ['warranty-entitlement', 'Warranties'],
-      ['loyalty-ledger-entry', 'Loyalty'],
-      ['referral', 'Referrals'],
-      ['accessory-fit-check', 'Accessory fit'],
     ],
   },
   {
@@ -196,7 +133,9 @@ export default function Admin() {
             <div className="admin-nav-group" key={g.title}>
               <span>{g.title}</span>
               {g.items
-                .filter(([r]) => can(r ? resources[r]?.permission : 'report.read'))
+                .filter(
+                  ([r]) => (!r || resources[r]) && can(r ? resources[r].permission : 'report.read'),
+                )
                 .map(([r, label]) => {
                   const Icon = icons[r] ?? FileText;
                   return (
@@ -254,7 +193,16 @@ export default function Admin() {
             <ResourcePage key={resource} resource={resource} user={user} />
           ) : (
             <Empty
-              title="This module isn’t available to your role."
+              title={
+                resources[resource]
+                  ? 'This module isn’t available to your role.'
+                  : 'This workflow is not enabled yet.'
+              }
+              description={
+                resources[resource]
+                  ? undefined
+                  : 'Implementation and validation are still in progress.'
+              }
               link="/admin"
               action="Back to overview"
             />

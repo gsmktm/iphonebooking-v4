@@ -121,7 +121,10 @@ deviceLifecycle.get('/account/devices/:id/passport', requireUser, async (req, re
       })
     : [];
   const accessories = await db.accessoryCompatibility.findMany({
-    where: { deviceId: device.unit.variant.productId, accessory: { active: true } },
+    where: {
+      deviceId: device.unit.variant.productId,
+      accessory: { active: true, variants: { some: {} } },
+    },
     select: { accessory: { select: { id: true, name: true, slug: true, image: true } } },
   });
   res.json({

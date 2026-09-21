@@ -80,3 +80,5 @@ Device events, part movements, QC evidence, and order money entries are protecte
 New development role templates are Quality Inspector, Procurement Officer, and Procurement Approver. Existing roles are not silently overwritten by the seed. Use the permission-controlled role editor and account role assignment; role updates revoke affected sessions. The permission catalog describes the implemented permissions.
 
 Internal order reconciliation is not bank or gateway reconciliation. Store receipts require actual confirmation by staff in commercial use. Browser E2E fixtures deliberately create clearly named development orders and test store receipts; never run those against commercial data.
+
+Account shopping-state migration adds a nonnegative revision counter without deleting existing carts or wishlists. Deploy the updated client with the API. The client includes the expected account ID and revision in every write; older supported cart/wishlist routes also increment the counter. Browser local storage contains selections, never session credentials.

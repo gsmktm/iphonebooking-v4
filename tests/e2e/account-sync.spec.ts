@@ -18,7 +18,11 @@ test('anonymous wishlist migrates, conflicts recover, and accounts remain separa
   expect(registration.ok()).toBe(true);
   const user = await registration.json();
   await page.goto('/');
-  const state = async () => (await context.request.get('/api/v1/account/shop-state')).json();
+  const state = async () => {
+    const response = await context.request.get('/api/v1/account/shop-state');
+    expect(response.ok()).toBe(true);
+    return response.json();
+  };
   await expect.poll(async () => (await state()).wishlist.length).toBe(1);
   const saved = await state();
   await expect(

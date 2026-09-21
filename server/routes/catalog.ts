@@ -62,8 +62,14 @@ catalog.get('/products/:slug', async (req, res) =>
   res.json(
     owned(
       await db.product.findFirst({
-        where: { slug: String(req.params.slug), active: true },
-        include: { ...include, accessories: { include: { accessory: { include } } } },
+        where: { slug: String(req.params.slug), active: true, variants: { some: {} } },
+        include: {
+          ...include,
+          accessories: {
+            where: { accessory: { active: true, variants: { some: {} } } },
+            include: { accessory: { include } },
+          },
+        },
       }),
     ),
   ),

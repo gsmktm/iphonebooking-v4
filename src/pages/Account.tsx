@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { api, post } from '../services/api';
+import { useShop } from '../store/shop';
 import type { User, Notification } from '../services/types';
 import { PageIntro, ErrorNotice, Loading, ButtonLink } from '../components/ui';
 import {
@@ -156,6 +157,8 @@ const sections = [
   ['security', 'Security'],
 ];
 export default function Account() {
+  const [logoutError, setLogoutError] = useState<Error | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
   const { section = 'overview' } = useParams();
   const qc = useQueryClient();
   const me = useQuery({ queryKey: ['me'], queryFn: () => api<User | null>('/auth/me') });
@@ -202,15 +205,35 @@ export default function Account() {
           </nav>
           <button
             className="text-button"
+            disabled={loggingOut}
             onClick={async () => {
-              await post('/auth/logout', {});
-              qc.clear();
-              qc.setQueryData(['me'], null);
+              setLoggingOut(true);
+              setLogoutError(null);
+              try {
+                await post('/auth/logout', {});
+                await qc.cancelQueries();
+                useShop.setState({
+                  ownerId: null,
+                  revision: null,
+                  dirty: false,
+                  cart: [],
+                  wishlist: [],
+                });
+                qc.removeQueries({ predicate: (query) => query.queryKey[0] !== 'me' });
+                qc.setQueryData(['me'], null);
+              } catch (error) {
+                setLogoutError(
+                  error instanceof Error ? error : new Error('Sign-out failed. Please try again.'),
+                );
+              } finally {
+                setLoggingOut(false);
+              }
             }}
           >
             <LogOut size={16} />
             Sign out
           </button>
+          {logoutError && <ErrorNotice error={logoutError} />}
         </aside>
         <div className="account-content">
           {section === 'overview' ? (

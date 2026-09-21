@@ -76,7 +76,7 @@ Creation routes exist for products, categories, variants, inventory stock, store
 | Staff support note/reply  | `POST /admin/tickets/:id/messages`                                 | `support.update`                                     |
 | Role assignment           | `PATCH /admin/customers/:id/role`                                  | `role.manage`; self-change blocked, sessions revoked |
 
-Seed roles: Super Admin (`*`), Content Manager, Technician, Finance, and Inventory Manager. Permissions are string arrays on the role and enforced in the server. Further roles and a complete role-management UI are open scope. Audit logs have no edit or delete API.
+Seed roles: Super Admin (`*`), Content Manager, Technician, Finance, and Inventory Manager. Permissions are string arrays on the role and enforced in the server. Additional role templates and a grouped permission editor are implemented; all grants remain bounded by the acting staff member’s permissions. Audit logs have no edit or delete API.
 
 ## Device OS domain endpoints
 
@@ -106,3 +106,9 @@ All mutations still require the same session and CSRF/origin protections. Amount
 | `PATCH /admin/customers/:id/role`            | `role.manage`         | Assign/remove a grantable role and revoke sessions                                                                            |
 
 Supported paginated admin read modules added: `device-identity`, `device-event`, `device-risk-check`, `parts`, `part-movements`, `repair-qc`, `repair-warranty`, `trade-in-quote`, `suppliers`, `purchase-orders`, and `receipts`. Other V3 schema-only modules remain unavailable.
+
+## Saved shopping selections
+
+`GET /api/v1/account/shop-state` requires a session and returns `accountId`, `revision`, hydrated cart lines, and wishlist product IDs. `PUT` accepts `{ accountId, revision, cart: [{ variantId, quantity }], wishlist: [productId] }` and atomically replaces the selection only at the expected revision. The response returns the new revision.
+
+A stale revision returns `409 SHOP_STATE_CHANGED`; a different signed-in account returns `409 ACCOUNT_CHANGED`. The client must load the saved selection or explicitly confirm keeping its local selection before retrying. A conflict must never be handled by unconditional background overwrite. Existing cart/wishlist endpoints increment the same revision for compatibility. Neither saved cart prices nor availability establish checkout pricing or reserve inventory.

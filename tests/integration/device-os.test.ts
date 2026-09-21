@@ -93,6 +93,40 @@ beforeAll(async () => {
 });
 afterAll(() => db.$disconnect());
 describe.sequential('Device OS domain integrity', () => {
+  it('keeps products without configurations and unpublished accessories out of public detail pages', async () => {
+    const source = await db.product.findUniqueOrThrow({ where: { id: productId } });
+    const incomplete = await db.product.create({
+      data: {
+        name: 'Incomplete fixture',
+        slug: `${prefix}-incomplete`,
+        tagline: '',
+        description: '',
+        categoryId: source.categoryId,
+        image: 'phone',
+        specs: {},
+        gallery: [],
+      },
+    });
+    expect((await call('get', `/products/${incomplete.slug}`)).status).toBe(404);
+    await db.accessoryCompatibility.create({
+      data: { deviceId: productId, accessoryId: incomplete.id },
+    });
+    expect((await call('get', `/products/${prefix}`)).body.accessories).toEqual([]);
+    await db.productVariant.create({
+      data: {
+        productId: incomplete.id,
+        sku: `${prefix}-accessory`,
+        color: 'Black',
+        colorHex: '#000000',
+        storage: 'Standard',
+        price: 10000,
+        deposit: 0,
+      },
+    });
+    expect((await call('get', `/products/${prefix}`)).body.accessories).toHaveLength(1);
+    await db.product.update({ where: { id: incomplete.id }, data: { active: false } });
+    expect((await call('get', `/products/${prefix}`)).body.accessories).toEqual([]);
+  });
   it('denies anonymous access to every generated V3 router', async () => {
     for (const path of scaffoldPaths) {
       const r = await call('post', `/${path}`).send({ status: 'APPROVED', amountNPR: 1 });
