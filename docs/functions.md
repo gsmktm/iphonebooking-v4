@@ -1,13 +1,15 @@
 # Complete function reference — full stack
 
 > Deep-research inventory of every function in the iPhoneBooking V2 monorepo: server foundation,
-> business services, all API endpoints with their guards and behavior, the Prisma data model, and
-> every client-side function. Read alongside [architecture.md](./architecture.md),
-> [api.md](./api.md), and [concept-mapping.md](./concept-mapping.md).
+> business services, all API endpoints with their guards and behavior, the Prisma data model, every
+> client-side function, the admin resource engine, PWA assets, seed/scripts/tests, and the complete
+> API error-code catalog. Read alongside [architecture.md](./architecture.md), [api.md](./api.md),
+> and [concept-mapping.md](./concept-mapping.md).
 >
 > Verified directly against source: `server/` (16 route files, 10 services, `core.ts`, `app.ts`,
-> `index.ts`, `worker.ts`), `prisma/schema.prisma` (127 models), `src/` (pages, components, store,
-> services, app hooks). Line counts drift with edits; behavior notes reflect the code as read.
+> `index.ts`, `worker.ts`), `prisma/schema.prisma` (127 models) + `prisma/seed.ts`, every file under
+> `src/` (45 files), `public/` (`sw.js`, `appearance.js`, manifest), `scripts/`, `tests/`. Line
+> counts drift with edits; behavior notes reflect the code as read.
 
 ## 1. Server foundation
 
@@ -427,9 +429,172 @@ State: `ownerId`, `revision`, `dirty`, `cart: CartLine[]`, `compare: string[]`,
 - **`components/ProductCard.tsx`** — `ProductCard`: product tile with CTA + compare/wishlist.
 - **`components/ui.tsx`** — `Brand`, `ArrowLink`, `ButtonLink`, `ProductVisual`,
   `SectionHeading`, `PageIntro`, `ErrorNotice(error, retry)`, `Loading`, `Empty`, `Dialog`,
-  `Status` (status pill); `cn()` (clsx + tailwind-merge) in `utils/cn`.
 
-## 6. Cross-cutting invariants (both tiers)
+## 6. Client building blocks — features, admin resource engine, types
+
+### 6.1 `src/features/` — feature components
+
+| File                                        | Exports                                      | Behavior                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `features/appearance/AppearanceControl.tsx` | `AppearanceControl()`                        | Theme `<select>` (dark/light/system) bound to `window.iphonebookingAppearance` via `useSyncExternalStore`; i18n labels through `t()`, `SunMoon` icon, `useId()` for the visually-hidden label. Backing store is `public/appearance.js` (§7.2).                                                                                                                                                                         |
+| `features/home/HomeHero.tsx`                | default `HomeHero({ title?, body?, href? })` | Campaign hero section (`aria-labelledby`), i18n defaults (`heroTitle`/`heroText`), primary `ButtonLink` → `href ?? '/store'`, secondary `ArrowLink` → `/compare`; imports `home-hero.css`.                                                                                                                                                                                                                             |
+| `features/home/QuickConfigure.tsx`          | default `QuickConfigure({ product })`        | Variant configurator: auto-selects the first in-stock variant, dedupes colors (`[...new Set(variants.map(v => v.color))]`), storage options per color, availability = any `stock.available > 0`; price via `money()` (client never computes — §10.1); captions **Pre-booking available / In stock / Currently unavailable**; `add(product, variant)` → zustand shop store + `added` flag; CTA `disabled={!available}`. |
+| `features/pwa/MobileApp.tsx`                | `InstallApp()`, `MobileNavigation()`         | `InstallApp`: intercepts `beforeinstallprompt` (prevents default, stores the event), clears on `appinstalled`; self-hides when `display-mode: standalone` or iOS `navigator.standalone`; help dialog when no prompt arrives. `MobileNavigation`: bottom `NavLink` bar — Home `/`, Shop `/store`, Care `/repair`, Account `/account` — returning `null` on `/products/*`, `/checkout`, `/cart`, `/confirmation`.        |
+
+### 6.2 Admin resource engine (`src/pages/admin/resource-*.ts`)
+
+| File                  | Exports                                                     | Role                                                                                                                                                                                                                                                                                                                              |
+| --------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `resource-types.ts`   | `Field`, `Action`, `Row`, `Resource`, `getValue(row, path)` | Contracts for the generic admin table: `Field` types `text \| number \| textarea \| json \| checkbox`; `Action` = `POST`/`PATCH` + `fields` + `permission` (+ optional `initial`, `help`); `Resource` = `title`, `description`, `permission`, `columns` (`money?`, `status?` flags). `getValue` walks dot-paths (`a.b.c`) safely. |
+| `resource-actions.ts` | `actionsFor(resource, row)`                                 | Maps `(resource, row)` → the row-level `Action[]` declared for that resource (label, path, method, form fields, required permission).                                                                                                                                                                                             |
+| `resource-create.ts`  | `createAction(resource)`                                    | The resource's create-dialog `Action` (POST path + form fields), if one is defined.                                                                                                                                                                                                                                               |
+| `resources.ts`        | `resources` registry + re-exports                           | **113-resource** `Record<string, Resource>` — single source of truth for titles/permissions/columns, consumed by `ResourcePage` and `Admin.tsx`.                                                                                                                                                                                  |
+
+### 6.3 `src/services/types.ts` — client-side contracts
+
+14 interfaces mirroring API payloads: `Variant`, `Category`, `Product`, `Store`, `User`,
+`ContentPage`, `History`, `Payment`, `Order`, `Repair`, `TradeIn`, `Device`, `Notification`,
+`Ticket`. TypeScript convenience only — runtime truth stays with zod validation on the server.
+
+### 6.4 Utilities & styles
+
+- `src/utils/cn.ts` — `cn(...inputs)` = `twMerge(clsx(inputs))`.
+- `src/styles/` — `tokens.css`, `storefront.css`, `luxe.css`, `pages.css`, `admin.css`,
+  `appearance.css`, `tailwind.css` (7 stylesheets, all imported by `main.tsx` — §5.1).
+
+## 7. PWA & public assets (`public/`)
+
+### 7.1 `public/sw.js` (9 lines — service worker)
+
+- `CACHE = 'iphonebooking-public-v4'` — **only** same-origin public static assets are cached;
+  account pages and API responses are network-only (file header comment).
+- `install` → precaches `/offline.html`, `/icon.svg`, `/appearance.js`; `self.skipWaiting()`.
+- `activate` → deletes every other `iphonebooking-public-*` cache; `self.clients.claim()`.
+- `fetch` → ignores cross-origin, non-GET, and `/api/*` requests; document navigations try the
+  network first and fall back to the cached `/offline.html`.
+
+### 7.2 `public/appearance.js` (52 lines — no-module IIFE)
+
+Theme store available before React boots (no flash of wrong theme):
+
+- localStorage key `iphonebooking-appearance`; `valid()` restricts values to
+  `light | dark | system`; `read()` tolerates missing/garbage values.
+- `apply()` resolves `system` through `matchMedia('(prefers-color-scheme: dark)')`, then sets
+  `documentElement.dataset.theme`, `style.colorScheme`, the background color (`#071014` dark /
+  `#faf9f6` light), and `<meta name="theme-color">`; notifies all listeners.
+- Exposes `Object.freeze(window.iphonebookingAppearance)` = `{ getSnapshot, subscribe,
+setPreference }` — exactly the `useSyncExternalStore` contract `AppearanceControl` consumes
+  (§6.1).
+- Re-applies on OS theme change (`media 'change'` listener) and cross-tab `storage` events;
+  `setPreference` persists with try/catch (private browsing may deny storage).
+
+### 7.3 Other assets
+
+`manifest.webmanifest` (install metadata), `offline.html` (navigation fallback, precached),
+`icon-192.png` / `icon-512.png` / `icon.svg`, `images/`. `main.tsx` registers `/sw.js` in
+production only (§5.1).
+
+## 8. Seed, scripts & tests
+
+### 8.1 `prisma/seed.ts` (376 lines)
+
+Guard first — throws unless `NODE_ENV !== 'production' && SEED_DEVELOPMENT === 'true'`. Then only
+idempotent `upsert`s with `update: {}` (never overwrites existing rows):
+
+| Step           | Data                                                                                                                                                                                                                                                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Categories     | 8 Apple-family categories (iphone, mac, ipad, watch, airpods, vision, home, accessories)                                                                                                                                                                                                                              |
+| Store          | `kathmandu-studio` sample store                                                                                                                                                                                                                                                                                       |
+| Products       | `products` array loop → `product.upsert` → per color × storage `productVariant.upsert` (sku `` `${slug}-${ci}-${si}` ``, paisa price `(base + storageIndex × 20000/10000) × 100`) → `inventoryStock` create-if-missing → `inventoryLedger.create` (`type: 'DEVELOPMENT_SEED'`, `quantity: 8`, `reference: 'seed-v2'`) |
+| Trade-in rules | per `[model, baseValue]` → `tradeInRule.upsert`                                                                                                                                                                                                                                                                       |
+| CMS pages      | `pages` array → published `cMSPage.upsert`s                                                                                                                                                                                                                                                                           |
+| Roles          | 9 roles: Super Admin (`['*']`), Content Manager, Technician, Repair Manager, Quality Inspector, Procurement Officer, Procurement Approver, Finance, Inventory Manager                                                                                                                                                 |
+| Admin user     | only when `ADMIN_PASSWORD` is set: `admin@iphonebooking.local` (override `ADMIN_EMAIL`), bcrypt cost 12, Super Admin role                                                                                                                                                                                             |
+
+Closes with `$disconnect()` and the honesty log: _"Development catalog seeded. No customer orders
+or dashboard metrics were fabricated."_ — run via `npm run db:seed` (`tsx prisma/seed.ts`).
+
+### 8.2 `scripts/`
+
+- `build-client.mjs` — pins `process.env.NODE_ENV = 'production'` **before** importing vite (a
+  local API `.env` must not produce dev client assets in release builds), then `build()`.
+- `check-pwa.mjs` — Playwright Chromium (`channel: 'chrome'`) production PWA check against
+  `PWA_TEST_ORIGIN` (default `http://localhost:4101`); throws unless the origin host is
+  `localhost`/`127.0.0.1`.
+
+### 8.3 `tests/` (vitest + Playwright)
+
+| Kind        | Files                       | Covers                                                       |
+| ----------- | --------------------------- | ------------------------------------------------------------ |
+| Unit        | `shop-sync.test.ts`         | anonymous selection migration                                |
+| Unit        | `valuation.test.ts`         | trade-in valuation in integer paisa                          |
+| Integration | `device-os.test.ts`         | device OS domain integrity                                   |
+| Integration | `lifecycle.test.ts`         | connected device lifecycle & authorization                   |
+| Integration | `repair-assignment.test.ts` | verified repair technician assignment (mocked deps)          |
+| E2E         | `e2e/*.spec.ts` (5)         | account-sync, appearance, device-os, mobile-home, storefront |
+
+Run: `npm test` (vitest run), `npm run test:e2e` (playwright), `npm run test:pwa` (§8.2).
+
+### 8.4 `package.json` scripts
+
+| Script                                   | Command / behavior                                                                                       |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `dev`                                    | `concurrently -k` → `tsx watch server/index.ts` + `vite --host 0.0.0.0`                                  |
+| `dev:client` / `dev:server`              | vite only / `tsx watch server/index.ts`                                                                  |
+| `build`                                  | `tsc --noEmit` → `build:client` → `tsc -p tsconfig.server.json`                                          |
+| `typecheck`                              | `tsc --noEmit`                                                                                           |
+| `test` / `test:e2e` / `test:pwa`         | `vitest run` / `playwright test` / `node scripts/check-pwa.mjs`                                          |
+| `start` / `start:worker`                 | `node dist-server/index.js` / `node dist-server/worker.js`                                               |
+| `worker`                                 | `tsx server/worker.ts` (foreground worker, §1.3)                                                         |
+| `db:generate` / `db:migrate` / `db:seed` | `prisma generate` / `prisma migrate deploy` / `tsx prisma/seed.ts`                                       |
+| `format` / `lint`                        | prettier `--write` / `--check` over `src server scripts prisma/seed.ts tests *.ts *.json docs README.md` |
+| `check`                                  | `lint && typecheck && test && build` — the full local gate                                               |
+
+## 9. API error-code catalog (77 codes)
+
+Every distinct `AppError(status, code, …)` string across `server/`, plus the codes emitted by the
+fixed guards (`requireUser`, `permit`, `owned`, CSRF middleware, error mapper — §1.1/§1.2). Wire
+shape: `{ success: false, error: { code, message, requestId } }`.
+
+**400 Bad Request** — `INVALID_JSON`
+
+**401 Unauthorized** — `INVALID_CREDENTIALS`, `INVALID_PASSWORD`, `SIGN_IN_REQUIRED`
+
+**403 Forbidden** — `ACCESS_DENIED`, `CSRF_REJECTED`, `ORIGIN_REJECTED`, `PRIVILEGE_ESCALATION`
+
+**404 Not Found** — `NOT_FOUND`
+
+**409 Conflict (49)** — `ACCOUNT_CHANGED`, `ACCOUNT_EXISTS`, `ALLOCATION_INVALID`,
+`ALLOCATION_MISMATCH`, `ALREADY_ALLOCATED`, `ALREADY_ASSIGNED`, `ALREADY_INSPECTED`,
+`ALREADY_SUBMITTED`, `ASSIGNMENT_CHANGED`, `ASSIGNMENT_STAGE_LOCKED`, `CONTENT_CHANGED`,
+`CREDIT_EXCEEDS_ORDER`, `DEVICE_LINK_REQUIRED`, `DUPLICATE_RECORD`,
+`INDEPENDENT_APPROVER_REQUIRED`, `INDEPENDENT_QC_REQUIRED`, `INVALID_TRANSITION`,
+`LEGACY_ASSIGNMENT_REVIEW_REQUIRED`, `LOCATION_REQUIRED`, `NEGATIVE_STOCK`,
+`ORDER_ALREADY_DECIDED`, `ORDER_CLOSED`, `OVERPAYMENT`, `OWNERSHIP_REQUIRED`, `PART_COST_REQUIRED`,
+`PART_OUT_OF_STOCK`, `PAYMENT_REQUIRED`, `PRODUCT_OUT_OF_STOCK`, `PRODUCT_UNAVAILABLE`,
+`PROTECTED_ROLE`, `PURCHASE_NOT_APPROVED`, `PURCHASE_QUANTITY_MISMATCH`, `QC_REQUIRED`,
+`QC_STAGE_REQUIRED`, `QUOTE_ALREADY_DECIDED`, `QUOTE_NOT_ALLOWED`, `QUOTE_NOT_READY`,
+`RECEIPT_ALREADY_INSPECTED`, `RECEIPT_REQUIRED`, `REFUND_UNAVAILABLE`, `REPAIR_NOT_APPROVED`,
+`RESERVATION_EXPIRED`, `RETRY_TRANSACTION`, `SELF_ROLE_CHANGE`, `SHOP_STATE_CHANGED`,
+`STATUS_CHANGED`, `TRADE_IN_NOT_APPROVED`, `UNIT_LOCATION_MISMATCH`, `VARIANT_MISMATCH`
+
+**422 Unprocessable (13)** — `DUPLICATE_ITEM`, `DUPLICATE_LINE`, `INCOMPLETE_QC`,
+`INVALID_CONFIGURATION`, `NAME_REQUIRED`, `ORDER_VALUE_LIMIT`, `PAST_APPOINTMENT`, `QUANTITY_LIMIT`,
+`SAVED_ITEM_UNAVAILABLE`, `STOCK_LOCATION_REQUIRED`, `TECHNICIAN_NOT_ELIGIBLE`, `VALIDATION_ERROR`,
+`VALUE_LIMIT`
+
+**429 Rate limited** — `AUTH_RATE_LIMITED`, `RATE_LIMITED`
+
+**5xx** — `INTERNAL_ERROR` (500), `WORKFLOW_NOT_IMPLEMENTED` (501 — legacy scaffolds §3.8),
+`PAYMENT_NOT_CONFIGURED` + `PROVIDER_NOT_CONFIGURED` (503 — fail-closed integrations, §10.3)
+
+Client rule: branch on `code`, never on the message (messages are not localized);
+`RETRY_TRANSACTION`/`DUPLICATE_RECORD` are safe to retry because writes carry idempotency keys
+(§10.2), everything else 5xx fails closed.
+
+`Status` (status pill); `cn()` (clsx + tailwind-merge) in `utils/cn`.
+
+## 10. Cross-cutting invariants (both tiers)
 
 1. **Money is integer paisa end-to-end**; the client never computes totals — the server derives
    `total`/`dueNow`, the client only formats (`money()`).
