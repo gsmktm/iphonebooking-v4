@@ -1,0 +1,9 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@theme {
+  --color-gold: #dec28d;
+  --color-midnight: #071014;
+  --color-panel: #101b20;
+  --color-soft: #b9c3c7;
+}

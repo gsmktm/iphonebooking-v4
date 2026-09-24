@@ -56,6 +56,7 @@ export interface ContentPage {
   title: string;
   description: string;
   published: boolean;
+  updatedAt: string;
   blocks: { type: string; title: string; body: string; href?: string }[];
 }
 export interface History {

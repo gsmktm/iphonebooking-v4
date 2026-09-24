@@ -29,7 +29,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.5rem;
+}
+.header-main .brand {
+  font-size: clamp(0.875rem, 4.6vw, 1.1rem);
 }
 .brand {
   display: inline-flex;
@@ -121,104 +124,6 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
-}
-.hero {
-  position: relative;
-  background: #f2f1ed;
-  isolation: isolate;
-  overflow: hidden;
-}
-.hero-image {
-  position: absolute;
-  z-index: -1;
-  inset: auto 0 0;
-  width: 100%;
-  height: 58%;
-  object-fit: cover;
-  object-position: 80% 40%;
-}
-.hero-inner {
-  position: relative;
-  min-height: 730px;
-  display: flex;
-  align-items: flex-start;
-  padding-top: 2.5rem;
-  padding-bottom: 3.5rem;
-}
-.hero-copy {
-  width: 100%;
-  position: relative;
-  z-index: 1;
-}
-.hero-copy h1 {
-  font-size: clamp(3rem, 7vw, 5rem);
-  white-space: pre-line;
-  font-weight: 570;
-  line-height: 1.04;
-  margin: 1.5rem 0 1rem;
-  letter-spacing: -0.065em;
-}
-.hero-copy p {
-  max-width: 280px;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: #737269;
-}
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 1.6rem;
-}
-.hero-actions .arrow-link {
-  font-size: 0.7rem;
-}
-.hero-note {
-  display: none;
-  align-items: center;
-  gap: 0.7rem;
-  font-size: 0.55rem;
-  letter-spacing: 0.13em;
-  color: #777a72;
-}
-.small-line {
-  height: 1px;
-  width: 20px;
-  background: #999b94;
-}
-.hero-bottom {
-  position: absolute;
-  bottom: 1.25rem;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.54rem;
-  letter-spacing: 0.1em;
-  color: #5c6058;
-}
-.hero-bottom > span:first-child {
-  display: none;
-}
-.hero-bottom > span:nth-child(2) {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-}
-.slide-line {
-  width: 42px;
-  height: 1px;
-  background: #a1a195;
-}
-.hero-bottom a {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.65rem;
 }
 .trust-strip {
   border-bottom: 1px solid var(--line);
@@ -823,36 +728,6 @@
   min-height: 35px;
 }
 @media (min-width: 640px) {
-  .hero-inner {
-    min-height: 610px;
-    align-items: center;
-    padding-block: 4rem;
-  }
-  .hero-image {
-    inset: 0;
-    height: 100%;
-    object-position: center;
-    object-fit: cover;
-  }
-  .hero-copy {
-    max-width: 49%;
-  }
-  .hero-copy h1 {
-    font-size: 3.2rem;
-  }
-  .hero-copy p {
-    max-width: 270px;
-  }
-  .hero-actions {
-    gap: 0.65rem;
-  }
-  .hero-note {
-    display: flex;
-    margin-top: 3rem;
-  }
-  .hero-bottom > span:first-child {
-    display: block;
-  }
   .trust-strip > .container {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -961,36 +836,6 @@
   .header-utilities .icon-button {
     width: 33px;
     height: 44px;
-  }
-  .hero-inner {
-    min-height: 620px;
-  }
-  .hero-image {
-    object-fit: cover;
-    object-position: center 47%;
-  }
-  .hero-copy h1 {
-    font-size: 4.5rem;
-  }
-  .hero-copy p {
-    font-size: 0.95rem;
-    max-width: 335px;
-  }
-  .hero-actions {
-    gap: 1.5rem;
-  }
-  .hero-actions .button {
-    font-size: 0.75rem;
-    padding: 0.9rem 1.3rem;
-  }
-  .hero-actions .arrow-link {
-    font-size: 0.7rem;
-  }
-  .hero-note {
-    margin-top: 3.5rem;
-  }
-  .hero-bottom {
-    bottom: 1.7rem;
   }
   .trust-strip > .container {
     padding-block: 1.7rem;
@@ -1116,28 +961,6 @@
     gap: 1.65rem;
     font-size: 0.74rem;
   }
-  .hero-inner {
-    min-height: 655px;
-  }
-  .hero-copy h1 {
-    font-size: 5rem;
-  }
-  .hero-image {
-    object-fit: cover;
-    object-position: center 45%;
-  }
-  .hero-copy {
-    padding-bottom: 1rem;
-  }
-  .hero-copy p {
-    font-size: 1rem;
-  }
-  .hero-actions .button {
-    font-size: 0.8rem;
-  }
-  .hero-note {
-    font-size: 0.57rem;
-  }
   .product-card-info h3 {
     font-size: 1.05rem;
   }
@@ -1164,7 +987,6 @@
 .dev-notice {
   color: #58624f;
 }
-.hero-copy p,
 .section-heading p,
 .why-grid p,
 .newsletter p,
@@ -1226,9 +1048,6 @@
   }
   .header-utilities .icon-button {
     width: 38px;
-  }
-  .hero-copy p {
-    font-size: 1rem;
   }
   .footer-grid > div > a:not(.brand) {
     min-height: 30px;

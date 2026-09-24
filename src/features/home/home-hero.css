@@ -1,0 +1,119 @@
+.campaign-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #faf5eb;
+  color: #18252c;
+}
+.campaign-inner {
+  position: relative;
+  z-index: 1;
+  padding-block: 3rem 2.5rem;
+}
+.campaign-copy {
+  max-width: 38rem;
+}
+.campaign-copy .eyebrow {
+  color: #364752;
+  gap: 0.65rem;
+  font-size: 0.7rem;
+}
+.campaign-copy h1 {
+  margin: 1.25rem 0;
+  font-size: clamp(2.5rem, 7vw, 3.5rem);
+  line-height: 1.08;
+  font-weight: 570;
+  letter-spacing: -0.055em;
+  white-space: pre-line;
+  overflow-wrap: break-word;
+}
+.campaign-copy p {
+  max-width: 32rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #34434c;
+}
+.campaign-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.75rem;
+}
+.campaign-actions .button {
+  background: #18252c;
+  border-color: #18252c;
+  color: #fff;
+  min-height: 3rem;
+  font-size: 0.85rem;
+}
+.campaign-actions .button:hover {
+  background: #304550;
+}
+.campaign-actions .arrow-link {
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+  color: #18252c;
+}
+.campaign-signoff {
+  display: block;
+  margin-top: 2rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  color: #34434c;
+}
+.campaign-art {
+  display: block;
+  width: 100%;
+  height: clamp(17rem, 65vw, 25rem);
+  object-fit: cover;
+  object-position: 78% center;
+}
+@media (min-width: 640px) {
+  .campaign-inner {
+    padding-block: 3.5rem;
+  }
+  .campaign-art {
+    height: 24rem;
+    object-position: right center;
+  }
+}
+@media (min-width: 1024px) {
+  .campaign-inner {
+    min-height: clamp(34rem, 43vw, 52rem);
+    display: flex;
+    align-items: center;
+    padding-block: 4rem;
+  }
+  .campaign-copy {
+    width: 42%;
+    max-width: 35rem;
+  }
+  .campaign-copy h1 {
+    font-size: clamp(2.5rem, 3.6vw, 4.25rem);
+  }
+  .campaign-copy p {
+    max-width: 28rem;
+  }
+  .campaign-art {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    object-position: center;
+    z-index: -2;
+  }
+  .campaign-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      90deg,
+      rgba(250, 245, 235, 0.55),
+      rgba(250, 245, 235, 0.15) 37%,
+      transparent 49%
+    );
+    pointer-events: none;
+  }
+}

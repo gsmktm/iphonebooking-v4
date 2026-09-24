@@ -1,12 +1,12 @@
 import { useEffect, useRef, useId, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, ArrowRight, X, Mountain, RotateCcw, PackageOpen } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, X, Mountain, Gem, RotateCcw, PackageOpen } from 'lucide-react';
 import { ApiError } from '../services/api';
-export function Brand() {
+export function Brand({ diamond = false }: { diamond?: boolean }) {
   return (
     <Link className="brand" to="/" aria-label="iPhoneBooking home">
       <span className="brand-mark">
-        <Mountain size={25} strokeWidth={1.5} />
+        {diamond ? <Gem size={29} strokeWidth={1.3} /> : <Mountain size={25} strokeWidth={1.5} />}
       </span>
       <span>
         iPhone<span className="brand-light">Booking</span>

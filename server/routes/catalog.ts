@@ -46,7 +46,8 @@ catalog.get('/products', async (req, res) => {
       },
     },
     include,
-    orderBy: q.sort === 'newest' ? { createdAt: 'desc' } : { featured: 'desc' },
+    orderBy:
+      q.sort === 'newest' ? [{ createdAt: 'desc' }] : [{ featured: 'desc' }, { createdAt: 'desc' }],
     take: 100,
   });
   if (q.sort?.startsWith('price'))

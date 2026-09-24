@@ -2,17 +2,15 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowUpRight,
-  ArrowRight,
   ShieldCheck,
-  Truck,
-  Headphones,
   RefreshCw,
-  MoveUpRight,
   Wrench,
-  Mountain,
-  Check,
+  MapPin,
+  Smartphone,
+  PackageCheck,
+  Gem,
 } from 'lucide-react';
-import { api } from '../services/api';
+import { api, money } from '../services/api';
 import type { Product, Category, ContentPage } from '../services/types';
 import { ProductCard } from '../components/ProductCard';
 import {
@@ -22,14 +20,17 @@ import {
   ProductVisual,
   Loading,
   ErrorNotice,
+  Empty,
 } from '../components/ui';
-import { t } from '../app/i18n';
+import HomeHero from '../features/home/HomeHero';
+import QuickConfigure from '../features/home/QuickConfigure';
+import WhatsNew from '../features/releases/WhatsNew';
 export default function Home() {
   const products = useQuery({
     queryKey: ['products', 'home'],
     queryFn: () => api<Product[]>('/products'),
   });
-  const { data: categories } = useQuery({
+  const categories = useQuery({
     queryKey: ['categories'],
     queryFn: () => api<Category[]>('/categories'),
   });
@@ -38,216 +39,195 @@ export default function Home() {
     queryFn: () => api<ContentPage>('/content/home'),
   });
   const hero = content?.blocks.find((b) => b.type === 'hero');
+  const featured = products.data?.filter((p) => p.featured).slice(0, 4) ?? [];
+  const configurable = featured.find((p) => p.category.slug === 'iphone' && p.variants.length);
+  const value = products.data
+    ?.filter((p) => p.category.slug === 'iphone')
+    .flatMap((p) =>
+      p.variants
+        .filter((v) => v.stock.some((s) => s.available > 0))
+        .map((v) => ({ product: p, variant: v })),
+    )
+    .sort((a, b) => a.variant.price - b.variant.price)[0];
   return (
-    <>
-      <section className="hero">
-        <img
-          src="/images/hero.webp"
-          className="hero-image"
-          alt="Desert titanium smartphones photographed in soft studio light"
-          fetchPriority="high"
-          width="1536"
-          height="1024"
-        />
-        <div className="container hero-inner">
-          <div className="hero-copy">
-            <span className="eyebrow">
-              <span className="red-dot" /> A NEW PERSPECTIVE
-            </span>
-            <h1>{hero?.title ?? t('heroTitle')}</h1>
-            <p>{hero?.body ?? t('heroText')}</p>
-            <div className="hero-actions">
-              <ButtonLink to={hero?.href ?? '/iphone'}>{t('heroCta')}</ButtonLink>
-              <ArrowLink to="/compare">Find your perfect match</ArrowLink>
-            </div>
-            <div className="hero-note">
-              <span className="small-line" /> PRO IN EVERY WAY. YOURS IN EVERY DETAIL.
-            </div>
-          </div>
-          <div className="hero-bottom">
-            <span>DESIGNED FOR POSSIBILITY.</span>
-            <span>
-              <span className="slide-line" /> A CLOSER LOOK
-            </span>
-            <Link to="/store">
-              Explore the collection <ArrowRight size={15} />
-            </Link>
-          </div>
-        </div>
-      </section>
-      <div className="trust-strip">
-        <div className="container">
-          {[
-            [ShieldCheck, 'Genuine products', 'Confidence, included.'],
-            [Truck, 'Across Nepal', 'Closer than you think.'],
-            [RefreshCw, 'Easy upgrades', 'More from your old device.'],
-            [Headphones, 'Real people. Real care.', 'Here, when you need us.'],
-          ].map(([Icon, title, body]) => {
-            const I = Icon as typeof ShieldCheck;
-            return (
-              <div key={String(title)}>
-                <I size={22} strokeWidth={1.3} />
-                <span>
-                  <strong>{String(title)}</strong>
-                  <small>{String(body)}</small>
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      <section className="container ecosystem-section">
+    <div className="luxe-content">
+      <HomeHero title={hero?.title} body={hero?.body} href={hero?.href} />
+      <WhatsNew products={products.data} />
+      <section className="container home-section">
         <div className="compact-heading">
-          <h2>A world of possibilities.</h2>
-          <ArrowLink to="/store">Shop all products</ArrowLink>
+          <h2 className="text-balance">Shop what you love.</h2>
+          <ArrowLink to="/store">All categories</ArrowLink>
         </div>
-        <div className="category-grid">
-          {categories?.map((c) => (
-            <Link to={`/${c.slug}`} className="category-tile" key={c.id}>
-              <ProductVisual image={c.image} name={c.name} />
-              <span>
-                {c.name}
-                <ArrowUpRight size={13} />
-              </span>
-            </Link>
-          ))}
-        </div>
+        {categories.isLoading ? (
+          <Loading />
+        ) : categories.error ? (
+          <ErrorNotice error={categories.error} />
+        ) : (
+          <div className="category-grid">
+            {categories.data?.map((c) => (
+              <Link to={`/${c.slug}`} className="category-tile" key={c.id}>
+                <ProductVisual image={c.image} name={c.name} />
+                <span>
+                  {c.name}
+                  <ArrowUpRight size={13} />
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
-      <section className="container section products-section">
+      <section className="container home-section products-section">
         <SectionHeading
-          eyebrow="GOOD THINGS START HERE"
-          title={t('collectionTitle')}
-          description={t('collectionText')}
-          action={<ArrowLink to="/store">Explore the collection</ArrowLink>}
+          title="Your next favourite starts here."
+          action={<ArrowLink to="/store">View all products</ArrowLink>}
         />
         {products.isLoading ? (
           <Loading />
         ) : products.error ? (
           <ErrorNotice error={products.error} retry={() => void products.refetch()} />
+        ) : !featured.length ? (
+          <Empty
+            title="The collection is being updated."
+            link="/store"
+            action="Explore the store"
+          />
         ) : (
           <div className="product-grid">
-            {products.data
-              ?.filter((p) => p.featured)
-              .slice(0, 4)
-              .map((p) => (
-                <ProductCard product={p} key={p.id} />
-              ))}
+            {featured.map((p) => (
+              <ProductCard product={p} key={p.id} />
+            ))}
           </div>
         )}
       </section>
-      <section className="container services-grid">
-        <article className="trade-promo">
-          <span className="eyebrow">
-            <RefreshCw size={15} /> THE NEXT CHAPTER
-          </span>
-          <h2>
-            Goodbye, old.
+      {configurable && (
+        <div className="container home-section">
+          <QuickConfigure key={configurable.id} product={configurable} />
+        </div>
+      )}
+      <section className="container home-section grid gap-4 lg:grid-cols-2">
+        <article className="luxe-panel service-panel">
+          <RefreshCw size={28} />
+          <span className="eyebrow">YOUR NEXT CHAPTER</span>
+          <h2 className="text-balance">
+            Your old device.
             <br />
-            Hello, possibilities.
+            New possibilities.
           </h2>
-          <p>
-            Your current device could be the start
-            <br />
-            of something new. Trade in. Step up.
+          <p className="text-pretty">
+            Get an estimate, review your inspection offer, and put your device toward your next
+            upgrade.
           </p>
-          <ButtonLink to="/trade-in">Discover your trade-in value</ButtonLink>
-          <div className="trade-art">
-            <ProductVisual image="phone" name="Devices ready for their next chapter" />
-            <span>
-              <RefreshCw size={27} strokeWidth={1.2} />
-            </span>
-          </div>
-          <small>Better for your pocket. Better for the planet.</small>
+          <ButtonLink to="/trade-in">Check trade-in value</ButtonLink>
         </article>
-        <article className="repair-promo">
-          <span className="eyebrow">
-            <Wrench size={15} /> CARE THAT GOES FURTHER
-          </span>
-          <h2>
-            Back to doing
-            <br />
-            what you love.
-          </h2>
-          <p>
-            A little care. A lot more life.
-            <br />
-            Expert help for the devices you rely on.
-          </p>
-          <ArrowLink to="/repair">Let’s get it fixed</ArrowLink>
-          <div className="repair-art">
-            <Wrench size={120} strokeWidth={0.7} />
-            <div className="repair-check">
-              <Check size={22} />
+        <article className="luxe-panel service-panel">
+          <span className="eyebrow">A CLEARER CHOICE</span>
+          <h2 className="text-balance">A good place to start.</h2>
+          {value ? (
+            <div className="value-product grid grid-cols-2 items-center gap-4">
+              <ProductVisual image={value.product.image} name={value.product.name} />
+              <div>
+                <h3>{value.product.name}</h3>
+                <p>
+                  {value.variant.storage} · {value.variant.color}
+                </p>
+                <strong className="value-price tabular-nums">{money(value.variant.price)}</strong>
+                <ArrowLink to={`/products/${value.product.slug}`}>View configuration</ArrowLink>
+              </div>
             </div>
-          </div>
-          <div className="repair-promo-tags">
-            <span>Clear quotes</span>
-            <span>Careful diagnostics</span>
-            <span>Personal support</span>
-          </div>
+          ) : (
+            <>
+              <p>Compare configurations and current availability.</p>
+              <ButtonLink to="/compare">Compare devices</ButtonLink>
+            </>
+          )}
         </article>
       </section>
-      <section className="container section why-section">
-        <SectionHeading
-          eyebrow="THE IPHONEBOOKING DIFFERENCE"
-          title="More than a purchase. A connection."
-          description="From your first unboxing to your next upgrade. We’re with you."
-        />
-        <div className="why-grid">
+      <section className="container home-section grid gap-4 md:grid-cols-2">
+        {[
+          {
+            Icon: Wrench,
+            title: 'Expert care. More life.',
+            body: 'Book a repair, approve your quote, and follow every service update.',
+            to: '/repair',
+            cta: 'Book a repair',
+          },
+          {
+            Icon: ShieldCheck,
+            title: 'Your device. Its whole story.',
+            body: 'Purchases, masked serials, warranty and service history, together in My Devices.',
+            to: '/account/devices',
+            cta: 'Open My Devices',
+          },
+        ].map(({ Icon, title, body, to, cta }) => (
+          <article className="luxe-panel service-panel compact-service" key={to}>
+            <Icon size={30} />
+            <h2 className="text-balance">{title}</h2>
+            <p className="text-pretty">{body}</p>
+            <ArrowLink to={to}>{cta}</ArrowLink>
+          </article>
+        ))}
+      </section>
+      <section className="container home-section">
+        <SectionHeading title="One account. Your entire Apple world." />
+        <div className="ecosystem-links grid grid-cols-2 gap-3 md:grid-cols-5">
           {[
-            [
-              ShieldCheck,
-              'Peace of mind. Built in.',
-              'Clear product details, transparent pricing, and warranty information that makes sense.',
-            ],
-            [
-              RefreshCw,
-              'Your devices. Connected.',
-              'Orders, warranty, repairs, and upgrades. One account that grows with you.',
-            ],
-            [
-              Mountain,
-              'Global thinking. Local heart.',
-              'An Apple ecosystem experience, thoughtfully built for life in Nepal.',
-            ],
-          ].map(([Icon, title, body]) => {
-            const I = Icon as typeof Mountain;
-            return (
-              <article key={String(title)}>
-                <I size={28} strokeWidth={1.2} />
-                <h3>{String(title)}</h3>
-                <p>{String(body)}</p>
-              </article>
-            );
-          })}
+            { Icon: Gem, label: 'Discover', note: 'Find your next device', to: '/store' },
+            { Icon: RefreshCw, label: 'Upgrade', note: 'Explore trade-in', to: '/trade-in' },
+            { Icon: Wrench, label: 'Care', note: 'Track your repair', to: '/account/repairs' },
+            { Icon: PackageCheck, label: 'Track', note: 'Follow your order', to: '/track' },
+            { Icon: Smartphone, label: 'Own', note: 'Manage your devices', to: '/account/devices' },
+          ].map(({ Icon, label, note, to }) => (
+            <Link className="luxe-panel" key={label} to={to}>
+              <Icon size={25} />
+              <strong>{label}</strong>
+              <small>{note}</small>
+            </Link>
+          ))}
         </div>
       </section>
       <section className="himalayan-story">
-        <div className="mountain-lines" aria-hidden="true">
-          <svg viewBox="0 0 1400 450" preserveAspectRatio="none">
-            <path d="M0 450 180 290 260 330 480 120 630 280 870 35 1060 280 1190 195 1400 450Z" />
-            <path d="m480 120-22 98 64-35 45 93m303-241-40 141 64-60 55 94 40-32" />
-          </svg>
-        </div>
         <div className="container story-content">
-          <span className="eyebrow">ROOTED HERE. REACHING EVERYWHERE.</span>
-          <h2>
-            From the Himalayas.
+          <span className="eyebrow">FROM 8848. FOR NEPAL.</span>
+          <h2 className="text-balance">
+            Same roots.
             <br />
-            For your world.
+            Higher possibilities.
           </h2>
-          <p>
-            A higher standard of technology.
-            <br />A more human way to experience it.
-          </p>
+          <p>Technology moves forward. Connection stays.</p>
           <ArrowLink to="/stores" light>
-            Meet iPhoneBooking
+            Find your nearest store
           </ArrowLink>
-          <span className="altitude">
-            8848 <small>METERS OF INSPIRATION</small>
-          </span>
         </div>
       </section>
-    </>
+      <section className="container home-section grid gap-4 md:grid-cols-2">
+        <article className="luxe-panel service-panel">
+          <MapPin size={28} />
+          <h2 className="text-balance">
+            Online convenience.
+            <br />
+            Local connection.
+          </h2>
+          <p>Explore store locations, opening hours, pickup and available services.</p>
+          <ButtonLink to="/stores">Find a store</ButtonLink>
+        </article>
+        <article className="luxe-panel service-panel">
+          <h2 className="text-balance">
+            A little guidance.
+            <br />A better decision.
+          </h2>
+          <div className="guide-links">
+            {[
+              ['Buying & booking', '/support'],
+              ['Compare your options', '/compare'],
+              ['Warranty & care', '/policies/warranty'],
+            ].map(([label, to]) => (
+              <ArrowLink key={to} to={to}>
+                {label}
+              </ArrowLink>
+            ))}
+          </div>
+        </article>
+      </section>
+    </div>
   );
 }

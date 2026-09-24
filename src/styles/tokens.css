@@ -1,7 +1,7 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   color: #232522;
-  background: #fff;
+  background: var(--surface);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -247,8 +247,8 @@ summary:focus-visible {
 }
 .notice {
   padding: 1rem 1.25rem;
-  background: #f4f4ee;
-  border: 1px solid #e3e4da;
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: 8px;
   font-size: 0.85rem;
   margin: 1rem 0;
@@ -350,7 +350,7 @@ summary:focus-visible {
   top: -70px;
   left: 20px;
   z-index: 1000;
-  background: white;
+  background: var(--surface);
   padding: 12px;
 }
 .skip-link:focus {
@@ -400,7 +400,7 @@ textarea {
   border-radius: 6px;
   padding: 0.8rem 0.9rem;
   min-height: 46px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   width: 100%;
   font-size: 0.9rem;

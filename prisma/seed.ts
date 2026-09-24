@@ -31,7 +31,20 @@ const store = await db.store.upsert({
     services: ['Pickup', 'Trade-in inspection', 'Repair consultation'],
   },
 });
-const products = [
+type SeedProduct = {
+  slug: string;
+  name: string;
+  category: string;
+  tagline: string;
+  image: string;
+  price: number;
+  badge: string | null;
+  specs: Record<string, string>;
+  colors: string[][];
+  storage: string[];
+  preorder?: boolean;
+};
+const products: SeedProduct[] = [
   {
     slug: 'iphone-16-pro',
     name: 'iPhone 16 Pro',
@@ -54,6 +67,50 @@ const products = [
       ['Black Titanium', '#434342'],
     ],
     storage: ['128GB', '256GB', '512GB'],
+  },
+  {
+    slug: 'iphone-18-pro',
+    name: 'iPhone 18 Pro',
+    category: 'iphone',
+    tagline: 'Pro further.',
+    image: 'phone',
+    price: 189900,
+    badge: 'New',
+    specs: {
+      Chip: 'A20 Pro · vapor-cooled',
+      Camera: '48MP Fusion · variable aperture',
+      Video: '4K 120 fps Dolby Vision',
+      Durability: 'Ceramic Shield 2',
+      Intelligence: 'Neural Accelerators · on-device AI',
+      Material: 'Titanium',
+    },
+    colors: [
+      ['Cosmic Titanium', '#43566b'],
+      ['Titanium Silver', '#c9cbcd'],
+      ['Black Titanium', '#3b3b3d'],
+    ],
+    storage: ['128GB', '256GB', '512GB'],
+  },
+  {
+    slug: 'iphone-duo',
+    name: 'iPhone Duo',
+    category: 'iphone',
+    tagline: 'Hello, hello.',
+    image: 'phone',
+    price: 169900,
+    badge: 'Pre-book',
+    preorder: true,
+    specs: {
+      Status: 'All-new iPhone',
+      'Pre-order': '16 Oct, 5:00 a.m. PT',
+      'First orders': '23 Oct',
+      Silicon: 'Apple silicon',
+    },
+    colors: [
+      ['Ink', '#23252c'],
+      ['Cloud White', '#e8e6e1'],
+    ],
+    storage: ['256GB', '512GB'],
   },
   {
     slug: 'macbook-air',
@@ -116,6 +173,26 @@ const products = [
     },
     colors: [
       ['Jet Black', '#2f3032'],
+      ['Silver', '#c9cbcd'],
+    ],
+    storage: ['42mm', '46mm'],
+  },
+  {
+    slug: 'apple-watch-series-12',
+    name: 'Apple Watch Series 12',
+    category: 'watch',
+    tagline: 'The most accurate heart rate sensing in a wearable.',
+    image: 'watch',
+    price: 69900,
+    badge: 'New',
+    specs: {
+      'Heart rate': 'Industry-leading accuracy',
+      Launch: '2026 model',
+      Care: 'Warranty & expert service included',
+    },
+    colors: [
+      ['Jet Black', '#1c1c1e'],
+      ['Starlight', '#e7e3d9'],
       ['Silver', '#c9cbcd'],
     ],
     storage: ['42mm', '46mm'],
@@ -219,7 +296,7 @@ for (const p of products) {
           storage,
           price,
           deposit: Math.min(price, 1000000),
-          preorder: p.category === 'vision',
+          preorder: p.preorder ?? p.category === 'vision',
         },
       });
       const existing = await db.inventoryStock.findUnique({
@@ -251,9 +328,9 @@ const pages = [
     blocks: [
       {
         type: 'hero',
-        title: 'Great things.\nAhead of you.',
-        body: 'Meet iPhone 16 Pro. A new perspective on everything you do.',
-        href: '/products/iphone-16-pro',
+        title: 'Your Apple world.\nFrom the Himalayas.',
+        body: 'Shop Apple devices, explore trade-ins, and book expert care. One home for your Apple world.',
+        href: '/store',
       },
     ],
   },
@@ -330,6 +407,10 @@ const roles = [
   ['Super Admin', ['*']],
   ['Content Manager', ['content.read', 'content.update', 'product.read']],
   ['Technician', ['repair.read', 'repair.update']],
+  [
+    'Repair Manager',
+    ['repair.read', 'repair.update', 'repair.assign', 'inventory.read', 'device.read'],
+  ],
   [
     'Quality Inspector',
     ['repair.read', 'repair.qc', 'inventory.read', 'inventory.qc', 'device.read'],

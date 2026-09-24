@@ -1,5 +1,9 @@
 export const messages = {
   en: {
+    appearance: 'Appearance',
+    darkMode: 'Dark',
+    lightMode: 'Light',
+    systemMode: 'System',
     store: 'Store',
     tradeIn: 'Trade In',
     repair: 'Repair',
@@ -12,9 +16,13 @@ export const messages = {
     retry: 'Try again',
     empty: 'Nothing here just yet.',
     brandLine: 'FROM THE HIMALAYAS',
-    heroTitle: 'Great things.\nAhead of you.',
-    heroText: 'Meet iPhone 16 Pro. A new perspective on everything you do.',
-    heroCta: 'Find your iPhone',
+    heroTitle: 'Your Apple world.\nFrom the Himalayas.',
+    heroText:
+      'Shop Apple devices, explore trade-ins, and book expert care. One home for your Apple world.',
+    heroCta: 'Explore the collection',
+    heroCompare: 'Compare devices',
+    heroSignoff: 'DISCOVER · UPGRADE · CARE',
+    heroImageAlt: 'Illustration of smartphones overlooking the Himalayas at sunrise.',
     discover: 'Discover what’s possible',
     collectionTitle: 'Your world. Upgraded.',
     collectionText: 'The devices you love. The possibilities you haven’t imagined.',
