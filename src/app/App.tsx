@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect, Component, type ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Shell } from '../components/Shell';
 import { Loading } from '../components/ui';
 import Home from '../pages/Home';
 const Passport = lazy(() => import('../pages/account/Passport'));
 const Catalog = lazy(() => import('../pages/Catalog'));
+const IPhone = lazy(() => import('../pages/IPhone'));
 const Product = lazy(() => import('../pages/Product'));
 const Account = lazy(() => import('../pages/Account'));
 const Admin = lazy(() => import('../pages/Admin'));
@@ -68,11 +69,25 @@ export default function App() {
               <Route path="/store" element={<Catalog />} />
               <Route path="/prebook" element={<Catalog />} />
               <Route path="/wishlist" element={<Catalog />} />
-              {['iphone', 'mac', 'ipad', 'watch', 'airpods', 'vision', 'home', 'accessories'].map(
+              <Route path="/iphone" element={<IPhone />} />
+              {['mac', 'ipad', 'watch', 'airpods', 'vision', 'home', 'accessories'].map(
                 (category) => (
                   <Route key={category} path={`/${category}`} element={<Catalog />} />
                 ),
               )}
+              {(
+                [
+                  ['/iphone-18', '/iphone'],
+                  ['/pre-order', '/prebook'],
+                  ['/compare-iphones', '/compare'],
+                  ['/emi-options', '/support'],
+                  ['/track-order', '/track'],
+                  ['/imei-check', '/support'],
+                  ['/repair-booking', '/repair'],
+                ] as const
+              ).map(([from, to]) => (
+                <Route key={from} path={from} element={<Navigate to={to} replace />} />
+              ))}
               <Route path="/products/:slug" element={<Product />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
