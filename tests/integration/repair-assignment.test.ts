@@ -1,10 +1,10 @@
 import { beforeAll, afterAll, afterEach, describe, it, expect, vi } from 'vitest';
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
-import { app } from '../../server/app';
-import { db } from '../../server/db';
-import { hash, token } from '../../server/core';
-import { qcChecks } from '../../server/services/repair-quality';
+import { app } from '../../apps/api/server/app';
+import { db } from '../../apps/api/server/db';
+import { hash, token } from '../../apps/api/server/core';
+import { qcChecks } from '../../apps/api/server/services/repair-quality';
 const prefix = `assignment-${randomUUID()}`;
 type Person = { id: string; cookie: string };
 let manager: Person, technician: Person, alternate: Person, inspector: Person, customer: Person;

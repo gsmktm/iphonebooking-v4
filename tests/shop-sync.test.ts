@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { mergeAnonymous } from '../src/app/shop-sync';
-import type { CartLine } from '../src/store/shop';
+import { mergeAnonymous } from '../apps/web/src/app/shop-sync';
+import type { CartLine } from '../apps/web/src/store/shop';
 const line = (variantId: string, quantity: number, price: number): CartLine => ({
   variantId,
   quantity,

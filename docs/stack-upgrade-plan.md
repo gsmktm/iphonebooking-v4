@@ -188,6 +188,18 @@ Zustand, Tailwind 4, Vitest + Playwright**.
 - **S1**: `package-lock.json` remains in git history; revert + `npm ci` restores npm flow if pnpm blocks.
 - **S12**: SPA keeps serving until `sprint-12-ok`; cutover reversal = routing flag/DNS back.
 
+## Sprint 1 — execution record (2026-09-25)
+
+Status: **complete** → tagged `sprint-1-ok`. Prerequisites honored: `git status` first, `pre-upgrade` tag set, baseline recorded.
+
+- **Pre-move baseline**: `npm run check` green; e2e **15/17** with 2 deterministic pre-existing failures from 4-day-stale foreign WIP (`account-sync.spec.ts:4`, `storefront.spec.ts:24` — `.compare-floating` click timeout, reproduced twice before touching anything).
+- **WIP handling** (user-approved): stale WIP committed first as `77a9f46` (`wip: ...`), so the restructure commit is pure renames (118 × R100) on top.
+- **Layout as executed**: `apps/web` = SPA (`src/`, `public/`, `index.html`, `vite.config.ts`, `scripts/`); `apps/api` = Express + Prisma (`server/`, `prisma/`, `tsconfig.server.json`, route helpers → `apps/api/scripts/`). **Deviation from T1.3**: `tests/`, `vitest.config.ts`, `playwright.config.ts` and the root typecheck `tsconfig.json` stay at the repo root — the suite spans both halves and this kept `tsc --noEmit` semantics identical (zero new type errors). Test imports rewritten (`../server` → `../apps/api/server`, `../src` → `../apps/web/src`).
+- **pnpm 12.6.0 (corepack) live gotchas**: npm `overrides` had to move to `pnpm-workspace.yaml` (the `package.json#pnpm` field is no longer read by pnpm 11+); build approvals use the `allowBuilds` map (`onlyBuiltDependencies` was removed in pnpm 11) — allowlisted `prisma`, `@prisma/client`, `@prisma/engines`, `esbuild`; `package-lock.json` deleted, `pnpm-lock.yaml` committed; `.turbo/` git-ignored.
+- **Env**: `.env` copied to `apps/api/.env` (api dev cwd) and kept at repo root (root-run vitest reaches it via server `dotenv/config`).
+- **Scripts**: root `check`/`lint`/`format`/`typecheck`/`test`/`test:e2e` keep semantics; `dev` = `turbo dev` (replaces `concurrently`); `db:*`/`start`/`worker` delegate via `pnpm --filter api`.
+- **Gate results**: `pnpm check` → lint 0, tsc 0, vitest **36/36**, turbo build **2/2**; `pnpm dev` boots both apps (web 200 on :5173, API listening :4000); e2e post-move **15/17 — identical to baseline** (a first-pass `storefront:68` flake passes in isolation and on re-run).
+
 ---
 
 _Generated via plan-harder. Versions verified 2026-09-25 (Next 16.3.4, React 19.3.0, Prisma 7.10.0 GA → 8.0.0-rc.1, PostgreSQL 18.6, NestJS 12, pnpm 12.6). Pro skills applied: vercel-react-best-practices (S12 rules), frontend-design (S3)._

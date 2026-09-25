@@ -18,12 +18,23 @@ function parseSchema() {
   // Find the end of each model block
   for (let i = 0; i < modelPositions.length; i++) {
     const start = schema.indexOf('{', modelPositions[i].index) + 1;
-    const endModel = i < modelPositions.length - 1 ? schema.indexOf('model ', start) : schema.indexOf('\n}', start);
+    const endModel =
+      i < modelPositions.length - 1
+        ? schema.indexOf('model ', start)
+        : schema.indexOf('\n}', start);
     const blockEnd = schema.lastIndexOf('}', start + (endModel - start));
     const body = schema.slice(start, blockEnd);
     const fields = [];
     const relations = [];
-    const fieldLines = body.split('\n').filter(l => l.trim() && !l.trim().startsWith('//') && !l.trim().startsWith('///') && !l.trim().startsWith('+'));
+    const fieldLines = body
+      .split('\n')
+      .filter(
+        (l) =>
+          l.trim() &&
+          !l.trim().startsWith('//') &&
+          !l.trim().startsWith('///') &&
+          !l.trim().startsWith('+'),
+      );
     for (const line of fieldLines) {
       const trimmed = line.trim();
       const parts = trimmed.split(/\s+/);
@@ -42,7 +53,16 @@ function parseSchema() {
         isId,
         isUnique,
       });
-      if (!fieldType.startsWith('Int') && !fieldType.startsWith('String') && !fieldType.startsWith('Boolean') && !fieldType.startsWith('Float') && !fieldType.startsWith('DateTime') && !fieldType.startsWith('Json') && !fieldType.startsWith('Decimal') && !fieldType.startsWith('BigInt')) {
+      if (
+        !fieldType.startsWith('Int') &&
+        !fieldType.startsWith('String') &&
+        !fieldType.startsWith('Boolean') &&
+        !fieldType.startsWith('Float') &&
+        !fieldType.startsWith('DateTime') &&
+        !fieldType.startsWith('Json') &&
+        !fieldType.startsWith('Decimal') &&
+        !fieldType.startsWith('BigInt')
+      ) {
         relations.push({ name: fieldName, type: fieldType, isList: isArray });
       }
     }
@@ -52,13 +72,48 @@ function parseSchema() {
 }
 
 const SKIP_MODELS = new Set([
-  'User', 'Role', 'UserSession', 'Address', 'Category', 'Product', 'ProductVariant',
-  'AccessoryCompatibility', 'Store', 'InventoryStock', 'InventoryLedger', 'InventoryUnit',
-  'CartItem', 'Wishlist', 'Order', 'OrderItem', 'OrderStatusHistory', 'Booking', 'Payment',
-  'Refund', 'Device', 'TradeInRule', 'TradeIn', 'Repair', 'RepairStatusHistory', 'RepairQuote',
-  'SupportTicket', 'TicketMessage', 'Notification', 'CMSPage', 'AuditLog', 'WebhookEvent',
-  'Job', 'AnalyticsEvent', 'Subscriber', 'BookingAllocation', 'PolicyAcceptance',
-  'B2BContact', 'Retailer', 'RetailerSettlement', 'APIClient', 'SLAConfig',
+  'User',
+  'Role',
+  'UserSession',
+  'Address',
+  'Category',
+  'Product',
+  'ProductVariant',
+  'AccessoryCompatibility',
+  'Store',
+  'InventoryStock',
+  'InventoryLedger',
+  'InventoryUnit',
+  'CartItem',
+  'Wishlist',
+  'Order',
+  'OrderItem',
+  'OrderStatusHistory',
+  'Booking',
+  'Payment',
+  'Refund',
+  'Device',
+  'TradeInRule',
+  'TradeIn',
+  'Repair',
+  'RepairStatusHistory',
+  'RepairQuote',
+  'SupportTicket',
+  'TicketMessage',
+  'Notification',
+  'CMSPage',
+  'AuditLog',
+  'WebhookEvent',
+  'Job',
+  'AnalyticsEvent',
+  'Subscriber',
+  'BookingAllocation',
+  'PolicyAcceptance',
+  'B2BContact',
+  'Retailer',
+  'RetailerSettlement',
+  'APIClient',
+  'SLAConfig',
 ]);
 
 const models = parseSchema();
@@ -71,7 +126,7 @@ for (const model of models) {
   const fileName = `${camelName}.ts`;
 
   let code = `import { Router } from 'express';\nimport { db } from '../db.js';\n`;
-  if (model.fields.some(f => f.isId)) code += `import { AppError } from '../core.js';\n`;
+  if (model.fields.some((f) => f.isId)) code += `import { AppError } from '../core.js';\n`;
   code += `export const ${camelName} = Router();\n\n`;
 
   // GET /list
@@ -80,7 +135,7 @@ for (const model of models) {
   code += `});\n\n`;
 
   // GET /:id
-  if (model.fields.some(f => f.isId)) {
+  if (model.fields.some((f) => f.isId)) {
     code += `${camelName}.get('/:id', async (req, res) => {\n`;
     code += `  const row = await db.${pascalName}.findUnique({ where: { id: String(req.params.id) } });\n`;
     code += `  if (!row) throw new AppError(404, 'NOT_FOUND', '${pascalName} not found.');\n`;
@@ -95,7 +150,7 @@ for (const model of models) {
   code += `});\n\n`;
 
   // PATCH /:id
-  if (model.fields.some(f => f.isId)) {
+  if (model.fields.some((f) => f.isId)) {
     code += `${camelName}.patch('/:id', async (req, res) => {\n`;
     code += `  const row = await db.${pascalName}.update({ where: { id: String(req.params.id) }, data: req.body });\n`;
     code += `  res.json(row);\n`;
@@ -103,7 +158,7 @@ for (const model of models) {
   }
 
   // DELETE /:id
-  if (model.fields.some(f => f.isId)) {
+  if (model.fields.some((f) => f.isId)) {
     code += `${camelName}.delete('/:id', async (req, res) => {\n`;
     code += `  await db.${pascalName}.delete({ where: { id: String(req.params.id) } });\n`;
     code += `  res.json({ ok: true });\n`;
@@ -119,13 +174,23 @@ for (const model of models) {
 const appPath = path.resolve('server/app.ts');
 let appCode = fs.readFileSync(appPath, 'utf8');
 
-const imports = routeRegistrations.map(r => `import { ${r.varName} } from './routes/${r.fileName.replace('.ts', '')}.js';`).join('\n');
-const registrations = routeRegistrations.map(r => `app.use('/api/v1/${r.varName}', ${r.varName});`).join('\n');
+const imports = routeRegistrations
+  .map((r) => `import { ${r.varName} } from './routes/${r.fileName.replace('.ts', '')}.js';`)
+  .join('\n');
+const registrations = routeRegistrations
+  .map((r) => `app.use('/api/v1/${r.varName}', ${r.varName});`)
+  .join('\n');
 
 const insertMarker = 'const errors: ErrorRequestHandler';
 const insertIdx = appCode.indexOf(insertMarker);
 if (insertIdx > 0) {
-  appCode = appCode.slice(0, insertIdx) + imports + '\n' + registrations + '\n\n' + appCode.slice(insertIdx);
+  appCode =
+    appCode.slice(0, insertIdx) +
+    imports +
+    '\n' +
+    registrations +
+    '\n\n' +
+    appCode.slice(insertIdx);
   fs.writeFileSync(appPath, appCode);
   console.log('Updated server/app.ts');
 }

@@ -2,11 +2,11 @@ import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
 import bcrypt from 'bcryptjs';
-import { app } from '../../server/app';
-import { db } from '../../server/db';
-import { hash, token } from '../../server/core';
-import { qcChecks } from '../../server/services/repair-quality';
-import { expireReservations } from '../../server/services/orders';
+import { app } from '../../apps/api/server/app';
+import { db } from '../../apps/api/server/db';
+import { hash, token } from '../../apps/api/server/core';
+import { qcChecks } from '../../apps/api/server/services/repair-quality';
+import { expireReservations } from '../../apps/api/server/services/orders';
 const prefix = `test-${randomUUID()}`;
 let customer: string,
   other: string,

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import type { Product } from '../../src/services/types';
+import type { Product } from '../../apps/web/src/services/types';
 test('home configurator uses catalog prices and adds the chosen variant to the bag', async ({
   page,
   request,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { valueDevice } from '../server/services/valuation';
+import { valueDevice } from '../apps/api/server/services/valuation';
 const rule = { baseValue: 10000000, goodPercent: 85, fairPercent: 65, damagedPercent: 30 };
 describe('valuation in integer paisa', () => {
   it('never adds floating point money', () => {

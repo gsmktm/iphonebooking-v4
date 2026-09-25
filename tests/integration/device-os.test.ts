@@ -1,11 +1,11 @@
 import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
-import { app } from '../../server/app';
-import { db } from '../../server/db';
-import { hash, token } from '../../server/core';
-import { scaffoldPaths } from '../../server/routes/legacy-scaffolds';
-import { qcChecks } from '../../server/services/repair-quality';
+import { app } from '../../apps/api/server/app';
+import { db } from '../../apps/api/server/db';
+import { hash, token } from '../../apps/api/server/core';
+import { scaffoldPaths } from '../../apps/api/server/routes/legacy-scaffolds';
+import { qcChecks } from '../../apps/api/server/services/repair-quality';
 
 const prefix = `device-os-${randomUUID()}`;
 let admin: string,
