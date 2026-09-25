@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 const Passport = lazy(() => import('../pages/account/Passport'));
 const Catalog = lazy(() => import('../pages/Catalog'));
 const IPhone = lazy(() => import('../pages/IPhone'));
+const Category = lazy(() => import('../pages/Category'));
 const Product = lazy(() => import('../pages/Product'));
 const Account = lazy(() => import('../pages/Account'));
 const Admin = lazy(() => import('../pages/Admin'));
@@ -66,15 +67,15 @@ export default function App() {
             <Route path="/admin/:resource" element={<Admin />} />
             <Route element={<Shell />}>
               <Route index element={<Home />} />
-              <Route path="/store" element={<Catalog />} />
               <Route path="/prebook" element={<Catalog />} />
               <Route path="/wishlist" element={<Catalog />} />
               <Route path="/iphone" element={<IPhone />} />
-              {['mac', 'ipad', 'watch', 'airpods', 'vision', 'home', 'accessories'].map(
-                (category) => (
-                  <Route key={category} path={`/${category}`} element={<Catalog />} />
-                ),
-              )}
+              {['store', 'mac', 'ipad', 'watch', 'airpods', 'accessories'].map((category) => (
+                <Route key={category} path={`/${category}`} element={<Category />} />
+              ))}
+              {['vision', 'home'].map((category) => (
+                <Route key={category} path={`/${category}`} element={<Catalog />} />
+              ))}
               {(
                 [
                   ['/iphone-18', '/iphone'],
