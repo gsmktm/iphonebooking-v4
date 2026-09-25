@@ -3,8 +3,8 @@
   "short_name": "iPhoneBooking",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f5f2",
-  "theme_color": "#171918",
+  "background_color": "#071014",
+  "theme_color": "#071014",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -17,6 +17,23 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "id": "/",
+  "scope": "/",
+  "description": "Shop, upgrade and care for your Apple devices. From the Himalayas.",
+  "shortcuts": [
+    {
+      "name": "Shop devices",
+      "url": "/store"
+    },
+    {
+      "name": "My devices",
+      "url": "/account/devices"
+    },
+    {
+      "name": "Book a repair",
+      "url": "/repair"
     }
   ]
 }

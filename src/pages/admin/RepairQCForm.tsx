@@ -42,16 +42,16 @@ export default function RepairQCForm({
       <p>Inspect each function. A failed check keeps this repair from being marked ready.</p>
       <div className="qc-grid">
         {query.data?.map((name) => (
-          <label key={name}>
-            {human(name)}
-            <select name={name} required defaultValue="">
+          <div key={name}>
+            <label htmlFor={`qc-${repairId}-${name}`}>{human(name)}</label>
+            <select id={`qc-${repairId}-${name}`} name={name} required defaultValue="">
               <option value="" disabled>
                 Choose result
               </option>
               <option value="pass">Passed</option>
               <option value="fail">Failed / needs attention</option>
             </select>
-          </label>
+          </div>
         ))}
       </div>
       <label>

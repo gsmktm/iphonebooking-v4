@@ -211,8 +211,8 @@ operations.patch('/repairs/:id/status', permit('repair.update'), async (req, res
     .object({
       status: z.string(),
       note: z.string().min(3).max(1000),
-      technician: z.string().max(100).optional(),
     })
+    .strict()
     .parse(req.body);
   await db.$transaction(
     async (tx) => {
@@ -239,7 +239,6 @@ operations.patch('/repairs/:id/status', permit('repair.update'), async (req, res
         where: { id: repair.id },
         data: {
           status: data.status,
-          technician: data.technician,
           history: { create: { status: data.status, note: data.note } },
         },
       });

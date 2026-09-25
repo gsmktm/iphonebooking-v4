@@ -269,6 +269,9 @@ describe.sequential('connected device lifecycle and authorization', () => {
     const passport = await get(`/account/devices/${deviceId}/passport`, customer);
     expect(passport.status).toBe(200);
     expect(passport.body.canonicalId).toMatch(/^DEVICE-IB-/);
+    expect(passport.body.events).toEqual(
+      expect.arrayContaining([expect.objectContaining({ eventType: 'SOLD' })]),
+    );
     expect(JSON.stringify(passport.body)).not.toContain('serialHash');
     expect((await get(`/account/devices/${deviceId}/passport`, other)).status).toBe(404);
     expect(

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { db } from '../db.js';
 import { permit } from '../core.js';
@@ -8,27 +9,33 @@ finance.get('/reconciliation', permit('payment.view'), async (req, res) => {
     .object({ page: z.coerce.number().int().min(1).max(100000).default(1) })
     .parse(req.query);
   const take = 50;
-  const [orders, total] = await Promise.all([
-    db.order.findMany({
-      orderBy: { createdAt: 'desc' },
-      take,
-      skip: (page - 1) * take,
-      select: {
-        id: true,
-        number: true,
-        total: true,
-        status: true,
-        payments: { where: { status: 'CONFIRMED' }, select: { amount: true } },
-      },
-    }),
-    db.order.count(),
-  ]);
-  const entries = await db.orderMoneyEntry.groupBy({
-    by: ['orderId'],
-    where: { orderId: { in: orders.map((o) => o.id) } },
-    _sum: { amount: true },
-    _count: true,
-  });
+  const { orders, total, entries } = await db.$transaction(
+    async (tx) => {
+      const [orders, total] = await Promise.all([
+        tx.order.findMany({
+          orderBy: { createdAt: 'desc' },
+          take,
+          skip: (page - 1) * take,
+          select: {
+            id: true,
+            number: true,
+            total: true,
+            status: true,
+            payments: { where: { status: 'CONFIRMED' }, select: { amount: true } },
+          },
+        }),
+        tx.order.count(),
+      ]);
+      const entries = await tx.orderMoneyEntry.groupBy({
+        by: ['orderId'],
+        where: { orderId: { in: orders.map((o) => o.id) } },
+        _sum: { amount: true },
+        _count: true,
+      });
+      return { orders, total, entries };
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+  );
   const rows = orders.map((order) => {
     const paid = order.payments.reduce((sum, p) => sum + p.amount, 0);
     const entry = entries.find((e) => e.orderId === order.id);

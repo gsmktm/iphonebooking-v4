@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { AppError, permit } from '../core.js';
 
-// Existing generated routers remain in source for migration reference, but cannot
-// bypass domain validation or mutate historical/financial records.
+// Legacy generated URL families cannot bypass domain validation or mutate
+// historical/financial records. Their unsafe CRUD implementations were removed.
 export const scaffoldPaths = [
   'deviceIdentity',
   'identityLink',

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { db } from '../db.js';
+import { createContentSchema } from '../schemas/content.js';
 import { assertGrantable } from '../services/permissions.js';
 import { permit, AppError, owned } from '../core.js';
 export const adminCreate = Router();
@@ -98,28 +99,23 @@ adminCreate.post('/stores', permit('store.update'), async (req, res) => {
   res.status(201).json(await db.store.create({ data }));
 });
 adminCreate.post('/content', permit('content.update'), async (req, res) => {
-  const data = z
-    .object({
-      slug,
-      title: short,
-      description: z.string().max(300),
-      blocks: z
-        .array(
-          z.object({
-            type: z.enum(['hero', 'text', 'faq', 'cta']),
-            title: short,
-            body: z.string().max(5000),
-            href: z
-              .string()
-              .regex(/^\/(?!\/)/)
-              .optional(),
-          }),
-        )
-        .max(30),
-      published: z.boolean(),
-    })
-    .parse(req.body);
-  res.status(201).json(await db.cMSPage.create({ data }));
+  const data = createContentSchema.parse(req.body);
+  res.status(201).json(
+    await db.$transaction(async (tx) => {
+      const page = await tx.cMSPage.create({ data });
+      await tx.auditLog.create({
+        data: {
+          actorId: req.user!.id,
+          action: 'content.create',
+          entity: 'CMSPage',
+          entityId: page.id,
+          after: data,
+          requestId: req.requestId,
+        },
+      });
+      return page;
+    }),
+  );
 });
 adminCreate.post('/valuation-rules', permit('tradein.update'), async (req, res) => {
   const data = z

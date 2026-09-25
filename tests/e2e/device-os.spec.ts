@@ -20,6 +20,7 @@ test('customer passport and staff QC connect to the same purchased device', asyn
   browser,
   baseURL,
 }) => {
+  test.setTimeout(180000);
   test.skip(!process.env.ADMIN_PASSWORD, 'Requires the local development admin.');
   if (process.env.NODE_ENV === 'production' || baseURL !== 'http://localhost:5173')
     throw new Error('Browser fixture may only run against the local development storefront.');
@@ -33,7 +34,7 @@ test('customer passport and staff QC connect to the same purchased device', asyn
       email,
       password: `Test-${randomUUID()}`,
     });
-    await post(staff.request, '/auth/login', {
+    const staffUser = await post(staff.request, '/auth/login', {
       email: process.env.ADMIN_EMAIL ?? 'admin@iphonebooking.local',
       password: process.env.ADMIN_PASSWORD,
     });
@@ -81,6 +82,7 @@ test('customer passport and staff QC connect to the same purchased device', asyn
     await page.getByRole('link', { name: 'Open device passport' }).click();
     await expect(page.getByRole('heading', { name: product.name, exact: true })).toBeVisible();
     await expect(page.getByText(unit.canonicalId, { exact: true })).toBeVisible();
+    await expect(page.locator('.timeline')).toContainText('Sold');
     const axe = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
@@ -100,6 +102,19 @@ test('customer passport and staff QC connect to the same purchased device', asyn
       description: 'Browser test: diagnose battery issue.',
       method: 'STORE',
     });
+    const adminPage = await staff.newPage();
+    await adminPage.goto(`/admin/repairs?q=${repair.id}`);
+    await adminPage.getByRole('button', { name: 'View', exact: true }).click();
+    await adminPage.getByRole('button', { name: 'Assign technician', exact: true }).click();
+    const assignment = adminPage.getByRole('dialog', { name: 'Assign technician' });
+    await assignment.getByLabel('Find technician').fill(staffUser.name);
+    await assignment.getByRole('button', { name: 'Search staff' }).click();
+    await assignment.getByLabel('Assigned technician', { exact: true }).selectOption(staffUser.id);
+    await assignment
+      .getByLabel('Assignment reason')
+      .fill('Browser fixture: assign the verified service operator.');
+    await assignment.getByRole('button', { name: 'Confirm technician' }).click();
+    await expect(assignment).not.toBeVisible();
     for (const status of ['RECEIVED', 'INSPECTION', 'DIAGNOSIS'])
       await stage(staff.request, repair.id, status);
     const quote = await post(staff.request, `/admin/repairs/${repair.id}/quote`, {
@@ -113,11 +128,11 @@ test('customer passport and staff QC connect to the same purchased device', asyn
     });
     for (const status of ['REPAIR_IN_PROGRESS', 'QUALITY_CONTROL'])
       await stage(staff.request, repair.id, status);
-    const adminPage = await staff.newPage();
     await adminPage.goto(`/admin/repairs?q=${repair.id}`);
     await adminPage.getByRole('button', { name: 'View', exact: true }).click();
     await adminPage.getByRole('button', { name: 'Record quality checks' }).click();
     const dialog = adminPage.getByRole('dialog', { name: 'Repair quality control' });
+    await expect(dialog.getByLabel('Power', { exact: true })).toBeVisible();
     for (const select of await dialog.locator('select').all()) await select.selectOption('pass');
     await dialog.getByLabel('Inspection notes').fill('Browser test: all functional checks passed.');
     await dialog.getByRole('button', { name: 'Record QC results' }).click();

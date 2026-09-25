@@ -84,7 +84,12 @@ export async function storefrontDocument(req: Request, res: Response) {
     /^\/(admin|account|checkout|confirmation|cart|track|wishlist)/.test(req.path) ||
     process.env.SEED_DEVELOPMENT === 'true' ||
     Object.keys(req.query).length > 0;
-  const tags = `<link rel="canonical" href="${escape(canonical)}"/><meta name="robots" content="${noindex ? 'noindex,nofollow' : 'index,follow'}"/><meta property="og:title" content="${escape(title)}"/><meta property="og:description" content="${escape(description)}"/><meta property="og:url" content="${escape(canonical)}"/><meta property="og:image" content="${origin()}/images/hero.webp"/><meta name="twitter:card" content="summary_large_image"/><script type="application/ld+json">${JSON.stringify(structured).replaceAll('<', '\\u003c')}</script>`;
+  const shareImage = req.path === '/' ? '/images/himalayan-banner.png' : '/images/hero.webp';
+  const heroPreload =
+    req.path === '/'
+      ? '<link rel="preload" as="image" href="/images/himalayan-banner.png" fetchpriority="high"/>'
+      : '';
+  const tags = `${heroPreload}<link rel="canonical" href="${escape(canonical)}"/><meta name="robots" content="${noindex ? 'noindex,nofollow' : 'index,follow'}"/><meta property="og:title" content="${escape(title)}"/><meta property="og:description" content="${escape(description)}"/><meta property="og:url" content="${escape(canonical)}"/><meta property="og:image" content="${origin()}${shareImage}"/><meta name="twitter:card" content="summary_large_image"/><script type="application/ld+json">${JSON.stringify(structured).replaceAll('<', '\\u003c')}</script>`;
   const html = (await readFile('dist/index.html', 'utf8'))
     .replace(/<title>.*?<\/title>/, `<title>${escape(title)}</title>`)
     .replace(

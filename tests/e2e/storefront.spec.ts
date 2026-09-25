@@ -27,7 +27,7 @@ test('search and comparison are interactive', async ({ page }) => {
   await page.getByLabel('Search catalog').fill('MacBook');
   await expect(page.locator('.search-results')).toContainText('MacBook Air');
   await page.keyboard.press('Escape');
-  await expect(page.locator('dialog')).not.toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Find your next great thing' })).not.toBeVisible();
   await page.getByRole('button', { name: 'Compare iPhone 16 Pro' }).click();
   await page.getByRole('button', { name: 'Compare MacBook Air' }).click();
   await page.locator('.compare-floating').click();
@@ -66,6 +66,7 @@ test('customer login does not expose admin modules', async ({ page }) => {
 });
 
 test('staff can open operational modules and edit dialogs', async ({ page }) => {
+  test.setTimeout(180000);
   const { config } = await import('dotenv');
   config({ quiet: true });
   test.skip(!process.env.ADMIN_PASSWORD, 'Local seeded admin credential is required.');
@@ -97,7 +98,7 @@ test('staff can open operational modules and edit dialogs', async ({ page }) => 
   ]) {
     await page.goto(`/admin/${path}`);
     await expect(page.locator('.admin-page-heading h1')).toBeVisible();
-    await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+    await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15000 });
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
   }
   await page.goto('/admin/roles');

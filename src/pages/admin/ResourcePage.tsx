@@ -20,6 +20,8 @@ import { ErrorNotice, Loading, Dialog, Status } from '../../components/ui';
 import { resources, actionsFor, createAction, getValue, type Row, type Action } from './resources';
 import RoleEditor from './RoleEditor';
 import RepairQCForm from './RepairQCForm';
+import TechnicianAssignment from './TechnicianAssignment';
+import ContentEditor from './ContentEditor';
 export default function ResourcePage({ resource, user }: { resource: string; user: User }) {
   const config = resources[resource];
   const [params, setParams] = useSearchParams();
@@ -30,6 +32,7 @@ export default function ResourcePage({ resource, user }: { resource: string; use
     [error, setError] = useState<Error | null>(null),
     [busy, setBusy] = useState(false);
   const [qcRepair, setQCRepair] = useState<string | null>(null);
+  const [assignRepair, setAssignRepair] = useState<Row | null>(null);
   const qc = useQueryClient();
   const result = useQuery({
     queryKey: ['admin', resource, params.toString()],
@@ -229,7 +232,7 @@ export default function ResourcePage({ resource, user }: { resource: string; use
         </div>
       </section>
       <Dialog
-        open={!!selected && !action && !qcRepair}
+        open={!!selected && !action && !qcRepair && !assignRepair}
         onClose={() => setSelected(null)}
         title={`${config.title} · Details`}
       >
@@ -250,6 +253,20 @@ export default function ResourcePage({ resource, user }: { resource: string; use
                 ))}
             </div>
             <div className="button-row">
+              {resource === 'repairs' &&
+                can('repair.assign') &&
+                ![
+                  'QUALITY_CONTROL',
+                  'READY',
+                  'COMPLETED',
+                  'CANCELLED',
+                  'REJECTED',
+                  'UNREPAIRABLE',
+                ].includes(String(selected.status)) && (
+                  <button className="button secondary" onClick={() => setAssignRepair(selected)}>
+                    Assign technician
+                  </button>
+                )}
               {resource === 'repairs' &&
                 selected.status === 'QUALITY_CONTROL' &&
                 can('repair.qc') && (
@@ -273,6 +290,23 @@ export default function ResourcePage({ resource, user }: { resource: string; use
                 ))}
             </div>
           </>
+        )}
+      </Dialog>
+      <Dialog open={!!assignRepair} onClose={() => setAssignRepair(null)} title="Assign technician">
+        {assignRepair && (
+          <TechnicianAssignment
+            repairId={String(assignRepair.id)}
+            currentId={
+              typeof assignRepair.assignedTechnicianId === 'string'
+                ? assignRepair.assignedTechnicianId
+                : null
+            }
+            onComplete={async () => {
+              await qc.invalidateQueries({ queryKey: ['admin'] });
+              setAssignRepair(null);
+              setSelected(null);
+            }}
+          />
         )}
       </Dialog>
       <Dialog open={!!qcRepair} onClose={() => setQCRepair(null)} title="Repair quality control">
@@ -301,6 +335,15 @@ export default function ResourcePage({ resource, user }: { resource: string; use
               action={action}
               onComplete={async () => {
                 await qc.invalidateQueries({ queryKey: ['admin'] });
+                setAction(null);
+                setSelected(null);
+              }}
+            />
+          ) : resource === 'content' ? (
+            <ContentEditor
+              key={action.path}
+              action={action}
+              onComplete={() => {
                 setAction(null);
                 setSelected(null);
               }}

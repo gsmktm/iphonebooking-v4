@@ -75,10 +75,20 @@ Bridge migrations preserve units and historical order snapshots. They abort on c
 
 Device events, part movements, QC evidence, and order money entries are protected by append-only triggers. Trade-in quote snapshots cannot be rewritten. Corrections need explicit subsequent business records; do not disable triggers for ordinary administration.
 
-`REQUIRE_INDEPENDENT_REPAIR_QC=true` requires an assigned repairing technician ID and a different checker. `REQUIRE_INDEPENDENT_RECEIVING_QC=true` prevents the receiving staff member from approving receiving QC. Both flags default to false for local development; configure them according to the reviewed operating policy. Procurement approval always requires a different creator and approver.
+`REQUIRE_INDEPENDENT_REPAIR_QC=true` requires a verified assigned staff account and a checker who has never been assigned to that repair. `REQUIRE_INDEPENDENT_RECEIVING_QC=true` prevents the receiving staff member from approving receiving QC. Both flags default to false for local development; configure them according to the reviewed operating policy. Procurement approval always requires a different creator and approver.
 
-New development role templates are Quality Inspector, Procurement Officer, and Procurement Approver. Existing roles are not silently overwritten by the seed. Use the permission-controlled role editor and account role assignment; role updates revoke affected sessions. The permission catalog describes the implemented permissions.
+New development role templates are Repair Manager, Quality Inspector, Procurement Officer, and Procurement Approver. Existing roles are not silently overwritten by the seed. Use the permission-controlled role editor and account role assignment; role updates revoke affected sessions. The permission catalog describes the implemented permissions.
 
 Internal order reconciliation is not bank or gateway reconciliation. Store receipts require actual confirmation by staff in commercial use. Browser E2E fixtures deliberately create clearly named development orders and test store receipts; never run those against commercial data.
 
 Account shopping-state migration adds a nonnegative revision counter without deleting existing carts or wishlists. Deploy the updated client with the API. The client includes the expected account ID and revision in every write; older supported cart/wishlist routes also increment the counter. Browser local storage contains selections, never session credentials.
+
+The technician assignment migration preserves legacy text and backfills only exact staff-account IDs. It records those as migration evidence with unknown original actor/date. Unmatched legacy text is not trusted for independent QC and requires a reviewed data-reconciliation migration before that policy can pass. New assignments use `repair.assign`; staff eligibility requires `repair.update`. Assignment is locked during QC and handover. The status API rejects the former free-text `technician` input; clients must use the assignment workflow.
+
+### Release assets and local development settings
+
+Use `npm run build` for a release. Its client step uses `scripts/build-client.mjs` to set `NODE_ENV=production` before loading Vite, even when the local API `.env` uses development mode. Without this separation, Vite can compile development React and omit production-only service worker registration. See [Vite modes and NODE_ENV](https://vite.dev/guide/env-and-mode). The script is portable across Node-supported operating systems.
+
+The installed web app needs HTTPS (localhost is allowed for local checks). Verify the built manifest, icons, active service worker, and offline recovery page. Only the public offline page and icon are cached; customer/API responses remain network-only. Native iOS/Android store publishing and physical-device installation testing remain separate work.
+
+After building, start a temporary local compiled server with `NODE_ENV=production PORT=4101 APP_ORIGIN=http://localhost:4101 PUBLIC_ORIGIN=http://localhost:4101 npm start`. In another terminal run `npm run test:pwa`, then stop that temporary server. The check refuses remote hostnames and makes no purchase/account mutations.

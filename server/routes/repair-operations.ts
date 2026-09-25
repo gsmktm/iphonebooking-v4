@@ -187,15 +187,35 @@ repairOperations.post('/repairs/:id/qc', permit('repair.qc'), async (req, res) =
         );
       if (
         process.env.REQUIRE_INDEPENDENT_REPAIR_QC === 'true' &&
-        (!repair.technician || repair.technician === req.user!.id)
+        repair.technician &&
+        !(await tx.repairAssignment.findFirst({
+          where: { repairId: repair.id, technicianId: repair.technician },
+          select: { id: true },
+        }))
+      )
+        throw new AppError(
+          409,
+          'LEGACY_ASSIGNMENT_REVIEW_REQUIRED',
+          'Legacy technician text has not been matched to a verified staff account. Reconcile historical assignments before independent QC.',
+        );
+      if (
+        process.env.REQUIRE_INDEPENDENT_REPAIR_QC === 'true' &&
+        (!repair.assignedTechnicianId ||
+          repair.assignedTechnicianId === req.user!.id ||
+          (await tx.repairAssignment.count({
+            where: { repairId: repair.id, technicianId: req.user!.id },
+          })) > 0)
       )
         throw new AppError(
           409,
           'INDEPENDENT_QC_REQUIRED',
-          'Assign the repairing technician and have a different authorized technician perform QC.',
+          'Assign a verified technician. QC requires an authorized inspector who has never been assigned to this repair.',
         );
       // Serialize QC decisions against stage changes, so Ready cannot race a failing check.
-      await tx.repair.update({ where: { id: repair.id }, data: { technician: repair.technician } });
+      await tx.repair.update({
+        where: { id: repair.id },
+        data: { assignedTechnicianId: repair.assignedTechnicianId },
+      });
       const passed = data.checks.every((c) => c.passed);
       const qc = await tx.repairQC.create({
         data: {

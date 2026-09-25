@@ -3,7 +3,9 @@
     "jetro": {
       "type": "stdio",
       "command": "/Users/sc/.jetro/runtime/node-darwin-x64",
-      "args": ["/Users/sc/.jetro/mcp-server/index.js"],
+      "args": [
+        "/Users/sc/.jetro/mcp-server/index.js"
+      ],
       "env": {
         "JET_WORKSPACE": "/Users/sc/Downloads/iphone-booking",
         "JET_API_URL": "https://api.jetro.ai",

@@ -1,12 +1,12 @@
 .admin-app {
   min-height: 100vh;
-  background: #f6f7f4;
-  color: #293026;
+  background: var(--paper);
+  color: var(--muted);
 }
 .admin-sidebar {
   width: 240px;
-  background: #fff;
-  border-right: 1px solid #e5e8e0;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
   position: fixed;
   top: 0;
   bottom: 0;
@@ -29,11 +29,11 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.63rem;
-  color: #7c8773;
+  color: var(--muted);
   margin: 1.8rem 0.5rem;
   padding: 0.65rem 0.5rem;
-  background: #f5f7f1;
-  border: 1px solid #e9ede1;
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: 5px;
 }
 .admin-nav-group {
@@ -44,7 +44,7 @@
   text-transform: uppercase;
   font-size: 0.53rem;
   letter-spacing: 0.09em;
-  color: #9aa18e;
+  color: var(--muted);
   margin: 0.3rem 0.7rem 0.65rem;
 }
 .admin-nav-group a {
@@ -55,16 +55,16 @@
   margin: 0.1rem 0;
   font-size: 0.71rem;
   border-radius: 6px;
-  color: #76816b;
+  color: var(--muted);
   min-height: 40px;
 }
 .admin-nav-group a.active {
   background: #e9efdf;
-  color: #415732;
+  color: var(--muted);
   font-weight: 500;
 }
 .admin-nav-group a:hover {
-  background: #f4f7ef;
+  background: var(--paper);
 }
 .back-to-store {
   display: flex;
@@ -73,7 +73,7 @@
   border-top: 1px solid var(--line);
   padding: 1rem 0.7rem;
   font-size: 0.7rem;
-  color: #76816b;
+  color: var(--muted);
 }
 .admin-header {
   height: 76px;
@@ -82,8 +82,8 @@
   gap: 0.65rem;
   justify-content: space-between;
   padding: 0 1.25rem;
-  border-bottom: 1px solid #e5e8df;
-  background: #ffffffda;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
   font-size: 0.7rem;
 }
 .admin-header > div {
@@ -100,7 +100,7 @@
 .admin-mode {
   font-size: 0.48rem;
   letter-spacing: 0.06em;
-  color: #78876a;
+  color: var(--muted);
   display: none;
 }
 .avatar {
@@ -112,7 +112,7 @@
   background: #e8eddf;
   border-radius: 50%;
   font-size: 0.75rem;
-  color: #6f805e;
+  color: var(--muted);
 }
 .admin-body {
   padding: 1.8rem 1.1rem;
@@ -128,7 +128,7 @@
 }
 .admin-page-heading .eyebrow {
   font-size: 0.58rem;
-  color: #7b886b;
+  color: var(--muted);
   margin-bottom: 0.8rem;
 }
 .admin-page-heading h1 {
@@ -152,8 +152,8 @@
   margin-bottom: 1.5rem;
 }
 .admin-metrics > a {
-  background: white;
-  border: 1px solid #e5e8df;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 1.2rem;
   min-width: 0;
@@ -163,7 +163,7 @@
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  color: #808a76;
+  color: var(--muted);
 }
 .admin-metrics strong {
   display: block;
@@ -176,11 +176,11 @@
 }
 .admin-metrics small {
   font-size: 0.56rem;
-  color: #829171;
+  color: var(--muted);
 }
 .admin-panel {
-  background: #fff;
-  border: 1px solid #e5e8df;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
   margin: 1.5rem 0;
@@ -191,7 +191,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
-  border-bottom: 1px solid #edf0e7;
+  border-bottom: 1px solid var(--line);
 }
 .panel-heading h2 {
   font-size: 0.9rem;
@@ -203,7 +203,7 @@
   gap: 0.6rem;
   align-items: center;
   font-size: 0.65rem;
-  color: #7b8a6b;
+  color: var(--muted);
 }
 .panel-heading > .muted {
   font-size: 0.65rem;
@@ -211,10 +211,10 @@
 .admin-panel th {
   font-size: 0.6rem;
   font-weight: 500;
-  color: #8c9781;
-  background: #fafbf7;
+  color: var(--muted);
+  background: var(--paper);
   padding: 0.9rem 1.25rem;
-  border-bottom: 1px solid #edf0e7;
+  border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
 .admin-panel td {
@@ -228,7 +228,7 @@
   border: 0;
 }
 .admin-panel tbody tr:hover {
-  background: #fafbf8;
+  background: var(--paper);
 }
 .admin-panel td .text-button {
   font-size: 0.65rem;
@@ -242,13 +242,13 @@
   align-items: center;
   text-align: center;
   padding: 3rem 1rem;
-  color: #96a08a;
+  color: var(--muted);
 }
 .admin-empty h3 {
   font-size: 1rem;
   font-weight: 500;
   margin: 1rem 0 0.5rem;
-  color: #67765c;
+  color: var(--muted);
 }
 .admin-empty p {
   font-size: 0.72rem;
@@ -288,12 +288,12 @@
 .action-row small {
   display: block;
   font-size: 0.6rem;
-  color: #99a28f;
+  color: var(--muted);
   margin-top: 0.3rem;
 }
 .panel-note {
   font-size: 0.63rem;
-  color: #919c84;
+  color: var(--muted);
   padding: 1rem 1.25rem;
   border-top: 1px solid #eff2e9;
 }
@@ -302,13 +302,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  border-bottom: 1px solid #edf0e7;
+  border-bottom: 1px solid var(--line);
 }
 .admin-search {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #f7f8f3;
+  background: var(--paper);
   padding: 0 0.65rem;
   border: 1px solid #e9ecdf;
   border-radius: 5px;
@@ -343,9 +343,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid #edf0e7;
+  border-top: 1px solid var(--line);
   font-size: 0.63rem;
-  color: #929b87;
+  color: var(--muted);
 }
 .pagination > div {
   display: flex;
@@ -377,7 +377,7 @@
   gap: 1rem;
   padding: 1rem 1.5rem;
   font-size: 0.53rem;
-  color: #a0a891;
+  color: var(--muted);
   border-top: 1px solid #e5e8dd;
 }
 .admin-footer > span {
@@ -467,7 +467,7 @@
 .admin-table-toolbar .muted,
 .pagination,
 .admin-footer {
-  color: #5d6b50;
+  color: var(--muted);
 }
 .admin-panel td,
 .admin-nav-group a {

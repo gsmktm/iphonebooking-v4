@@ -19,6 +19,9 @@ import { api, post } from '../services/api';
 import type { Product, User } from '../services/types';
 import { useShop } from '../store/shop';
 import { Brand, Dialog, ProductVisual, ErrorNotice } from './ui';
+import { cn } from '../utils/cn';
+import { InstallApp, MobileNavigation } from '../features/pwa/MobileApp';
+import { AppearanceControl } from '../features/appearance/AppearanceControl';
 const links = [
   ['Store', '/store'],
   ['iPhone', '/iphone'],
@@ -37,6 +40,7 @@ export function Shell() {
     [subscribed, setSubscribed] = useState(false),
     [newsletterError, setNewsletterError] = useState<unknown>();
   const location = useLocation();
+  const home = location.pathname === '/';
   const { cart, compare, wishlist } = useShop();
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -72,20 +76,33 @@ export function Shell() {
     return () => window.removeEventListener('keydown', handle);
   }, []);
   return (
-    <>
+    <div className={cn('storefront', home && 'luxe-home')}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
       <div className="topbar">
-        <span>One destination. Your entire Apple world.</span>
-        <Link to="/trade-in">
-          Give your next upgrade a head start <ArrowUpRight size={12} />
-        </Link>
-        <span className="topbar-country">NEPAL · NPR</span>
+        {home ? (
+          <div className="topbar-links">
+            <Link to="/track">Track order</Link>
+            <Link to="/account/repairs">Repair status</Link>
+            <Link to="/support">Support</Link>
+          </div>
+        ) : (
+          <>
+            <span>One destination. Your entire Apple world.</span>
+            <Link to="/trade-in">
+              Give your next upgrade a head start <ArrowUpRight size={12} />
+            </Link>
+          </>
+        )}
+        <div className="topbar-tools">
+          <span className="topbar-country">NEPAL · NPR</span>
+          <AppearanceControl />
+        </div>
       </div>
       <header className="site-header">
         <div className="header-main container">
-          <Brand />
+          <Brand diamond={home} />
           <nav aria-label="Main navigation" className="desktop-nav">
             {links.map(([label, to]) => (
               <NavLink key={to} to={to}>
@@ -106,6 +123,9 @@ export function Shell() {
             </button>
             <Link to="/account" className="icon-button account-nav" aria-label="Your account">
               <UserRound size={19} />
+            </Link>
+            <Link to="/wishlist" className="icon-button account-nav" aria-label="Your wishlist">
+              <Heart size={19} />
             </Link>
             <Link
               to="/cart"
@@ -161,6 +181,7 @@ export function Shell() {
       <main id="main">
         <Outlet />
       </main>
+      {home && <InstallApp />}
       <section className="newsletter container">
         <div>
           <span className="eyebrow">ALWAYS ONE STEP AHEAD</span>
@@ -210,7 +231,7 @@ export function Shell() {
       <footer className="site-footer">
         <div className="container footer-grid">
           <div className="footer-brand">
-            <Brand />
+            <Brand diamond={home} />
             <p>
               Technology from the Himalayas.
               <br />
@@ -334,6 +355,7 @@ export function Shell() {
         </div>
         {user && <p className="muted">Welcome back, {user.name.split(' ')[0]}.</p>}
       </Dialog>
-    </>
+      <MobileNavigation />
+    </div>
   );
 }

@@ -15,25 +15,28 @@ model Role {
 }
 
 model User {
-  shopRevision  Int             @default(0)
-  id            String          @id @default(cuid())
-  email         String          @unique
-  name          String
-  passwordHash  String
-  roleId        String?
-  role          Role?           @relation(fields: [roleId], references: [id])
-  createdAt     DateTime        @default(now())
-  sessions      UserSession[]
-  addresses     Address[]
-  orders        Order[]
-  devices       Device[]
-  repairs       Repair[]
-  tradeIns      TradeIn[]
-  tickets       SupportTicket[]
-  notifications Notification[]
-  wishlist      Wishlist[]
-  cart          CartItem[]
-  appointments  Appointment[]
+  shopRevision          Int                @default(0)
+  id                    String             @id @default(cuid())
+  email                 String             @unique
+  name                  String
+  passwordHash          String
+  roleId                String?
+  role                  Role?              @relation(fields: [roleId], references: [id])
+  createdAt             DateTime           @default(now())
+  sessions              UserSession[]
+  addresses             Address[]
+  orders                Order[]
+  devices               Device[]
+  repairs               Repair[]
+  assignedRepairs       Repair[]           @relation("AssignedTechnician")
+  technicianAssignments RepairAssignment[] @relation("RepairTechnician")
+  repairAssignmentsMade RepairAssignment[] @relation("RepairAssigner")
+  tradeIns              TradeIn[]
+  tickets               SupportTicket[]
+  notifications         Notification[]
+  wishlist              Wishlist[]
+  cart                  CartItem[]
+  appointments          Appointment[]
 }
 
 model UserSession {
@@ -329,28 +332,45 @@ model TradeIn {
 }
 
 model Repair {
-  partMovements  PartMovement[]
-  id             String                @id @default(cuid())
-  userId         String
-  user           User                  @relation(fields: [userId], references: [id])
-  deviceId       String?
-  device         Device?               @relation(fields: [deviceId], references: [id])
-  model          String
-  issue          String
-  description    String
-  method         String
-  appointment    DateTime?
-  status         String                @default("REQUESTED")
-  technician     String?
-  createdAt      DateTime              @default(now())
-  history        RepairStatusHistory[]
-  quotes         RepairQuote[]
-  part           Part?                 @relation(fields: [partId], references: [id])
-  partId         String?
-  repairQCs      RepairQC[]
-  repairWarranty RepairWarranty?
+  partMovements        PartMovement[]
+  id                   String                @id @default(cuid())
+  userId               String
+  user                 User                  @relation(fields: [userId], references: [id])
+  deviceId             String?
+  device               Device?               @relation(fields: [deviceId], references: [id])
+  model                String
+  issue                String
+  description          String
+  method               String
+  appointment          DateTime?
+  status               String                @default("REQUESTED")
+  technician           String?
+  assignedTechnicianId String?
+  assignedTechnician   User?                 @relation("AssignedTechnician", fields: [assignedTechnicianId], references: [id], onDelete: Restrict)
+  assignments          RepairAssignment[]
+  createdAt            DateTime              @default(now())
+  history              RepairStatusHistory[]
+  quotes               RepairQuote[]
+  part                 Part?                 @relation(fields: [partId], references: [id])
+  partId               String?
+  repairQCs            RepairQC[]
+  repairWarranty       RepairWarranty?
 
   @@index([userId, createdAt])
+}
+
+model RepairAssignment {
+  id           String   @id @default(cuid())
+  repairId     String
+  repair       Repair   @relation(fields: [repairId], references: [id], onDelete: Restrict)
+  technicianId String
+  technician   User     @relation("RepairTechnician", fields: [technicianId], references: [id], onDelete: Restrict)
+  assignedById String?
+  assignedBy   User?    @relation("RepairAssigner", fields: [assignedById], references: [id], onDelete: Restrict)
+  reason       String
+  createdAt    DateTime @default(now())
+
+  @@index([repairId, createdAt])
 }
 
 model RepairStatusHistory {

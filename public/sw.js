@@ -1,6 +1,6 @@
 /* Only public static assets are cached. Account pages and API responses are network-only. */
-const CACHE='iphonebooking-public-v2';
-self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['/offline.html','/icon.svg'])));self.skipWaiting();});
+const CACHE='iphonebooking-public-v4';
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['/offline.html','/icon.svg','/appearance.js'])));self.skipWaiting();});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE&&key.startsWith('iphonebooking-public-')).map(key=>caches.delete(key)))));self.clients.claim();});
 self.addEventListener('fetch',event=>{
  const url=new URL(event.request.url);

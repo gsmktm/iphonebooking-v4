@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AppearanceControl } from '../features/appearance/AppearanceControl';
 import { Link, NavLink, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -172,6 +173,7 @@ export default function Admin() {
             <span className="muted">/ {resource ? resources[resource]?.title : 'Overview'}</span>
           </span>
           <div>
+            <AppearanceControl />
             <span className="admin-mode">LIVE DATABASE</span>
             <span className="avatar">{user.name[0]}</span>
             <span>{user.name}</span>

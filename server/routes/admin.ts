@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { db } from '../db.js';
+import { updateContentSchema } from '../schemas/content.js';
 import { AppError, owned, permit, hash } from '../core.js';
 export const admin = Router();
 const paging = z.object({
@@ -261,7 +262,21 @@ admin.get(
       case 'repairs':
         [rows, total] = await Promise.all([
           db.repair.findMany({
-            include: { user: { select: { name: true, email: true } }, quotes: true, history: true },
+            include: {
+              user: { select: { name: true, email: true } },
+              quotes: true,
+              history: true,
+              assignedTechnician: { select: { id: true, name: true } },
+              assignments: {
+                select: {
+                  id: true,
+                  reason: true,
+                  createdAt: true,
+                  technician: { select: { id: true, name: true } },
+                },
+                orderBy: { createdAt: 'desc' },
+              },
+            },
             take,
             skip,
           }),
@@ -638,36 +653,38 @@ admin.post('/inventory/:id/adjust', permit('inventory.adjust'), async (req, res)
   );
   res.json({ ok: true });
 });
+admin.get('/content/:id', permit('content.read'), async (req, res) => {
+  res.json(owned(await db.cMSPage.findUnique({ where: { id: String(req.params.id) } })));
+});
 admin.patch('/content/:id', permit('content.update'), async (req, res) => {
-  const data = z
-    .object({
-      title: z.string().min(1).max(160),
-      description: z.string().max(300),
-      published: z.boolean(),
-      blocks: z
-        .array(
-          z.object({
-            type: z.enum(['hero', 'text', 'faq', 'cta']),
-            title: z.string().max(200),
-            body: z.string().max(5000),
-            href: z
-              .string()
-              .regex(/^\/(?!\/)/)
-              .optional(),
-          }),
-        )
-        .max(30),
-    })
-    .parse(req.body);
+  const { expectedUpdatedAt, ...data } = updateContentSchema.parse(req.body);
   res.json(
     await db.$transaction(async (tx) => {
-      const result = await tx.cMSPage.update({ where: { id: String(req.params.id) }, data });
+      const before = owned(await tx.cMSPage.findUnique({ where: { id: String(req.params.id) } }));
+      const expected = expectedUpdatedAt ? new Date(expectedUpdatedAt) : before.updatedAt;
+      const changed = await tx.cMSPage.updateMany({
+        where: { id: before.id, updatedAt: expected },
+        data,
+      });
+      if (changed.count !== 1)
+        throw new AppError(
+          409,
+          'CONTENT_CHANGED',
+          'Another editor changed this page. Load the latest saved version before saving again.',
+        );
+      const result = owned(await tx.cMSPage.findUnique({ where: { id: before.id } }));
       await tx.auditLog.create({
         data: {
           actorId: req.user!.id,
           action: 'content.update',
           entity: 'CMSPage',
           entityId: result.id,
+          before: {
+            title: before.title,
+            description: before.description,
+            published: before.published,
+            blocks: before.blocks,
+          },
           after: data,
           requestId: req.requestId,
         },

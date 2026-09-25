@@ -134,6 +134,7 @@ services.get('/repairs', requireUser, async (req, res) =>
     await db.repair.findMany({
       where: { userId: req.user!.id },
       include: { history: true, quotes: true, repairWarranty: true },
+      omit: { technician: true, assignedTechnicianId: true },
       orderBy: { createdAt: 'desc' },
     }),
   ),

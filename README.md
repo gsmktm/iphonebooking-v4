@@ -4,7 +4,7 @@ A working React/TypeScript storefront and Express/PostgreSQL operations applicat
 
 **Status: local development implementation, not a completed or certified production platform.** The combined 203-section V2/V3 specification is larger than the features implemented here. Live payment gateways are deliberately disabled. See [implementation status](docs/implementation-status.md) for the exact boundary.
 
-The workspace was empty when audited. No previous source code or production records were replaced. Additive Prisma migrations preserve existing records while extending the relational model and integrity constraints.
+The initial V2 build started from an empty workspace. Subsequent V3 work preserves existing records and migrations, replaces unsafe generated CRUD routes with protected workflow boundaries, and extends the relational model through additive migrations. See the Device OS progress report for that audit and implementation scope.
 
 ## Run locally
 

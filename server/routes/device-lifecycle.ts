@@ -113,7 +113,10 @@ deviceLifecycle.get('/account/devices/:id/passport', requireUser, async (req, re
         where: {
           deviceId: identity.id,
           customerVisible: true,
-          timestamp: { gte: device.createdAt },
+          OR: [
+            { timestamp: { gte: device.createdAt } },
+            { eventType: 'SOLD', reference: device.orderId },
+          ],
         },
         select: { id: true, eventType: true, timestamp: true },
         orderBy: { timestamp: 'asc' },

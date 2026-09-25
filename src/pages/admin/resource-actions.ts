@@ -212,7 +212,6 @@ export function actionsFor(resource: string, row: Row): Action[] {
           fields: [
             text('status', 'Next status'),
             text('note', 'Customer-visible update', 'textarea'),
-            { key: 'technician', label: 'Technician' },
           ],
           help: 'Valid sequence: REQUESTED → RECEIVED → INSPECTION → DIAGNOSIS. After quote approval: APPROVED → REPAIR_IN_PROGRESS → QUALITY_CONTROL → READY → COMPLETED.',
         },

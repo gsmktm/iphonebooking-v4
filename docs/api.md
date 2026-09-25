@@ -112,3 +112,10 @@ Supported paginated admin read modules added: `device-identity`, `device-event`,
 `GET /api/v1/account/shop-state` requires a session and returns `accountId`, `revision`, hydrated cart lines, and wishlist product IDs. `PUT` accepts `{ accountId, revision, cart: [{ variantId, quantity }], wishlist: [productId] }` and atomically replaces the selection only at the expected revision. The response returns the new revision.
 
 A stale revision returns `409 SHOP_STATE_CHANGED`; a different signed-in account returns `409 ACCOUNT_CHANGED`. The client must load the saved selection or explicitly confirm keeping its local selection before retrying. A conflict must never be handled by unconditional background overwrite. Existing cart/wishlist endpoints increment the same revision for compatibility. Neither saved cart prices nor availability establish checkout pricing or reserve inventory.
+
+## Repair assignment
+
+- `GET /api/v1/admin/repair-technicians?q=...` requires `repair.assign` and returns at most 50 staff with repair work permission, their role name, and current assigned workload. Search by name; staff email and credential fields are excluded.
+- `POST /api/v1/admin/repairs/:id/assign` requires `repair.assign` and accepts `{ technicianId, expectedTechnicianId: string | null, reason }`. The expected current assignee protects against stale edits. The transaction validates staff eligibility and service stage, writes the assignment and immutable history, and records an audit entry.
+- `PATCH /api/v1/admin/repairs/:id/status` no longer accepts `technician`. Assignment requires the dedicated permission even if the actor may update repair stages.
+- With `REQUIRE_INDEPENDENT_REPAIR_QC=true`, QC blocks both current and historical assignees. Legacy names that were not safely mapped to staff IDs return `LEGACY_ASSIGNMENT_REVIEW_REQUIRED`.

@@ -20,11 +20,17 @@ Role management now supports a grouped permission editor, scoped creation/editin
 
 Authenticated carts and wishlists now use account-scoped revision checks. Guest selections merge on login; concurrent edits require an explicit choice. Sign-out clears local account selections and private query caches. A browser journey covers migration, conflict recovery, sign-out, and switching accounts.
 
+Verified technician assignment now uses staff accounts with repair work permission, a dedicated assignment permission, and an immutable assignment history. The staff picker shows current workload. Status updates cannot change technicians. When independent QC is enabled, current and previous assignees cannot inspect the repair; unresolved legacy technician text blocks QC pending data review.
+
+## Homepage and mobile web update — 22 September 2026
+
+Added the supplied-banner navy/gold campaign, Tailwind layout utilities, catalog-backed homepage configuration and cart actions, mobile navigation, and browser installation guidance. The responsive web app shares the existing account and service routes. This does not complete the broader V2/V3 backlog or create native app-store binaries.
+
 ## Still required
 
 - V2 gaps in [implementation status](implementation-status.md) remain except where superseded above. Live provider payments/refunds, email/SMS, full CMS/navigation, media, complete search, i18n, authentication recovery/MFA, promotions, and production deployment remain unfinished.
 - Device ownership periods and resale/replacement allocation must be modeled before enabling refurbishment, resale, recycling, or retirement. Current single-purchase ownership must not be reused as if multi-owner history were complete.
-- Repair BOM execution, evidence uploads, part returns, independent technician assignment UI, warranty claims, repair payment, and formal service documents still need work.
+- Repair BOM execution, evidence uploads, part returns, warranty claims, repair payment, and formal service documents still need work.
 - Procurement needs partial receiving-QC decisions, supplier returns, multi-currency/freight allocation, purchasing amendments, and supplier settlement. The current supplier entity reuses the existing PartSupplier table and supports device purchases through the same supplier directory.
 - Financial reconciliation currently compares internal orders, payments, and the new order ledger. Bank/gateway imports, provider fees, refunds, settlement, cash drawers, general accounting export, and retailer balances are not implemented.
 - POS, scanner mode, appointments with real capacity, store queues, logistics/couriers, stocktake/bin transfers, launch command center, B2B, dealer networks, AI tools, workflow automation, forecasting, experiments, partner APIs, and operations command centers remain schema-only or absent.
@@ -33,7 +39,7 @@ Authenticated carts and wishlists now use account-scoped revision checks. Guest 
 ## Next dependency sequence
 
 1. Finish transactional truth: gateway verification and refunds, settlement ingestion, physical stock reconciliation, and explicit ownership periods.
-2. Extend the device lifecycle: handover consent/evidence, technician assignment, BOM/QC policies, warranty/RMA, refurbishment, resale, and retirement on the same identity.
+2. Extend the device lifecycle: handover consent/evidence, BOM/QC policies, warranty/RMA, refurbishment, resale, and retirement on the same identity.
 3. Add omnichannel operations: appointment capacity, POS/cash sessions, transfers, procurement exceptions, courier/reverse logistics, corporate/dealer orders.
 4. Add operational intelligence only after those sources are reliable: outbox-driven automation, risk review, price guardrails, data quality, analytics and grounded AI.
 5. Complete production validation and external setup: reviewed business policies/catalog, secrets/providers, HTTPS environments, migration rehearsal, restore drill, load and accessibility review, deployment and health checks.
