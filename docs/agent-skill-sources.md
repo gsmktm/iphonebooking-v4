@@ -2,16 +2,16 @@
 
 Snapshot: 26 November 2026. Scope: gsmktm/iphonebooking-v4. These sources are reviewed methodology references, **not installed third-party runtime code or executable hooks**. The five project SKILL.md files are original adaptations.
 
-| Source pinned for review | Practices selected |
-| --- | --- |
-| [mattpocock/skills](https://github.com/mattpocock/skills/tree/6f7f7831a625f040a8e06a0e7954826b87ce775a) | TDD, standards/spec review |
-| [obra/superpowers](https://github.com/obra/superpowers/tree/22f0b463e7a5e579904dd6211a520321035526f7) | Root-cause debugging, verification |
-| [affaan-m/ECC](https://github.com/affaan-m/ECC/tree/4adeee6732a12d1540f49a4d50a38ce8c97f9a53) | Security, database migrations, browser QA, delivery gates |
-| [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills/tree/2c606141936f1eeef17fa3043a72095b4765b9c2) | Minimal, surgical code changes |
-| [anthropics/skills](https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba) | Frontend design and skill authoring |
-| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/tree/8db36338810d0942567b97ce439affd1619fcf31) | Responsive design research |
-| [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills/tree/e997ac5b9a74eab332d5e9793bb38a38c8cfdd74) | CI/CD, security, incremental implementation |
-| [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill/tree/d1a2bb41d927083ac7118f60cfc9cdf711810ea0) | Editorial UI restraint, browser checks |
+| Source pinned for review                                                                                                                      | Practices selected                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| [mattpocock/skills](https://github.com/mattpocock/skills/tree/6f7f7831a625f040a8e06a0e7954826b87ce775a)                                       | TDD, standards/spec review                                |
+| [obra/superpowers](https://github.com/obra/superpowers/tree/22f0b463e7a5e579904dd6211a520321035526f7)                                         | Root-cause debugging, verification                        |
+| [affaan-m/ECC](https://github.com/affaan-m/ECC/tree/4adeee6732a12d1540f49a4d50a38ce8c97f9a53)                                                 | Security, database migrations, browser QA, delivery gates |
+| [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills/tree/2c606141936f1eeef17fa3043a72095b4765b9c2)       | Minimal, surgical code changes                            |
+| [anthropics/skills](https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba)                                       | Frontend design and skill authoring                       |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/tree/8db36338810d0942567b97ce439affd1619fcf31) | Responsive design research                                |
+| [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills/tree/e997ac5b9a74eab332d5e9793bb38a38c8cfdd74)                           | CI/CD, security, incremental implementation               |
+| [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill/tree/d1a2bb41d927083ac7118f60cfc9cdf711810ea0)                                 | Editorial UI restraint, browser checks                    |
 
 ## Deferred or not applicable as direct application dependencies
 
