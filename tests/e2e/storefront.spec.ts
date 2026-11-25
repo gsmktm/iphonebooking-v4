@@ -114,8 +114,12 @@ test('staff can open operational modules and edit dialogs', async ({ page }) => 
     'order-ledger',
     'reconciliation',
   ]) {
+    console.log('Opening operational module:', path);
     await page.goto(`/admin/${path}`);
-    await expect(page.locator('.admin-page-heading h1')).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.locator('.admin-page-heading h1'),
+      `Operational module /admin/${path} must render its heading`,
+    ).toBeVisible({ timeout: 15000 });
     await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15000 });
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
   }

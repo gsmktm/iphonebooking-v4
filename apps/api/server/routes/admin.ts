@@ -529,7 +529,7 @@ const productSchema = z.object({
   categoryId: z.string(),
   image: z.string().regex(/^\/images\/[a-zA-Z0-9._-]+$/),
   gallery: z.array(z.string()).default([]),
-  specs: z.record(z.string()).default({}),
+  specs: z.record(z.string(), z.string()).default({}),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
   badge: z.string().max(30).nullable().optional(),

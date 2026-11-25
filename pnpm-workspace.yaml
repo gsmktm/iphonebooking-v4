@@ -5,6 +5,9 @@ overrides:
   effect: ^3.20.0
   deepmerge-ts: ^8.0.0
   source-map-js: 1.2.2
+  body-parser: 2.4.0
+  ip-address: 10.7.6
+  qs: 6.17.1
 
 allowBuilds:
   prisma: true

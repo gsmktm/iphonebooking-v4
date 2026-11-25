@@ -36,7 +36,12 @@ test('mobile home fits small screens, supports app navigation and explains insta
   for (const width of [320, 375, 414, 430, 768, 1024, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
-    await page.locator('.quick-config').waitFor();
+    // Keep the failing viewport actionable without printing customer data.
+    console.log('Mobile viewport under test:', width);
+    await expect(
+      page.locator('.quick-config'),
+      `Home configurator should render at ${width}px (route: /)`,
+    ).toBeVisible({ timeout: 12000 });
     await expect
       .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
       .toBe(true);
