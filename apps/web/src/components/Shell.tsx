@@ -16,14 +16,15 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useCustomerSync } from '../app/useCustomerSync';
 import { api, post } from '../services/api';
-import type { Product, User } from '../services/types';
+import type { User } from '../services/types';
 import { useShop } from '../store/shop';
-import { Brand, Dialog, ProductVisual, ErrorNotice } from './ui';
+import { Brand, Dialog, ErrorNotice } from './ui';
+import { SearchDialog } from '../features/search/SearchDialog';
 import { cn } from '../utils/cn';
 import { InstallApp, MobileNavigation } from '../features/pwa/MobileApp';
 import { AppearanceControl } from '../features/appearance/AppearanceControl';
 const links = [
-  ['Store', '/store'],
+  ['Shop', '/store'],
   ['iPhone', '/iphone'],
   ['Mac', '/mac'],
   ['iPad', '/ipad'],
@@ -34,10 +35,9 @@ const links = [
 export function Shell() {
   const [searchOpen, setSearchOpen] = useState(false),
     [mobile, setMobile] = useState(false),
-    [query, setQuery] = useState(''),
-    [search, setSearch] = useState(''),
     [newsletter, setNewsletter] = useState(''),
     [subscribed, setSubscribed] = useState(false),
+    [subscribing, setSubscribing] = useState(false),
     [newsletterError, setNewsletterError] = useState<unknown>();
   const location = useLocation();
   const home = location.pathname === '/';
@@ -51,15 +51,6 @@ export function Shell() {
     queryKey: ['config'],
     queryFn: () => api<{ developmentData: boolean }>('/config'),
   });
-  const { data: results, error } = useQuery({
-    queryKey: ['search', search],
-    queryFn: () => api<Product[]>(`/products?q=${encodeURIComponent(search)}`),
-    enabled: searchOpen,
-  });
-  useEffect(() => {
-    const timer = setTimeout(() => setSearch(query), 180);
-    return () => clearTimeout(timer);
-  }, [query]);
   useEffect(() => {
     setMobile(false);
     setSearchOpen(false);
@@ -102,7 +93,7 @@ export function Shell() {
       </div>
       <header className="site-header">
         <div className="header-main container">
-          <Brand diamond={home} />
+          <Brand diamond />
           <nav aria-label="Main navigation" className="desktop-nav">
             {links.map(([label, to]) => (
               <NavLink key={to} to={to}>
@@ -110,8 +101,10 @@ export function Shell() {
               </NavLink>
             ))}
             <span className="nav-divider" />
+            <NavLink to="/prebook">Pre-book</NavLink>
             <NavLink to="/trade-in">Trade In</NavLink>
             <NavLink to="/repair">Repair</NavLink>
+            <NavLink to="/deals">Deals</NavLink>
           </nav>
           <div className="header-utilities">
             <button
@@ -147,23 +140,27 @@ export function Shell() {
             </button>
           </div>
         </div>
-        {mobile && (
-          <nav className="mobile-nav" aria-label="Mobile navigation">
+        <Dialog open={mobile} onClose={() => setMobile(false)} title="Explore iPhoneBooking">
+          <nav className="mobile-nav mobile-nav-dialog" aria-label="Mobile navigation">
             {[
               ...links,
               ['Trade In', '/trade-in'],
               ['Repair', '/repair'],
+              ['Pre-book', '/prebook'],
+              ['Deals', '/deals'],
+              ['Wishlist', '/wishlist'],
+              ['Retailer workspace', '/retailer'],
               ['Compare', '/compare'],
               ['Support', '/support'],
               ['My account', '/account'],
             ].map(([label, to]) => (
-              <Link key={to} to={to}>
+              <Link key={to} to={to} onClick={() => setMobile(false)}>
                 {label}
                 <ArrowUpRight size={16} />
               </Link>
             ))}
           </nav>
-        )}
+        </Dialog>
       </header>
       {accountSync.error && (
         <div className="container sync-notice" role="status">
@@ -191,11 +188,16 @@ export function Shell() {
         <form
           onSubmit={async (e) => {
             e.preventDefault();
+            if (subscribing) return;
+            setSubscribing(true);
+            setNewsletterError(undefined);
             try {
               await post('/subscribe', { email: newsletter, consent: true });
               setSubscribed(true);
             } catch (e) {
               setNewsletterError(e);
+            } finally {
+              setSubscribing(false);
             }
           }}
         >
@@ -215,7 +217,13 @@ export function Shell() {
                   value={newsletter}
                   onChange={(e) => setNewsletter(e.target.value)}
                 />
-                <button aria-label="Subscribe to launch notifications">
+                <button
+                  disabled={subscribing}
+                  aria-busy={subscribing}
+                  aria-label={
+                    subscribing ? 'Saving subscription' : 'Subscribe to launch notifications'
+                  }
+                >
                   <ArrowRight size={20} />
                 </button>
               </div>
@@ -231,7 +239,7 @@ export function Shell() {
       <footer className="site-footer">
         <div className="container footer-grid">
           <div className="footer-brand">
-            <Brand diamond={home} />
+            <Brand diamond />
             <p>
               Technology from the Himalayas.
               <br />
@@ -260,6 +268,8 @@ export function Shell() {
                 ['Pre-booking', '/prebook'],
                 ['Compare devices', '/compare'],
                 ['Find a store', '/stores'],
+                ['Retailer network', '/retailer-network'],
+                ['World prices', '/world-price-map'],
               ],
             },
             {
@@ -269,6 +279,8 @@ export function Shell() {
                 ['Track an order', '/track'],
                 ['Help & support', '/support'],
                 ['Warranty', '/policies/warranty'],
+                ['Journal', '/blog'],
+                ['IMEI format check', '/imei-check'],
                 ['Returns & refunds', '/policies/returns'],
               ],
             },
@@ -296,8 +308,7 @@ export function Shell() {
         </div>
         {config?.developmentData && (
           <div className="dev-notice">
-            Development environment · Sample catalog, pricing, stock, and store details · Online
-            payments are not enabled
+            Development environment · Sample catalog, pricing, stock, and store details
           </div>
         )}
       </footer>
@@ -308,53 +319,7 @@ export function Shell() {
           <ArrowRight size={16} />
         </Link>
       )}
-      <Dialog
-        open={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        title="Find your next great thing"
-      >
-        <div className="search-input">
-          <Search size={22} />
-          <input
-            autoFocus
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search devices, models, or SKU…"
-            aria-label="Search catalog"
-          />
-          <kbd>⌘ K</kbd>
-        </div>
-        <div className="search-results">
-          {error ? (
-            <ErrorNotice error={error} />
-          ) : (
-            results?.slice(0, 6).map((p) => (
-              <Link to={`/products/${p.slug}`} key={p.id}>
-                <ProductVisual image={p.image} name={p.name} />
-                <div>
-                  <strong>{p.name}</strong>
-                  <p>{p.tagline}</p>
-                </div>
-                <ArrowUpRight size={18} />
-              </Link>
-            ))
-          )}
-          {results?.length === 0 && <p>No devices match. Try “iPhone”, “Mac”, or a model name.</p>}
-        </div>
-        <div className="search-shortcuts">
-          <Link to="/compare">Compare devices {compare.length > 0 && `(${compare.length})`}</Link>
-          <Link to="/wishlist">
-            <Heart size={14} />
-            Wishlist ({wishlist.length})
-          </Link>
-          <Link to="/support">Support</Link>
-          <Link to="/stores">
-            <MapPin size={14} />
-            Stores
-          </Link>
-        </div>
-        {user && <p className="muted">Welcome back, {user.name.split(' ')[0]}.</p>}
-      </Dialog>
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
       <MobileNavigation />
     </div>
   );

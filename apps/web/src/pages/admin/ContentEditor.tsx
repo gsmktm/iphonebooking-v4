@@ -5,13 +5,31 @@ import { api, ApiError } from '../../services/api';
 import { ErrorNotice } from '../../components/ui';
 import type { Action, Row } from './resource-types';
 
-const types = ['hero', 'text', 'faq', 'cta'] as const;
+const types = ['hero', 'text', 'faq', 'cta', 'section'] as const;
+const homeSections = [
+  'spotlights',
+  'finder',
+  'saved',
+  'iphones',
+  'ecosystem',
+  'why',
+  'trade-in',
+  'repair',
+  'network',
+  'intelligence',
+  'journey',
+  'reviews',
+  'news',
+  'final',
+];
 interface Block {
   id: string;
   type: string;
   title: string;
   body: string;
   href: string;
+  key?: string;
+  enabled?: boolean;
 }
 interface Draft {
   title: string;
@@ -76,17 +94,19 @@ export default function ContentEditor({
               ...(action.method === 'POST'
                 ? { slug: draft.slug }
                 : { expectedUpdatedAt: draft.updatedAt }),
-              blocks: draft.blocks.map(({ type, title, body, href }) => ({
+              blocks: draft.blocks.map(({ type, title, body, href, key, enabled }) => ({
                 type,
                 title,
                 body,
                 ...(href ? { href } : {}),
+                ...(type === 'section' ? { key, enabled: enabled !== false } : {}),
               })),
             }),
           });
           await Promise.all([
             client.invalidateQueries({ queryKey: ['admin', 'content'] }),
             client.invalidateQueries({ queryKey: ['content'] }),
+            client.invalidateQueries({ queryKey: ['home'] }),
           ]);
           onComplete();
         } catch (cause) {
@@ -132,7 +152,9 @@ export default function ContentEditor({
         {draft.slug === 'home' && (
           <p className="notice">
             The homepage uses the first hero block for its headline, introduction and primary
-            destination. Other homepage sections currently use the storefront layout.
+            destination. Add a homepage section block to customize the heading, description and
+            destination, or hide a storefront section. Product, stock, review and article data come
+            from the database.
           </p>
         )}
         <h3>Content blocks</h3>
@@ -189,13 +211,44 @@ export default function ContentEditor({
               {types.map((type) => (
                 <option value={type} key={type}>
                   {
-                    { hero: 'Hero', text: 'Text', faq: 'Question & answer', cta: 'Call to action' }[
-                      type
-                    ]
+                    {
+                      hero: 'Hero',
+                      text: 'Text',
+                      faq: 'Question & answer',
+                      cta: 'Call to action',
+                      section: 'Homepage section',
+                    }[type]
                   }
                 </option>
               ))}
             </select>
+            {block.type === 'section' && (
+              <>
+                <label>
+                  Homepage section
+                  <select
+                    required
+                    value={block.key ?? ''}
+                    onChange={(e) => update(block.id, { key: e.target.value })}
+                  >
+                    <option value="">Choose a section</option>
+                    {homeSections.map((key) => (
+                      <option key={key} value={key}>
+                        {key.replaceAll('-', ' ')}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={block.enabled !== false}
+                    onChange={(e) => update(block.id, { enabled: e.target.checked })}
+                  />
+                  Show this section on the homepage
+                </label>
+              </>
+            )}
             <label>
               {block.type === 'faq' ? 'Question' : 'Heading'}
               <input

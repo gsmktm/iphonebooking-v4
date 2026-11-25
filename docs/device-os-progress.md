@@ -1,5 +1,7 @@
 # V2 + V3 implementation progress
 
+> Historical implementation note. The 6 October 2026 refresh is documented in [ARCHITECTURE.md](../ARCHITECTURE.md), [API.md](../API.md), [DEPLOYMENT.md](../DEPLOYMENT.md) and [TESTING.md](../TESTING.md). Those files supersede older payment/mail, homepage, build-command and verification claims below.
+
 The complete 203-section specification remains unfinished. This continuation implements and tests additional connected workflows; it does not turn schema-only modules into completed features.
 
 ## Added in this continuation

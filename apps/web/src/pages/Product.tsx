@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ArrowRight, Heart, ShieldCheck, Truck, RefreshCw, Plus } from 'lucide-react';
 import { api, money, track } from '../services/api';
 import type { Product as ProductType } from '../services/types';
+import { ProductCard } from '../components/ProductCard';
 import { useShop } from '../store/shop';
+import { useRecentDevices } from '../store/recent';
+import ProductReviews from '../features/reviews/Reviews';
 import {
   Loading,
   ErrorNotice,
@@ -15,9 +18,11 @@ import {
 } from '../components/ui';
 export default function Product() {
   const { slug } = useParams();
+  const [params, setParams] = useSearchParams();
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const result = useQuery({
     queryKey: ['product', slug],
-    queryFn: () => api<ProductType>(`/products/${slug}`),
+    queryFn: () => api<ProductType & { related: ProductType[] }>(`/products/${slug}`),
   });
   const p = result.data;
   const [color, setColor] = useState(''),
@@ -27,7 +32,10 @@ export default function Product() {
   useEffect(() => {
     setColor('');
     setStorage('');
-    if (p) track('product_viewed', p.id);
+    if (p) {
+      track('product_viewed', p.id);
+      useRecentDevices.getState().record(p.id);
+    }
   }, [p?.id]);
   if (result.isLoading)
     return (
@@ -42,9 +50,12 @@ export default function Product() {
       </div>
     );
   const colors = [...new Map(p.variants.map((v) => [v.color, v])).values()];
-  const selectedColor = color || p.variants[0]?.color;
+  const requested = p.variants.find((v) => v.id === params.get('variant'));
+  const selectedColor = color || requested?.color || p.variants[0]?.color;
   const options = p.variants.filter((v) => v.color === selectedColor);
-  const v = options.find((v) => v.storage === (storage || p.variants[0]?.storage)) ?? options[0];
+  const v =
+    options.find((v) => v.storage === (storage || requested?.storage || p.variants[0]?.storage)) ??
+    options[0];
   if (!v)
     return (
       <div className="container page">
@@ -61,8 +72,16 @@ export default function Product() {
   const choose = (kind: 'color' | 'storage', value: string) => {
     if (kind === 'color') setColor(value);
     else setStorage(value);
-    track('variant_selected', v.id);
+    const next =
+      kind === 'color'
+        ? (p.variants.find((option) => option.color === value && option.storage === v.storage) ??
+          p.variants.find((option) => option.color === value))
+        : p.variants.find((option) => option.color === v.color && option.storage === value);
+    if (next) setParams({ variant: next.id }, { replace: true });
+    setGalleryIndex(0);
+    track('variant_selected', next?.id ?? v.id);
   };
+  const gallery = [...new Set([v.image ?? p.image, ...p.gallery])];
   const addToBag = () => {
     add(p, v);
     setAdded(true);
@@ -73,17 +92,30 @@ export default function Product() {
       <nav className="breadcrumbs">
         <Link to="/store">Store</Link>
         <span>/</span>
-        <Link to={`/${p.category.slug}`}>{p.category.name}</Link>
+        <Link to={`/store?category=${p.category.slug}`}>{p.category.name}</Link>
         <span>/</span>
         <span>{p.name}</span>
       </nav>
       <div className="product-detail-grid">
         <div className="product-gallery">
           <ProductVisual
-            image={v.image ?? p.image}
+            image={gallery[galleryIndex] ?? gallery[0]}
             name={`${p.name}, ${v.color}`}
             className={`detail-visual color-${v.color.toLowerCase().replaceAll(' ', '-')}`}
           />
+          <div className="gallery-thumbnails" aria-label="Product gallery">
+            {gallery.length > 1 &&
+              gallery.map((image, i) => (
+                <button
+                  key={image}
+                  aria-label={`View product image ${i + 1}`}
+                  aria-pressed={galleryIndex === i}
+                  onClick={() => setGalleryIndex(i)}
+                >
+                  <ProductVisual image={image} name={`${p.name}, view ${i + 1}`} />
+                </button>
+              ))}
+          </div>
           <div className="gallery-caption">
             <span>{p.name}</span>
             <span>Illustrative studio render</span>
@@ -163,7 +195,7 @@ export default function Product() {
           </Link>
           {v.preorder && (
             <div className="notice">
-              Booking deposit: {money(v.deposit)}. Pay at the store to confirm your allocation.
+              Booking deposit: {money(v.deposit)}. Payment options are shown after you reserve.
             </div>
           )}
           <div className="purchase-actions">
@@ -201,12 +233,13 @@ export default function Product() {
           ))}
         </div>
       </section>
+      <ProductReviews key={p.id} slug={p.slug} />
       <section className="faq">
         <h2>A few things you might be wondering.</h2>
         {[
           [
             'How do I reserve this device?',
-            'Choose your color and configuration, add it to your bag, and complete checkout. Your reservation is held for 24 hours for store payment.',
+            'Choose your color and configuration, add it to your bag, and complete checkout. Your unpaid reservation is normally held for 24 hours. Available payment options appear after you reserve.',
           ],
           [
             'Can I trade in my current device?',
@@ -226,6 +259,16 @@ export default function Product() {
           </details>
         ))}
       </section>
+      {!!p.related?.length && (
+        <section className="related-products">
+          <h2>A few more possibilities.</h2>
+          <div className="product-grid">
+            {p.related.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
       <div className="mobile-purchase-bar">
         <div>
           <strong>{money(v.price)}</strong>

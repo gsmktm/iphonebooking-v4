@@ -106,7 +106,7 @@ const SERVICES: ServiceItem[] = [
   {
     Icon: Wrench,
     title: 'Care that keeps up.',
-    body: 'Book a repair, approve your quote and follow every service update — genuine parts, warranted work.',
+    body: 'Book a repair, approve your quote and follow every service update. Parts and warranty terms are listed in your quotation.',
     to: '/repair',
     cta: 'Book a repair',
   },

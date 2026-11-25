@@ -73,36 +73,6 @@
 .luxe-home .eyebrow {
   color: var(--accent-text);
 }
-.luxe-home .campaign-hero {
-  background: var(--canvas);
-  color: var(--ink);
-  border-bottom: 1px solid var(--line);
-}
-.luxe-home .campaign-copy h1 {
-  color: var(--accent-text);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  line-height: 1.07;
-}
-.luxe-home .campaign-copy p {
-  color: var(--muted);
-}
-.luxe-home .campaign-signoff,
-.luxe-home .campaign-copy .eyebrow {
-  color: var(--accent-text);
-}
-.luxe-home .campaign-art {
-  filter: brightness(0.62) saturate(0.55);
-}
-.luxe-home .campaign-actions .button {
-  background: #dec28d;
-  border-color: var(--accent-text);
-  color: #101719;
-}
-.luxe-home .campaign-actions .arrow-link {
-  color: var(--accent-text);
-}
 .luxe-home .red-dot {
   background: #dec28d;
 }
@@ -285,7 +255,7 @@
   border-block: 1px solid #34414a;
 }
 .luxe-home .himalayan-story h2 {
-  font-family: Georgia, serif;
+  font-family: var(--font-display);
   color: var(--accent-text);
   font-weight: 400;
 }
@@ -390,18 +360,6 @@
   }
 }
 @media (min-width: 1024px) {
-  .luxe-home .campaign-inner {
-    min-height: clamp(32rem, 40vw, 45rem);
-  }
-  .luxe-home .campaign-hero::before {
-    background: linear-gradient(
-      90deg,
-      var(--canvas) 1%,
-      rgba(7, 16, 20, 0.93) 21%,
-      rgba(7, 16, 20, 0.5) 44%,
-      transparent 68%
-    );
-  }
   .mobile-app-nav {
     display: none;
   }

@@ -71,6 +71,10 @@ export function AccountOrders() {
               <span>Total</span>
               <strong>{money(order.total)}</strong>
             </div>
+            <Link className="text-button" to={`/confirmation?order=${order.id}`}>
+              Payment options & status
+              <ArrowRight size={16} />
+            </Link>
             {order.booking && (
               <p>
                 Booking status: <Status value={order.booking.status} />

@@ -23,16 +23,66 @@ jobs:
       NODE_ENV: test
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm run db:generate
-      - run: npx prisma validate
-      - run: npm run db:migrate
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
-      - run: npm audit --audit-level=moderate
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - run: pnpm --filter api exec prisma validate
+      - run: pnpm db:migrate
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm audit --audit-level=moderate
+      - name: Prepare isolated browser database
+        env:
+          PGPASSWORD: test
+        run: createdb --host localhost --username test iphonebooking_browser
+      - name: Seed and start browser fixture
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/iphonebooking_browser?schema=public
+          NODE_ENV: development
+          SEED_DEVELOPMENT: 'true'
+          ADMIN_EMAIL: browser-admin@example.test
+          ADMIN_PASSWORD: Browser-only-ci-password-2026
+        run: |
+          pnpm db:migrate
+          pnpm db:seed
+          pnpm exec playwright install --with-deps chrome
+          pnpm dev > /tmp/iphonebooking-browser.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:5173/api/health > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - run: pnpm test:e2e
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/iphonebooking_browser?schema=public
+          ADMIN_EMAIL: browser-admin@example.test
+          ADMIN_PASSWORD: Browser-only-ci-password-2026
+      - name: Verify compiled application
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/iphonebooking_browser?schema=public
+          NODE_ENV: production
+          SEED_DEVELOPMENT: 'false'
+          APP_ORIGIN: https://example.test
+          PUBLIC_ORIGIN: https://example.test
+          PORT: 4101
+        run: |
+          pnpm start > /tmp/iphonebooking-production.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:4101/api/health > /dev/null; then break; fi
+            sleep 1
+          done
+          pnpm test:pwa
+          pnpm test:release
+      - run: pnpm release:package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iphonebooking-rc
+          path: release/

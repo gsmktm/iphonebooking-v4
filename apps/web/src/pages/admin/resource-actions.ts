@@ -9,6 +9,18 @@ export function actionsFor(resource: string, row: Row): Action[] {
     required: true,
   });
   switch (resource) {
+    case 'reviews':
+      return (['PUBLISHED', 'REJECTED'] as const)
+        .filter((status) => status !== row.status)
+        .map((status) => ({
+          label: status === 'PUBLISHED' ? 'Publish review' : 'Reject review',
+          path,
+          method: 'PATCH',
+          permission: 'review.moderate',
+          values: { status, expectedUpdatedAt: row.updatedAt },
+          fields: [text('reason', 'Reason for moderation', 'textarea')],
+          help: 'The review text stays unchanged. This publication decision and its reason are recorded in the audit trail. You cannot moderate your own review.',
+        }));
     case 'products':
       return [
         {

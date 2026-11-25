@@ -137,7 +137,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await db.$disconnect();
 });
-describe.sequential('connected device lifecycle and authorization', () => {
+describe('connected device lifecycle and authorization', () => {
   it('rejects CSRF and backend admin access independently of UI', async () => {
     expect((await request(app).post('/api/v1/orders').send(checkout())).status).toBe(403);
     expect((await get('/admin/orders')).status).toBe(401);

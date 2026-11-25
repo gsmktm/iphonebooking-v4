@@ -135,8 +135,20 @@ test('customer passport and staff QC connect to the same purchased device', asyn
     await expect(dialog.getByLabel('Power', { exact: true })).toBeVisible();
     for (const select of await dialog.locator('select').all()) await select.selectOption('pass');
     await dialog.getByLabel('Inspection notes').fill('Browser test: all functional checks passed.');
-    await dialog.getByRole('button', { name: 'Record QC results' }).click();
-    await expect(dialog).not.toBeVisible();
+    const [qcResponse] = await Promise.all([
+      adminPage.waitForResponse(
+        (response) =>
+          response.url().endsWith(`/api/v1/admin/repairs/${repair.id}/qc`) &&
+          response.request().method() === 'POST',
+      ),
+      dialog.getByRole('button', { name: 'Record QC results' }).click(),
+    ]);
+    expect(
+      qcResponse.ok(),
+      'The server must accept all quality checks before the form closes.',
+    ).toBe(true);
+    await expect(dialog).not.toBeVisible({ timeout: 15000 });
+    expect(await adminPage.evaluate(() => document.body.style.overflow)).toBe('');
     for (const status of ['READY', 'COMPLETED']) await stage(staff.request, repair.id, status);
     await page.reload();
     await expect(page.getByText(/Repair warranty through/)).toBeVisible();

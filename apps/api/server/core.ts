@@ -29,7 +29,13 @@ export async function identity(req: Request, _res: Response, next: NextFunction)
       where: { tokenHash: hash(cookie) },
       include: { user: { include: { role: true } } },
     });
-    if (session && session.expiresAt > new Date()) req.user = session.user;
+    if (
+      session &&
+      session.expiresAt > new Date() &&
+      session.user.status === 'ACTIVE' &&
+      (!session.user.passwordChangedAt || session.createdAt >= session.user.passwordChangedAt)
+    )
+      req.user = session.user;
   }
   next();
 }
@@ -53,6 +59,7 @@ export function safeUser(user: Identity) {
     id: user.id,
     name: user.name,
     email: user.email,
+    emailVerifiedAt: user.emailVerifiedAt,
     role: user.role?.name,
     permissions: user.role?.permissions ?? [],
   };

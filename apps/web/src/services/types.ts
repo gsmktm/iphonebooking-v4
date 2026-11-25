@@ -57,7 +57,43 @@ export interface ContentPage {
   description: string;
   published: boolean;
   updatedAt: string;
-  blocks: { type: string; title: string; body: string; href?: string }[];
+  blocks: {
+    type: string;
+    key?: string;
+    title: string;
+    body: string;
+    href?: string;
+    enabled?: boolean;
+  }[];
+}
+export interface CustomerReview {
+  id: string;
+  rating: number;
+  title: string;
+  body: string;
+  author: string;
+  verifiedPurchase: boolean;
+  createdAt: string;
+  product: { name: string; slug: string };
+}
+export interface HomeFeed {
+  products: Product[];
+  iphones: Product[];
+  categories: Category[];
+  stores: Store[];
+  hero: ContentPage['blocks'][number] | null;
+  sections: ContentPage['blocks'];
+  articles: { title: string; slug: string; description: string; updatedAt: string }[];
+  reviews: CustomerReview[];
+  reviewSummary: { total: number; average: number | null };
+  marketSummary: { sources: number; countries: number };
+}
+export interface CatalogResult {
+  products: Product[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
 }
 export interface History {
   id: string;

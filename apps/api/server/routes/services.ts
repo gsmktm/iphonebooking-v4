@@ -139,6 +139,21 @@ services.get('/repairs', requireUser, async (req, res) =>
     }),
   ),
 );
+services.get('/repairs/:id', requireUser, async (req, res) => {
+  res.json(
+    owned(
+      await db.repair.findFirst({
+        where: { id: String(req.params.id), userId: req.user!.id },
+        include: {
+          history: { orderBy: { createdAt: 'asc' } },
+          quotes: { orderBy: { createdAt: 'desc' } },
+          repairWarranty: true,
+        },
+        omit: { technician: true, assignedTechnicianId: true },
+      }),
+    ),
+  );
+});
 services.post('/repairs', requireUser, async (req, res) => {
   const data = z
     .object({

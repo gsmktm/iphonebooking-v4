@@ -22,6 +22,13 @@ import { SignIn } from './Account';
 import { resources } from './admin/resources';
 import Dashboard from './admin/Dashboard';
 import ResourcePage from './admin/ResourcePage';
+import { RetailerApplications } from './Retailer';
+import { PriceIntelligenceAdmin } from './Intelligence';
+const customResources: Record<string, { title: string; permission: string }> = {
+  'retailer-applications': { title: 'Retailer applications', permission: 'retailer.read' },
+  'price-intelligence': { title: 'World price observations', permission: 'product.read' },
+};
+const allResources = { ...resources, ...customResources };
 const groups = [
   { title: 'Overview', items: [['', 'Dashboard']] },
   {
@@ -65,7 +72,10 @@ const groups = [
     items: [
       ['customers', 'Customers'],
       ['stores', 'Stores'],
+      ['retailer-applications', 'Retailer applications'],
+      ['price-intelligence', 'World price observations'],
       ['content', 'Content studio'],
+      ['reviews', 'Customer reviews'],
       ['tickets', 'Support'],
       ['notifications', 'Notifications'],
       ['subscribers', 'Launch subscribers'],
@@ -135,7 +145,8 @@ export default function Admin() {
               <span>{g.title}</span>
               {g.items
                 .filter(
-                  ([r]) => (!r || resources[r]) && can(r ? resources[r].permission : 'report.read'),
+                  ([r]) =>
+                    (!r || allResources[r]) && can(r ? allResources[r].permission : 'report.read'),
                 )
                 .map(([r, label]) => {
                   const Icon = icons[r] ?? FileText;
@@ -170,7 +181,7 @@ export default function Admin() {
           </button>
           <span>
             Workspace{' '}
-            <span className="muted">/ {resource ? resources[resource]?.title : 'Overview'}</span>
+            <span className="muted">/ {resource ? allResources[resource]?.title : 'Overview'}</span>
           </span>
           <div>
             <AppearanceControl />
@@ -191,6 +202,10 @@ export default function Admin() {
                 action="Your account"
               />
             )
+          ) : resource === 'retailer-applications' && can('retailer.read') ? (
+            <RetailerApplications />
+          ) : resource === 'price-intelligence' && can('product.read') ? (
+            <PriceIntelligenceAdmin />
           ) : resources[resource] && can(resources[resource].permission) ? (
             <ResourcePage key={resource} resource={resource} user={user} />
           ) : (

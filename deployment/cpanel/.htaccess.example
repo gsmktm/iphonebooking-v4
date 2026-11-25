@@ -1,0 +1,10 @@
+# Only for a separate STATIC frontend document root (apps/web/dist).
+# The host must configure a same-origin /api proxy to Node BEFORE this fallback.
+# Prefer routing the whole domain to Node to retain per-page server SEO metadata.
+Options -Indexes
+RewriteEngine On
+RewriteRule ^api(?:/|$) - [L]
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^ index.html [L]

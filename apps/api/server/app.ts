@@ -6,6 +6,11 @@ import { randomUUID } from 'node:crypto';
 import { ZodError, z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { db } from './db.js';
+import { config } from './config.js';
+import { retailer } from './routes/retailer.js';
+import { information } from './routes/information.js';
+import { reviews } from './routes/reviews.js';
+import { home } from './routes/home.js';
 import { identity, AppError, hash, requireUser, owned } from './core.js';
 import { auth } from './routes/auth.js';
 import { catalog } from './routes/catalog.js';
@@ -25,7 +30,7 @@ import { deviceLifecycle } from './routes/device-lifecycle.js';
 import { legacyScaffolds } from './routes/legacy-scaffolds.js';
 export const app = express();
 app.disable('x-powered-by');
-if (process.env.TRUST_PROXY_HOPS) app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS));
+if (config.trustProxyHops) app.set('trust proxy', config.trustProxyHops);
 app.use((req, res, next) => {
   const started = performance.now();
   res.on('finish', () => {
@@ -87,22 +92,33 @@ app.use('/api', (req, _res, next) => {
     if (req.get('X-Requested-With') !== 'iPhoneBooking')
       throw new AppError(403, 'CSRF_REJECTED', 'Reload this page before trying again.');
     const origin = req.get('origin');
-    if (origin && origin !== (process.env.APP_ORIGIN ?? 'http://localhost:5173'))
+    if (origin && !config.allowedOrigins.has(origin))
       throw new AppError(403, 'ORIGIN_REJECTED', 'Request origin is not allowed.');
   }
   next();
 });
-app.get('/api/health', async (_req, res) => {
-  await db.$queryRaw`SELECT 1`;
-  res.json({ status: 'ok', version: '2.0.0' });
+app.get('/health', (_req, res) =>
+  res.json({ status: 'ok', version: '2.1.0', timestamp: new Date().toISOString() }),
+);
+app.get(['/api/health', '/ready'], async (_req, res) => {
+  try {
+    await db.$queryRaw`SELECT 1`;
+    res.json({ status: 'ok', version: '2.1.0', timestamp: new Date().toISOString() });
+  } catch {
+    res.status(503).json({ status: 'unavailable', version: '2.1.0' });
+  }
 });
 app.use('/api/v1', identity);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1', catalog);
+app.use('/api/v1', home);
 app.use('/api/v1', commerce);
 app.use('/api/v1/account', shopState);
 app.use('/api/v1/account', account);
 app.use('/api/v1', services);
+app.use('/api/v1', retailer);
+app.use('/api/v1', information);
+app.use('/api/v1', reviews);
 app.use('/api/v1', legacyScaffolds);
 app.use('/api/v1', deviceLifecycle);
 app.use('/api/v1/admin', adminCreate);
@@ -146,6 +162,11 @@ const errors: ErrorRequestHandler = (error, req, res, _next) => {
     code = 'VALIDATION_ERROR';
     message = error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
   } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2025') {
+      status = 404;
+      code = 'NOT_FOUND';
+      message = 'This record was not found or is no longer available.';
+    }
     if (error.code === 'P2002') {
       status = 409;
       code = 'DUPLICATE_RECORD';

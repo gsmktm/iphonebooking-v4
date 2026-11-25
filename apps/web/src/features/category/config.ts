@@ -53,7 +53,7 @@ const iphone: CategoryConfig = {
   slug: 'iphone',
   docTitle: 'iPhone in Nepal — prices, specs & pre-order — iPhoneBooking',
   query: 'category=iphone',
-  eyebrow: 'IPHONE · SEPTEMBER 2026',
+  eyebrow: 'IPHONE · THE CURRENT CATALOG',
   headline: 'The line-up, in Nepal.',
   intro: (h) =>
     `${h.name} — “${h.tagline}”. Choose a configuration to see live pricing, then buy, pre-book or reserve in-store pickup.`,
@@ -65,27 +65,27 @@ const iphone: CategoryConfig = {
   },
   features: {
     eyebrow: "WHAT'S NEW",
-    title: 'Serious silicon. Cooler by design.',
+    title: 'A closer look at your next device.',
     description:
-      "The story behind the current iPhone line-up — the same technology you'll read on apple.com, with Nepal pricing attached.",
+      'Compare the specifications published in the current catalog, alongside configuration prices in Nepal.',
     items: [
       {
         Icon: Cpu,
         tag: 'Performance',
-        name: 'A20 Pro, cooled',
-        body: 'Vapor-cooled A20 Pro with Neural Accelerators keeps sustained performance steady through games, editing and on-device AI.',
+        name: 'Performance for your day',
+        body: 'Compare the chip specifications for your chosen model in the catalog.',
       },
       {
         Icon: Camera,
         tag: 'Camera',
-        name: '48MP Fusion, variable aperture',
-        body: 'A physical variable aperture pairs with the 48MP Fusion sensor for natural low-light depth — then 4K 120 fps Dolby Vision when it matters.',
+        name: 'A closer look at the camera',
+        body: 'Camera capabilities depend on the model. Check the published specifications before choosing.',
       },
       {
         Icon: ShieldCheck,
         tag: 'Durability',
-        name: 'Ceramic Shield 2',
-        body: 'Front and back Ceramic Shield 2 with a titanium frame — tougher glass, lighter feel, built for a decade of everyday Nepal.',
+        name: 'Materials that matter',
+        body: 'Review the materials and care information for your chosen model.',
       },
       {
         Icon: BatteryCharging,
@@ -97,7 +97,7 @@ const iphone: CategoryConfig = {
         Icon: Sparkles,
         tag: 'Intelligence',
         name: 'On-device intelligence',
-        body: 'Neural Accelerators run language and image models privately, right on the phone — no round trip required.',
+        body: 'Feature availability varies by device, software, language and region. Confirm the features you need before purchase.',
       },
       {
         Icon: Waves,

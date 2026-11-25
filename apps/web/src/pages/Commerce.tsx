@@ -105,7 +105,7 @@ export function Cart() {
             <ButtonLink to="/checkout">Continue to checkout</ButtonLink>
             <p className="secure-note">
               <LockKeyhole size={14} />
-              No payment collected online
+              Prices confirmed at checkout
             </p>
           </aside>
         </div>
@@ -121,6 +121,11 @@ export function Checkout() {
     [busy, setBusy] = useState(false),
     [error, setError] = useState<Error | null>(null);
   const [key] = useState(() => crypto.randomUUID());
+  const [receiptKey] = useState(() =>
+    Array.from(crypto.getRandomValues(new Uint8Array(32)), (n) =>
+      n.toString(16).padStart(2, '0'),
+    ).join(''),
+  );
   const { data: user } = useQuery({
     queryKey: ['me'],
     queryFn: () => api<User | null>('/auth/me'),
@@ -148,13 +153,33 @@ export function Checkout() {
   useEffect(() => {
     track('checkout_started');
   }, []);
-  const total = cart.reduce((s, l) => s + l.quantity * l.price, 0),
-    credit = tradeIns?.find((t) => t.id === tradeInId)?.finalValue ?? 0,
-    dueNow = Math.min(
-      Math.max(0, total - credit),
-      cart.reduce((s, l) => s + l.quantity * (l.preorder ? l.deposit : l.price), 0),
-    );
+  const items = cart.map(({ variantId, quantity }) => ({ variantId, quantity }));
+  type Quote = {
+    subtotal: number;
+    credit: number;
+    total: number;
+    dueNow: number;
+    fingerprint: string;
+    shippingNote: string;
+  };
+  const quote = useQuery({
+    queryKey: ['checkout-quote', items, tradeInId, fulfillment, user?.id],
+    queryFn: () =>
+      post<Quote>('/checkout/quote', { items, fulfillment, ...(tradeInId ? { tradeInId } : {}) }),
+    enabled: cart.length > 0,
+    retry: false,
+    staleTime: 0,
+  });
+  const savedAddresses = useQuery({
+    queryKey: ['account', 'addresses'],
+    queryFn: () => api<(typeof address & { id: string; label: string })[]>('/account/addresses'),
+    enabled: !!user,
+  });
+  const total = quote.data?.subtotal ?? 0,
+    credit = quote.data?.credit ?? 0,
+    dueNow = quote.data?.dueNow ?? 0;
   async function submit() {
+    if (!quote.data || quote.isFetching) return;
     setBusy(true);
     setError(null);
     try {
@@ -164,13 +189,21 @@ export function Checkout() {
         fulfillment,
         address,
         idempotencyKey: key,
+        receiptKey,
+        expectedQuote: quote.data.fingerprint,
         termsAccepted: true,
         ...(tradeInId ? { tradeInId } : {}),
       });
+      try {
+        sessionStorage.setItem('iphonebooking-receipt', JSON.stringify(order));
+      } catch {
+        /* The confirmation also keeps the receipt in navigation state. */
+      }
       clear();
       navigate('/confirmation', { state: { order } });
     } catch (e) {
       setError(e as Error);
+      await quote.refetch();
     } finally {
       setBusy(false);
     }
@@ -200,6 +233,7 @@ export function Checkout() {
       <div className="checkout-layout">
         <div className="form-panel">
           {error && <ErrorNotice error={error} />}
+          {quote.error && <ErrorNotice error={quote.error} retry={() => void quote.refetch()} />}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -271,6 +305,33 @@ export function Checkout() {
                     <span>Timing and charges confirmed by staff.</span>
                   </button>
                 </div>
+                {fulfillment === 'DELIVERY' && !!savedAddresses.data?.length && (
+                  <label>
+                    Saved address
+                    <select
+                      defaultValue=""
+                      onChange={(e) => {
+                        const a = savedAddresses.data?.find((a) => a.id === e.target.value);
+                        if (a)
+                          setAddress({
+                            province: a.province,
+                            district: a.district,
+                            municipality: a.municipality,
+                            ward: a.ward,
+                            area: a.area,
+                            landmark: a.landmark,
+                          });
+                      }}
+                    >
+                      <option value="">Enter a new address</option>
+                      {savedAddresses.data.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.label} · {a.area}, {a.municipality}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 {fulfillment === 'DELIVERY' ? (
                   <div className="form-grid">
                     <label>
@@ -330,10 +391,10 @@ export function Checkout() {
                     </p>
                   )}
                 </div>
-                <h3>Payment at the store</h3>
+                <h3>Reserve first. Choose payment next.</h3>
                 <p>
                   Reserve now and complete payment with store staff within 24 hours. This is an
-                  unpaid reservation. Online payment gateways are not enabled.
+                  unpaid reservation. Available payment options appear on your confirmation.
                 </p>
                 {tradeIns?.some((t) => t.status === 'ACCEPTED') && (
                   <label>
@@ -359,14 +420,24 @@ export function Checkout() {
                 </label>
               </>
             )}
-            <button className="button" disabled={busy}>
+            <button
+              className="button"
+              disabled={busy || (step === 2 && (!quote.data || quote.isFetching || !!quote.error))}
+            >
               {busy ? 'Reserving your device…' : step < 2 ? 'Continue' : 'Place unpaid reservation'}
               <ArrowRight size={16} />
             </button>
           </form>
         </div>
         <aside className="summary-card">
-          <h2>Your next chapter.</h2>
+          <h2>Your reservation quote.</h2>
+          <p role="status" className="fine-print">
+            {quote.isFetching
+              ? 'Checking current prices and stock…'
+              : quote.data
+                ? 'Prices checked with the store.'
+                : 'Quote unavailable.'}
+          </p>
           {cart.map((l) => (
             <div className="summary-product" key={l.variantId}>
               <ProductVisual image={l.image} name={l.name} />
@@ -381,7 +452,7 @@ export function Checkout() {
           ))}
           <div className="summary-row">
             <span>Product total</span>
-            <strong>{money(total)}</strong>
+            <strong>{quote.data ? money(total) : '—'}</strong>
           </div>
           {credit > 0 && (
             <div className="summary-row">
@@ -391,15 +462,15 @@ export function Checkout() {
           )}
           <div className="summary-total">
             <span>Total</span>
-            <strong>{money(Math.max(0, total - credit))}</strong>
+            <strong>{quote.data ? money(quote.data.total) : '—'}</strong>
           </div>
           <div className="summary-row">
             <span>Due at store</span>
-            <strong>{money(dueNow)}</strong>
+            <strong>{quote.data ? money(dueNow) : '—'}</strong>
           </div>
           <p className="fine-print">
-            A reservation does not confirm payment or delivery. Save your private receipt key after
-            checkout.
+            {quote.data?.shippingNote} A reservation does not confirm payment or delivery. Save your
+            private receipt key after checkout.
           </p>
         </aside>
       </div>

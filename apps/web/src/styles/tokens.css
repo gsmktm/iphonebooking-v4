@@ -1,22 +1,84 @@
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  color: #232522;
-  background: var(--surface);
+  --font-ui: 'Inter', sans-serif;
+  --font-display: 'Instrument Serif', serif;
+  --font-data: var(--font-ui);
+  --color-page: #071014;
+  --color-surface: #101b20;
+  --color-surface-elevated: #18262e;
+  --color-text: #f3f1ec;
+  --color-text-muted: #abb7bd;
+  --color-brand: #dec28d;
+  --color-brand-hover: #efdab3;
+  --color-brand-on-dark: #e7c796;
+  --color-border: #2e3d46;
+  --color-success: #9ad3b0;
+  --color-warning: #e9c785;
+  --color-danger: #f0aaa0;
+  --color-info: #9fc6e8;
+  --color-success-surface: #183329;
+  --color-warning-surface: #322b1c;
+  --color-danger-surface: #38211e;
+  --color-focus: #f0d8af;
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-panel: 1rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --canvas: var(--color-page);
+  --surface: var(--color-surface);
+  --ink: var(--color-text);
+  --muted: var(--color-text-muted);
+  --line: var(--color-border);
+  --paper: var(--color-surface);
+  --warm: var(--color-surface-elevated);
+  --gold: var(--color-brand);
+  --gold-start: var(--color-brand-hover);
+  --gold-end: var(--color-brand);
+  --accent-text: var(--color-brand-on-dark);
+  --action-bg: var(--color-brand);
+  --action-text: #101719;
+  --focus: var(--color-focus);
+  --success: var(--color-success);
+  --warning: var(--color-warning);
+  --danger: var(--color-danger);
+  --info: var(--color-info);
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background: var(--canvas);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --ink: #232522;
-  --muted: #737570;
-  --line: #e8e9e5;
-  --paper: #f6f5f2;
-  --warm: #efeeea;
   --crimson: #a43d39;
   --navy: #18272b;
-  --radius: 0.75rem;
+  --radius: var(--radius-card);
   --space: 8px;
   --max-width: 1320px;
   --motion: 180ms;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:root[data-theme='light'] {
+  --color-page: #faf9f6;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f0eee7;
+  --color-text: #17252c;
+  --color-text-muted: #536269;
+  --color-brand-on-dark: #765724;
+  --color-border: #d8dedc;
+  --color-success: #226744;
+  --color-warning: #785419;
+  --color-danger: #923c36;
+  --color-info: #365f83;
+  --color-success-surface: #eaf2ea;
+  --color-warning-surface: #f7efd9;
+  --color-danger-surface: #fff4f1;
+  --color-focus: #765724;
 }
 * {
   box-sizing: border-box;
@@ -97,7 +159,7 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 summary:focus-visible {
-  outline: 2px solid #526a8c;
+  outline: 2px solid var(--focus);
   outline-offset: 4px;
 }
 ::selection {
@@ -154,24 +216,24 @@ summary:focus-visible {
   gap: 1.2rem;
   min-height: 48px;
   padding: 0.85rem 1.4rem;
-  border-radius: 6px;
-  background: var(--ink);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid var(--ink);
+  border-radius: var(--radius-control);
+  background: var(--action-bg);
+  color: var(--action-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid var(--action-bg);
   transition:
     background var(--motion),
     transform var(--motion);
 }
 .button:hover {
-  background: #41463e;
+  background: var(--color-brand-hover);
   transform: translateY(-1px);
 }
 .button.secondary {
   color: var(--ink);
   background: transparent;
-  border-color: #d9dbd4;
+  border-color: var(--line);
 }
 .button.secondary:hover {
   background: var(--paper);
@@ -396,14 +458,14 @@ label {
 input,
 select,
 textarea {
-  border: 1px solid #d9dcd5;
-  border-radius: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
   padding: 0.8rem 0.9rem;
   min-height: 46px;
   background: var(--surface);
   color: var(--ink);
   width: 100%;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 textarea {
   resize: vertical;
@@ -540,7 +602,4 @@ td {
     transition: none !important;
     scroll-behavior: auto !important;
   }
-}
-:root {
-  --muted: #646b5d;
 }

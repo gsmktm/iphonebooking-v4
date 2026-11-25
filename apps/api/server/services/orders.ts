@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '../db.js';
 import { AppError, hash, token } from '../core.js';
 import { recordOrderCharge, voidReservationCharge } from './money-ledger.js';
+import { quoteFingerprint } from './checkout-quote.js';
 export const orderSchema = z
   .object({
     items: z
@@ -27,6 +28,14 @@ export const orderSchema = z
     idempotencyKey: z.string().uuid(),
     tradeInId: z.string().optional(),
     termsAccepted: z.literal(true),
+    expectedQuote: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
+    receiptKey: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (
@@ -44,10 +53,18 @@ export const orderSchema = z
       });
   });
 export async function createOrder(data: z.infer<typeof orderSchema>, userId?: string) {
-  const trackingToken = token();
+  const trackingToken = data.receiptKey ?? token();
+  const requestHash = hash(JSON.stringify({ ...data, userId: userId ?? null }));
   return db.$transaction(
     async (tx) => {
       const exists = await tx.order.findUnique({ where: { idempotencyKey: data.idempotencyKey } });
+      if (
+        exists &&
+        data.receiptKey &&
+        exists.trackingHash === hash(data.receiptKey) &&
+        exists.requestHash === requestHash
+      )
+        return { ...exists, trackingHash: undefined, trackingToken };
       if (exists)
         throw new AppError(
           409,
@@ -121,6 +138,16 @@ export async function createOrder(data: z.infer<typeof orderSchema>, userId?: st
         total = total - quote.finalValue;
         dueNow = Math.min(dueNow, total);
       }
+      if (
+        data.expectedQuote &&
+        data.expectedQuote !==
+          quoteFingerprint(lines, total, dueNow, data.fulfillment, data.tradeInId)
+      )
+        throw new AppError(
+          409,
+          'QUOTE_CHANGED',
+          'Prices or credit changed. Review the latest quote before placing your reservation.',
+        );
       const policy = await tx.cMSPage.findUnique({ where: { slug: 'prebooking-terms' } });
       const order = await tx.order.create({
         data: {
@@ -143,6 +170,7 @@ export async function createOrder(data: z.infer<typeof orderSchema>, userId?: st
           dueNow,
           trackingHash: hash(trackingToken),
           idempotencyKey: data.idempotencyKey,
+          requestHash,
           tradeInId: data.tradeInId,
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
           items: { create: lines },
@@ -198,13 +226,47 @@ export async function createOrder(data: z.infer<typeof orderSchema>, userId?: st
 }
 export async function expireReservations() {
   const expired = await db.order.findMany({
-    where: { status: 'PLACED', expiresAt: { lt: new Date() } },
+    where: {
+      status: 'PLACED',
+      expiresAt: { lt: new Date() },
+      payments: {
+        none: {
+          provider: 'KHALTI',
+          status: {
+            in: [
+              'INITIALIZING',
+              'INITIALIZATION_UNCERTAIN',
+              'PENDING',
+              'VERIFICATION_PENDING',
+              'REVIEW_REQUIRED',
+            ],
+          },
+        },
+      },
+    },
   });
   for (const order of expired)
     await db.$transaction(
       async (tx) => {
         const claimed = await tx.order.updateMany({
-          where: { id: order.id, status: 'PLACED' },
+          where: {
+            id: order.id,
+            status: 'PLACED',
+            payments: {
+              none: {
+                provider: 'KHALTI',
+                status: {
+                  in: [
+                    'INITIALIZING',
+                    'INITIALIZATION_UNCERTAIN',
+                    'PENDING',
+                    'VERIFICATION_PENDING',
+                    'REVIEW_REQUIRED',
+                  ],
+                },
+              },
+            },
+          },
           data: { status: 'EXPIRED', tradeInId: null },
         });
         if (!claimed.count) return;

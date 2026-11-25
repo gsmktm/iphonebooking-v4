@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { Link, NavLink, useSearchParams, useParams, useNavigate } from 'react-router-dom';
+import {
+  Link,
+  NavLink,
+  useSearchParams,
+  useParams,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowRight,
@@ -29,7 +36,8 @@ import {
   AccountProfile,
 } from './account/Settings';
 export function SignIn({ admin = false }: { admin?: boolean }) {
-  const [register, setRegister] = useState(false),
+  const location = useLocation();
+  const [register, setRegister] = useState(location.pathname === '/register'),
     [error, setError] = useState<Error | null>(null),
     [busy, setBusy] = useState(false);
   const [params] = useSearchParams();
@@ -80,7 +88,13 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
             qc.setQueryData(['me'], user);
             await qc.invalidateQueries({ queryKey: ['account'] });
             const redirect = params.get('redirect');
-            if (redirect?.startsWith('/') && !redirect.startsWith('//')) navigate(redirect);
+            navigate(
+              redirect?.startsWith('/') && !redirect.startsWith('//') && !redirect.includes('\\')
+                ? redirect
+                : admin
+                  ? '/admin'
+                  : '/account',
+            );
           } catch (e) {
             setError(e as Error);
           } finally {
@@ -106,7 +120,7 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
             name="password"
             type="password"
             autoComplete={register ? 'new-password' : 'current-password'}
-            minLength={12}
+            minLength={register ? 12 : 1}
             maxLength={128}
             required
           />
@@ -115,6 +129,11 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
           <p className="fine-print">
             Use at least 12 characters. Your password is securely hashed.
           </p>
+        )}
+        {!register && (
+          <Link className="text-button" to="/forgot-password">
+            Forgot your password?
+          </Link>
         )}
         {error && <ErrorNotice error={error} />}
         <button className="button" disabled={busy}>

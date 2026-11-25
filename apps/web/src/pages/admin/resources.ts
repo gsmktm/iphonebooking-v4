@@ -13,6 +13,17 @@ const columns = (...keys: string[]) =>
       .replace(/^./, (c) => c.toUpperCase()),
   }));
 export const resources: Record<string, Resource> = {
+  reviews: {
+    title: 'Customer reviews',
+    description:
+      'Verified purchase experiences. Publication decisions require a reason and are audited.',
+    permission: 'review.read',
+    columns: [
+      ...columns('product.name', 'user.name', 'rating', 'title'),
+      { key: 'status', label: 'Status', status: true },
+      ...columns('createdAt'),
+    ],
+  },
   'device-risk-check': {
     title: 'Device risk checks',
     description:

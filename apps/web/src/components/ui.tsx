@@ -2,6 +2,9 @@ import { useEffect, useRef, useId, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, ArrowRight, X, Mountain, Gem, RotateCcw, PackageOpen } from 'lucide-react';
 import { ApiError } from '../services/api';
+
+const dialogScrollLocks = new Set<HTMLDialogElement>();
+let overflowBeforeDialogs = '';
 export function Brand({ diamond = false }: { diamond?: boolean }) {
   return (
     <Link className="brand" to="/" aria-label="iPhoneBooking home">
@@ -51,17 +54,23 @@ export function ProductVisual({
   image,
   name,
   className = '',
+  priority = false,
 }: {
   image: string;
   name: string;
   className?: string;
+  priority?: boolean;
 }) {
   return image.startsWith('/images/') ? (
     <img
       src={image}
       alt={name}
       className={`product-visual uploaded-product ${className}`}
-      loading="lazy"
+      loading={priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : 'auto'}
+      decoding="async"
+      width={600}
+      height={800}
     />
   ) : (
     <div role="img" aria-label={name} className={`product-visual visual-${image} ${className}`} />
@@ -163,25 +172,39 @@ export function Dialog({
   onClose,
   title,
   children,
+  restoreFocusTo,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  restoreFocusTo?: HTMLElement | null;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   useEffect(() => {
     const dialog = ref.current;
-    if (open && !dialog?.open) dialog?.showModal();
-    if (!open && dialog?.open) dialog.close();
-    if (open) {
-      document.body.style.overflow = 'hidden';
+    if (!dialog) return;
+    if (!open) {
+      if (dialog.open) dialog.close();
+      return;
     }
+    const trigger =
+      restoreFocusTo ??
+      (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    if (!dialog.open) dialog.showModal();
+    if (!dialogScrollLocks.size) overflowBeforeDialogs = document.body.style.overflow;
+    dialogScrollLocks.add(dialog);
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = '';
+      if (dialog.open) dialog.close();
+      dialogScrollLocks.delete(dialog);
+      if (!dialogScrollLocks.size) document.body.style.overflow = overflowBeforeDialogs;
+      queueMicrotask(() => {
+        if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+      });
     };
-  }, [open]);
+  }, [open, restoreFocusTo]);
   return (
     <dialog
       ref={ref}

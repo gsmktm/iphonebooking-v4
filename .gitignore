@@ -9,3 +9,4 @@ test-results/
 .jetro/
 dist-server/
 .turbo/
+release/

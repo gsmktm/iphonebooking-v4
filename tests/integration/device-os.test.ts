@@ -92,7 +92,7 @@ beforeAll(async () => {
   stockId = stock.id;
 });
 afterAll(() => db.$disconnect());
-describe.sequential('Device OS domain integrity', () => {
+describe('Device OS domain integrity', () => {
   it('keeps products without configurations and unpublished accessories out of public detail pages', async () => {
     const source = await db.product.findUniqueOrThrow({ where: { id: productId } });
     const incomplete = await db.product.create({

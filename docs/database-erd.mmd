@@ -1,0 +1,1495 @@
+erDiagram
+  Role {
+    String id PK
+    String name UK
+    String_array permissions
+  }
+  User {
+    Int shopRevision
+    String id PK
+    String email UK
+    String name
+    String passwordHash
+    AccountStatus status
+    DateTime emailVerifiedAt "nullable"
+    DateTime passwordChangedAt "nullable"
+    String roleId FK "nullable"
+    DateTime createdAt
+  }
+  Role |o--o{ User : "role"
+  AccountToken {
+    String id PK
+    String userId FK
+    AccountTokenPurpose purpose
+    String tokenHash UK
+    String requestKey UK
+    String email
+    DateTime expiresAt
+    DateTime consumedAt "nullable"
+    DateTime deliveredAt "nullable"
+    DateTime createdAt
+  }
+  User ||--o{ AccountToken : "user"
+  UserSession {
+    String id PK
+    String tokenHash UK
+    String userId FK
+    DateTime expiresAt
+    DateTime createdAt
+    String userAgent "nullable"
+  }
+  User ||--o{ UserSession : "user"
+  Address {
+    String id PK
+    String userId FK
+    String label
+    String province
+    String district
+    String municipality
+    String ward
+    String area
+    String landmark "nullable"
+    String phone
+  }
+  User ||--o{ Address : "user"
+  Category {
+    String id PK
+    String slug UK
+    String name
+    String description
+    String image
+  }
+  Product {
+    String id PK
+    String slug UK
+    String name
+    String tagline
+    String description
+    String categoryId FK
+    String image
+    String_array gallery
+    Json specs
+    String badge "nullable"
+    Boolean active
+    Boolean featured
+    DateTime createdAt
+  }
+  Category ||--o{ Product : "category"
+  ProductVariant {
+    String id PK
+    String productId FK
+    String sku UK
+    String color
+    String colorHex
+    String storage
+    String region
+    Int price
+    Int comparePrice "nullable"
+    Int deposit
+    String image "nullable"
+    Boolean preorder
+  }
+  Product ||--o{ ProductVariant : "product"
+  AccessoryCompatibility {
+    String accessoryId FK
+    String deviceId FK
+  }
+  Product ||--o{ AccessoryCompatibility : "accessory"
+  Product ||--o{ AccessoryCompatibility : "device"
+  Store {
+    String id PK
+    String slug UK
+    String name
+    String address
+    String hours
+    String phone
+    String_array services
+    String retailerId FK "nullable"
+    DateTime retailerAssignedAt "nullable"
+  }
+  Retailer |o--o{ Store : "retailer"
+  InventoryStock {
+    String id PK
+    String variantId FK
+    String storeId FK
+    Int available
+    Int reserved
+  }
+  ProductVariant ||--o{ InventoryStock : "variant"
+  Store ||--o{ InventoryStock : "store"
+  InventoryLedger {
+    String id PK
+    String stockId FK
+    String type
+    Int quantity
+    String reference
+    DateTime createdAt
+  }
+  InventoryStock ||--o{ InventoryLedger : "stock"
+  InventoryUnit {
+    String grnId FK "nullable"
+    Int cost "nullable"
+    String stockId FK "nullable"
+    String id PK
+    String variantId FK
+    String serialHash UK
+    String serialLast4
+    String status
+  }
+  GoodsReceivedNote |o--o{ InventoryUnit : "grn"
+  InventoryStock |o--o{ InventoryUnit : "stock"
+  ProductVariant ||--o{ InventoryUnit : "variant"
+  CartItem {
+    String id PK
+    String userId FK
+    String variantId FK
+    Int quantity
+  }
+  User ||--o{ CartItem : "user"
+  ProductVariant ||--o{ CartItem : "variant"
+  Wishlist {
+    String userId FK
+    String productId FK
+  }
+  User ||--o{ Wishlist : "user"
+  Product ||--o{ Wishlist : "product"
+  Order {
+    String id PK
+    String number UK
+    String userId FK "nullable"
+    String email
+    String name
+    String phone
+    Json address
+    String fulfillment
+    String status
+    Int total
+    Int dueNow
+    String currency
+    String trackingHash UK
+    String idempotencyKey UK
+    String requestHash "nullable"
+    DateTime expiresAt
+    DateTime createdAt
+    String tradeInId FK "nullable"
+    String organizationId FK "nullable"
+  }
+  User |o--o{ Order : "user"
+  TradeIn |o--o| Order : "tradeIn"
+  Organization |o--o{ Order : "organization"
+  OrderItem {
+    String id PK
+    String orderId FK
+    String variantId FK
+    Int quantity
+    Int unitPrice
+    String stockId
+  }
+  Order ||--o{ OrderItem : "order"
+  ProductVariant ||--o{ OrderItem : "variant"
+  Review {
+    String id PK
+    String productId FK
+    String userId FK
+    String orderItemId FK
+    Int rating
+    String title
+    String body
+    ReviewStatus status
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Product ||--o{ Review : "product"
+  User ||--o{ Review : "user"
+  OrderItem ||--o| Review : "orderItem"
+  OrderStatusHistory {
+    String id PK
+    String orderId FK
+    String status
+    String note
+    DateTime createdAt
+  }
+  Order ||--o{ OrderStatusHistory : "order"
+  Booking {
+    String id PK
+    String orderId FK
+    String status
+    String preference "nullable"
+    DateTime createdAt
+  }
+  Order ||--o| Booking : "order"
+  Payment {
+    String id PK
+    String orderId FK
+    String provider
+    String externalId UK "nullable"
+    String transactionId UK "nullable"
+    String idempotencyKey UK "nullable"
+    String currency
+    String checkoutUrl "nullable"
+    DateTime expiresAt "nullable"
+    DateTime verifiedAt "nullable"
+    String failureCode "nullable"
+    Int amount
+    String status
+    DateTime createdAt
+  }
+  Order ||--o{ Payment : "order"
+  Refund {
+    String id PK
+    String paymentId FK
+    Int amount
+    String status
+    String reason
+    DateTime createdAt
+  }
+  Payment ||--o{ Refund : "payment"
+  Device {
+    String id PK
+    String userId FK
+    String orderId FK
+    String unitId FK
+    DateTime warrantyUntil
+    DateTime createdAt
+  }
+  User ||--o{ Device : "user"
+  Order ||--o{ Device : "order"
+  InventoryUnit ||--o| Device : "unit"
+  TradeInRule {
+    String id PK
+    String model UK
+    Int baseValue
+    Int goodPercent
+    Int fairPercent
+    Int damagedPercent
+    Boolean active
+  }
+  TradeIn {
+    String id PK
+    String userId FK
+    String deviceId FK "nullable"
+    String kind
+    String model
+    String storage
+    String condition
+    Json answers
+    Int estimate
+    Int finalValue "nullable"
+    String status
+    DateTime createdAt
+  }
+  User ||--o{ TradeIn : "user"
+  Device |o--o{ TradeIn : "device"
+  Repair {
+    String id PK
+    String userId FK
+    String deviceId FK "nullable"
+    String model
+    String issue
+    String description
+    String method
+    DateTime appointment "nullable"
+    String status
+    String technician "nullable"
+    String assignedTechnicianId FK "nullable"
+    DateTime createdAt
+    String partId FK "nullable"
+  }
+  User ||--o{ Repair : "user"
+  Device |o--o{ Repair : "device"
+  User |o--o{ Repair : "assignedTechnician"
+  Part |o--o{ Repair : "part"
+  RepairAssignment {
+    String id PK
+    String repairId FK
+    String technicianId FK
+    String assignedById FK "nullable"
+    String reason
+    DateTime createdAt
+  }
+  Repair ||--o{ RepairAssignment : "repair"
+  User ||--o{ RepairAssignment : "technician"
+  User |o--o{ RepairAssignment : "assignedBy"
+  RepairStatusHistory {
+    String id PK
+    String repairId FK
+    String status
+    String note
+    DateTime createdAt
+  }
+  Repair ||--o{ RepairStatusHistory : "repair"
+  RepairQuote {
+    String id PK
+    String repairId FK
+    String diagnosis
+    Int parts
+    Int labor
+    Int total
+    Int warrantyDays
+    String status
+    DateTime decidedAt "nullable"
+    DateTime createdAt
+  }
+  Repair ||--o{ RepairQuote : "repair"
+  SupportTicket {
+    String id PK
+    String userId FK
+    String subject
+    String status
+    DateTime createdAt
+  }
+  User ||--o{ SupportTicket : "user"
+  TicketMessage {
+    String id PK
+    String ticketId FK
+    String body
+    Boolean internal
+    Boolean staff
+    DateTime createdAt
+  }
+  SupportTicket ||--o{ TicketMessage : "ticket"
+  Notification {
+    String id PK
+    String userId FK
+    String title
+    String body
+    Boolean read
+    DateTime createdAt
+  }
+  User ||--o{ Notification : "user"
+  CMSPage {
+    String id PK
+    String slug UK
+    String title
+    String description
+    Json blocks
+    Boolean published
+    DateTime updatedAt
+  }
+  AuditLog {
+    String id PK
+    String actorId
+    String action
+    String entity
+    String entityId
+    Json before "nullable"
+    Json after "nullable"
+    String requestId
+    DateTime createdAt
+  }
+  WebhookEvent {
+    String id PK
+    String provider
+    String externalId
+    String payloadHash
+    DateTime processedAt "nullable"
+    DateTime createdAt
+  }
+  Job {
+    String id PK
+    String type
+    Json payload
+    String key UK
+    Int attempts
+    String status
+    DateTime runAt
+    String lastError "nullable"
+    DateTime createdAt
+  }
+  AnalyticsEvent {
+    String id PK
+    String name
+    String entityId "nullable"
+    DateTime createdAt
+  }
+  Subscriber {
+    String id PK
+    String email UK
+    DateTime createdAt
+  }
+  BookingAllocation {
+    String id PK
+    String orderId FK
+    String unitId FK
+    DateTime createdAt
+  }
+  Order ||--o{ BookingAllocation : "order"
+  InventoryUnit ||--o| BookingAllocation : "unit"
+  PolicyAcceptance {
+    String id PK
+    String orderId FK
+    String policySlug
+    String policyVersion
+    Json policySnapshot
+    DateTime acceptedAt
+  }
+  Order ||--o| PolicyAcceptance : "order"
+  DeviceIdentity {
+    String unitId FK "nullable"
+    String id PK
+    String canonicalId UK
+    String productId FK "nullable"
+    String variantId FK "nullable"
+    String primaryImei "nullable"
+    String primarySerial "nullable"
+    String status
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  InventoryUnit |o--o| DeviceIdentity : "unit"
+  Product |o--o{ DeviceIdentity : "product"
+  ProductVariant |o--o{ DeviceIdentity : "variant"
+  IdentityLink {
+    String id PK
+    String deviceId FK
+    String type
+    String valueHash
+    String valueLast4
+    Boolean verified
+    DateTime verifiedAt "nullable"
+    String source "nullable"
+    DateTime createdAt
+  }
+  DeviceIdentity ||--o{ IdentityLink : "device"
+  DeviceEvent {
+    String eventKey UK "nullable"
+    Boolean customerVisible
+    String id PK
+    String deviceId FK
+    String eventType
+    DateTime timestamp
+    String actor
+    String location "nullable"
+    String reference "nullable"
+    Json metadata
+  }
+  DeviceIdentity ||--o{ DeviceEvent : "device"
+  DevicePassport {
+    String id PK
+    String deviceId FK
+    DateTime generatedAt
+    Int version
+    String productName "nullable"
+    String model "nullable"
+    String storage "nullable"
+    String color "nullable"
+    DateTime purchaseDate "nullable"
+    String seller "nullable"
+    String invoiceNo "nullable"
+    DateTime warrantyUntil "nullable"
+    String conditionGrade "nullable"
+    Json repairHistory "nullable"
+    Json ownershipHistory "nullable"
+    Boolean tradeInEligible "nullable"
+    Json accessoriesCompat "nullable"
+    String_array permittedFields
+  }
+  DeviceIdentity ||--o{ DevicePassport : "device"
+  DeviceProvenance {
+    String id PK
+    String deviceId FK
+    String supplier "nullable"
+    String purchaseOrder "nullable"
+    String invoiceRef "nullable"
+    String importSource "nullable"
+    DateTime receivedDate "nullable"
+    String warehouse "nullable"
+    Json inspection "nullable"
+    String ownershipFrom "nullable"
+    DateTime ownershipDate "nullable"
+    Json repairIntervention "nullable"
+    Json tradeInInspection "nullable"
+    Json refurbishment "nullable"
+    DateTime resaleDate "nullable"
+    String inventoryClass
+    DateTime createdAt
+  }
+  DeviceIdentity ||--o{ DeviceProvenance : "device"
+  DeviceRiskCheck {
+    String id PK
+    String deviceId FK
+    String checkType
+    String result
+    Json details "nullable"
+    DateTime performedAt
+    String operator "nullable"
+    DateTime expiresAt "nullable"
+  }
+  DeviceIdentity ||--o{ DeviceRiskCheck : "device"
+  ConditionEvidence {
+    String id PK
+    String deviceId FK
+    String inspectionId
+    String tradeInId "nullable"
+    String repairId "nullable"
+    String type
+    String fileName
+    String fileUrl
+    String category
+    DateTime capturedAt
+    String inspector "nullable"
+    String location "nullable"
+    Json metadata "nullable"
+  }
+  DeviceIdentity ||--o{ ConditionEvidence : "device"
+  ConditionSnapshot {
+    String id PK
+    String deviceId FK
+    Int version
+    DateTime snapshotDate
+    String condition
+    Float batteryHealth "nullable"
+    String screenCondition "nullable"
+    String bodyCondition "nullable"
+    String cameraCondition "nullable"
+    String biometrics "nullable"
+    Json diagnosticResult "nullable"
+    String technicianNotes "nullable"
+    Json customerDeclaration "nullable"
+    String inspector "nullable"
+    String location "nullable"
+  }
+  DeviceIdentity ||--o{ ConditionSnapshot : "device"
+  TradeInQuote {
+    String id PK
+    String tradeInId FK
+    String version
+    String stage
+    Int previousValue "nullable"
+    Int newValue
+    Int difference "nullable"
+    String_array reasonCodes
+    String_array evidenceIds
+    String approver "nullable"
+    DateTime approvedAt "nullable"
+    String status
+    DateTime createdAt
+  }
+  TradeIn |o--o{ TradeInQuote : "tradeIn"
+  RefurbishedDevice {
+    String id PK
+    String deviceId FK
+    String grade
+    Json conditionReport
+    String batteryCondition "nullable"
+    String screenCondition "nullable"
+    String bodyCondition "nullable"
+    String cameraCondition "nullable"
+    String biometrics "nullable"
+    String_array partsReplaced
+    String qcResult "nullable"
+    String technician "nullable"
+    DateTime warrantyStart "nullable"
+    DateTime warrantyEnd "nullable"
+    Int sellingPrice "nullable"
+    String status
+    DateTime createdAt
+  }
+  DeviceIdentity ||--o| RefurbishedDevice : "device"
+  Part {
+    String id PK
+    String sku UK
+    String name
+    String category "nullable"
+    String description "nullable"
+    Int cost "nullable"
+    String supplierId FK "nullable"
+    Int stock
+    String binLocation "nullable"
+    String warranty "nullable"
+    String batchLot "nullable"
+    Boolean active
+    DateTime createdAt
+  }
+  PartSupplier |o--o{ Part : "supplier"
+  PartSupplier {
+    String id PK
+    String name
+    String contact "nullable"
+    String email "nullable"
+    String phone "nullable"
+    Float rating "nullable"
+    Boolean active
+  }
+  PartCompatibility {
+    String id PK
+    String partId FK
+    String deviceId FK
+  }
+  Part ||--o{ PartCompatibility : "part"
+  Product ||--o{ PartCompatibility : "device"
+  RepairBOM {
+    String id PK
+    String code UK
+    String name
+    String description "nullable"
+    String category "nullable"
+    Int laborMinutes
+    Boolean diagnosticRequired
+    String_array qcChecklist
+    Boolean active
+    DateTime createdAt
+    String partId FK "nullable"
+  }
+  Part |o--o{ RepairBOM : "part"
+  RepairBOMItem {
+    String id PK
+    String bomId FK
+    String partId FK
+    Int quantity
+    String unit
+  }
+  RepairBOM ||--o{ RepairBOMItem : "bom"
+  Part ||--o{ RepairBOMItem : "part"
+  RepairQC {
+    String id PK
+    String repairId FK
+    String checkedBy
+    String approvedBy "nullable"
+    String status
+    DateTime checkedAt
+    DateTime approvedAt "nullable"
+    String notes "nullable"
+  }
+  Repair ||--o{ RepairQC : "repair"
+  RepairQCCheckItem {
+    String id PK
+    String qcId FK
+    String category
+    String name
+    Boolean passed
+    String detail "nullable"
+  }
+  RepairQC ||--o{ RepairQCCheckItem : "qc"
+  RepairWarranty {
+    String id PK
+    String repairId FK
+    String coveredPart "nullable"
+    DateTime startDate
+    DateTime expiryDate
+    String terms "nullable"
+    String status
+    Json_array claimHistory
+  }
+  Repair ||--o| RepairWarranty : "repair"
+  DeviceReplacement {
+    String id PK
+    String oldDeviceId FK
+    String newDeviceId FK
+    String reason
+    DateTime createdAt
+    String orderId "nullable"
+    String status
+  }
+  DeviceIdentity ||--o{ DeviceReplacement : "oldDevice"
+  DeviceIdentity ||--o{ DeviceReplacement : "newDevice"
+  POSSession {
+    String id PK
+    String storeId
+    String staffId
+    DateTime startedAt
+    DateTime endedAt "nullable"
+    Int totalNPR "nullable"
+    Int paymentCount
+    String status
+  }
+  ScanLog {
+    String id PK
+    String staffId
+    String type
+    String valueHash
+    String valueLast4 "nullable"
+    Json result "nullable"
+    String location "nullable"
+    DateTime scannedAt
+  }
+  Document {
+    String id PK
+    String entityType
+    String entityId
+    String documentType
+    String title
+    Int currentVersion
+    String status
+    DateTime createdAt
+  }
+  DocumentVersion {
+    String id PK
+    String documentId FK
+    Int version
+    Json content
+    String generatedBy "nullable"
+    String approvedBy "nullable"
+    DateTime approvedAt "nullable"
+    DateTime createdAt
+  }
+  Document ||--o{ DocumentVersion : "document"
+  Appointment {
+    String id PK
+    String customerId FK "nullable"
+    String location
+    String service
+    String staffId "nullable"
+    Int duration
+    Int capacity
+    Int bookedSlots
+    String status
+    DateTime preferredDate
+    String preferredTime "nullable"
+    Int rescheduleCount
+    Int remindersSent
+    Boolean checkedIn
+    Boolean completed
+    DateTime createdAt
+  }
+  User |o--o{ Appointment : "customer"
+  QueueToken {
+    String id PK
+    String storeId
+    String category
+    String service
+    String tokenNumber
+    String assignedDesk "nullable"
+    Int estimatedWait "nullable"
+    String status
+    DateTime checkedInAt "nullable"
+    DateTime calledAt "nullable"
+    DateTime completedAt "nullable"
+    Boolean missed
+    DateTime createdAt
+  }
+  FulfillmentPromise {
+    String id PK
+    String orderId UK
+    String promise
+    String reason "nullable"
+    String location "nullable"
+    Boolean cutoffMet
+    DateTime createdAt
+  }
+  FulfillmentUnit {
+    String id PK
+    String orderId
+    String fulfillmentType
+    String status
+    String location "nullable"
+    String carrier "nullable"
+    String trackingNo "nullable"
+    DateTime createdAt
+  }
+  ReverseLogistics {
+    String id PK
+    String orderId
+    String type
+    String status
+    String reason "nullable"
+    DateTime pickupDate "nullable"
+    String carrier "nullable"
+    String trackingNo "nullable"
+    DateTime createdAt
+  }
+  CourierProvider {
+    String id PK
+    String name
+    String apiKey "nullable"
+    String status
+    Json config "nullable"
+    DateTime createdAt
+  }
+  CourierShipment {
+    String id PK
+    String providerId FK
+    String orderId "nullable"
+    String shipmentNo "nullable"
+    String status
+    String labelUrl "nullable"
+    Json_array trackingEvents
+    DateTime createdAt
+  }
+  CourierProvider ||--o{ CourierShipment : "provider"
+  LaunchConfig {
+    String id PK
+    String name
+    String productId "nullable"
+    DateTime startDate
+    DateTime endDate "nullable"
+    Json config
+    String status
+    DateTime createdAt
+  }
+  AllocationRule {
+    String id PK
+    String productId "nullable"
+    String ruleType
+    Json criteria
+    Json allocation
+    Int priority
+    Boolean active
+    DateTime createdAt
+  }
+  AllocationEntry {
+    String id PK
+    String ruleId
+    String orderId
+    String unitId "nullable"
+    String status
+    DateTime allocatedAt "nullable"
+    String allocatedBy "nullable"
+    String reason "nullable"
+    DateTime createdAt
+  }
+  WaitlistEntry {
+    String id PK
+    String productId "nullable"
+    String variantId "nullable"
+    String customerId
+    String location "nullable"
+    String fulfillment "nullable"
+    String status
+    DateTime invitedAt "nullable"
+    DateTime reservationExpiry "nullable"
+    DateTime createdAt
+  }
+  BotSignal {
+    String id PK
+    String sessionId
+    String fingerprint "nullable"
+    String eventType
+    Float score
+    Json_array flags
+    DateTime createdAt
+  }
+  PurchaseRequest {
+    String id PK
+    String supplierId "nullable"
+    String status
+    Json items
+    Int totalNPR "nullable"
+    String approvedBy "nullable"
+    DateTime approvedAt "nullable"
+    DateTime createdAt
+  }
+  PurchaseOrder {
+    String createdBy "nullable"
+    String id PK
+    String poNumber UK
+    String supplierId FK
+    String status
+    Json items
+    Int orderedQty
+    Int receivedQty
+    Int pendingQty
+    Int costNPR
+    Int taxNPR
+    Int freightNPR
+    String currency
+    String paymentStatus
+    String invoiceRef "nullable"
+    String approvedBy "nullable"
+    DateTime createdAt
+  }
+  PartSupplier ||--o{ PurchaseOrder : "supplier"
+  GoodsReceivedNote {
+    String id PK
+    String poId FK
+    String grnNumber UK
+    String status
+    Boolean damageFound
+    Json discrepancy "nullable"
+    String receivedBy "nullable"
+    DateTime createdAt
+  }
+  PurchaseOrder ||--o{ GoodsReceivedNote : "po"
+  SupplierScorecard {
+    String id PK
+    String supplierId FK
+    String period
+    Float deliveryAccuracy "nullable"
+    Int avgLeadTime "nullable"
+    Float priceVariance "nullable"
+    Float defectRate "nullable"
+    Float returnRate "nullable"
+    Float orderCompletionRate "nullable"
+    DateTime createdAt
+  }
+  PartSupplier ||--o{ SupplierScorecard : "supplier"
+  InventoryBin {
+    String id PK
+    String locationId
+    String zone
+    String rack
+    String shelf
+    String bin
+    String variantId "nullable"
+    String storeId "nullable"
+    String note "nullable"
+  }
+  StocktakeSession {
+    String id PK
+    String storeId
+    String variantId "nullable"
+    Int expectedQty "nullable"
+    Int scannedQty
+    Int variance
+    String reason "nullable"
+    String approvedBy "nullable"
+    String status
+    Boolean hideExpected
+    DateTime createdAt
+  }
+  InventoryAging {
+    String id PK
+    String variantId
+    String unitId "nullable"
+    String bucket
+    Int daysOld
+    Int qty
+    DateTime createdAt
+  }
+  PriceIntelligence {
+    String id PK
+    String productId "nullable"
+    String variantId "nullable"
+    String source
+    String sourceUrl "nullable"
+    String countryCode "nullable"
+    String currency "nullable"
+    String priceKind "nullable"
+    Int observedPrice "nullable"
+    DateTime observedAt
+    String availability "nullable"
+    Float confidence
+    Json_array trend
+    Boolean active
+    Boolean published
+  }
+  PricingGuardrail {
+    String id PK
+    String productId "nullable"
+    Float minMargin "nullable"
+    Int minPrice "nullable"
+    Float targetMargin "nullable"
+    Float maxCampaignDiscount "nullable"
+    Int dealerPriceLimit "nullable"
+    Json stackingRules "nullable"
+    Boolean active
+  }
+  PromotionSimulation {
+    String id PK
+    String name
+    Float discountPercent "nullable"
+    Float projectedMargin "nullable"
+    Json inventoryImpact "nullable"
+    Json stackingResult "nullable"
+    Boolean negativeMargin
+    DateTime createdAt
+  }
+  Bundle {
+    String id PK
+    String code UK
+    String name
+    String description "nullable"
+    Int bundlePrice "nullable"
+    String discountType "nullable"
+    Boolean active
+    DateTime startDate "nullable"
+    DateTime endDate "nullable"
+    Json eligibility "nullable"
+    DateTime createdAt
+  }
+  BundleItem {
+    String id PK
+    String bundleId FK
+    String productId
+    Int quantity
+    String type
+  }
+  Bundle ||--o{ BundleItem : "bundle"
+  Organization {
+    String id PK
+    String name
+    String legalName "nullable"
+    String taxId "nullable"
+    String contactEmail "nullable"
+    String status
+    Int creditLimit "nullable"
+    DateTime createdAt
+  }
+  B2BContact {
+    String id PK
+    String organizationId FK
+    String name
+    String email
+    String role
+    Boolean isAuthorized
+    DateTime createdAt
+  }
+  Organization ||--o{ B2BContact : "organization"
+  BulkQuote {
+    String id PK
+    String organizationId FK
+    String status
+    Json items
+    Int versions
+    DateTime createdAt
+  }
+  Organization ||--o{ BulkQuote : "organization"
+  Retailer {
+    String id PK
+    String code UK
+    String name
+    String contactName "nullable"
+    String contactEmail "nullable"
+    String region "nullable"
+    Float commissionRate "nullable"
+    Int creditLimit "nullable"
+    String settlementPeriod "nullable"
+    String status
+    DateTime createdAt
+  }
+  RetailerMember {
+    String id PK
+    String retailerId FK
+    String userId FK
+    String role
+    Boolean active
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Retailer ||--o{ RetailerMember : "retailer"
+  User ||--o{ RetailerMember : "user"
+  RetailerApplication {
+    String id PK
+    String applicantId FK
+    String businessName
+    String contactName
+    String contactPhone
+    String city
+    String address
+    String note
+    String status
+    String reviewNote "nullable"
+    String reviewedBy "nullable"
+    DateTime reviewedAt "nullable"
+    String retailerId FK "nullable"
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  User ||--o| RetailerApplication : "applicant"
+  Retailer |o--o| RetailerApplication : "retailer"
+  RetailerSettlement {
+    String id PK
+    String retailerId
+    String period
+    Int saleTotalNPR
+    Int commissionNPR
+    Int discountNPR
+    Int paymentNPR "nullable"
+    Int creditNPR
+    Int debitNPR
+    Int refundNPR
+    Int adjustmentNPR
+    DateTime settlementDate "nullable"
+    String status
+    DateTime createdAt
+  }
+  FinancialLedger {
+    String id PK
+    String entityType
+    String entityId
+    String entryType
+    Int amountNPR
+    Int balanceNPR
+    String reference "nullable"
+    String description "nullable"
+    DateTime createdAt
+  }
+  ReconciliationMismatch {
+    String id PK
+    String orderId "nullable"
+    String gatewayTxId "nullable"
+    String type
+    String description
+    Int amount
+    String status
+    DateTime flaggedAt
+  }
+  FinancingApplication {
+    String id PK
+    String orderId "nullable"
+    String provider
+    String status
+    String customerId "nullable"
+    Int amount
+    Int tenure "nullable"
+    DateTime submittedAt "nullable"
+    DateTime approvedAt "nullable"
+    DateTime rejectedAt "nullable"
+    DateTime fundedAt "nullable"
+    Json notes "nullable"
+    DateTime createdAt
+  }
+  AIConversation {
+    String id PK
+    String customerId "nullable"
+    String sessionId
+    Json_array messages
+    Json context "nullable"
+    DateTime createdAt
+  }
+  WorkflowDefinition {
+    String id PK
+    String name
+    String description "nullable"
+    String trigger
+    Json steps
+    Json_array approvals
+    Boolean active
+    DateTime createdAt
+  }
+  WorkflowRun {
+    String id PK
+    String definitionId FK
+    String entityType
+    String entityId
+    String status
+    String triggeredBy
+    DateTime startedAt
+    DateTime completedAt "nullable"
+  }
+  WorkflowDefinition ||--o{ WorkflowRun : "definition"
+  WorkflowStep {
+    String id PK
+    String runId FK
+    Int stepIndex
+    String name
+    String status
+    DateTime startedAt "nullable"
+    DateTime completedAt "nullable"
+    Json output "nullable"
+    String error "nullable"
+  }
+  WorkflowRun ||--o{ WorkflowStep : "run"
+  WorkflowEvent {
+    String id PK
+    String runId FK
+    String eventType
+    Json payload
+    DateTime createdAt
+  }
+  WorkflowRun ||--o{ WorkflowEvent : "run"
+  WorkflowTask {
+    String id PK
+    String runId FK
+    String title
+    String assignee "nullable"
+    String status
+    String priority
+    DateTime dueAt "nullable"
+    DateTime createdAt
+  }
+  WorkflowRun ||--o{ WorkflowTask : "run"
+  WorkflowApproval {
+    String id PK
+    String runId FK
+    String stepId
+    String approver
+    String status
+    DateTime decidedAt "nullable"
+    String decision "nullable"
+    DateTime createdAt
+  }
+  WorkflowRun ||--o{ WorkflowApproval : "run"
+  ApprovalRequest {
+    String id PK
+    String entityType
+    String entityId
+    String action
+    Json details
+    String makerId
+    String checkerId "nullable"
+    String status
+    String reason "nullable"
+    DateTime createdAt
+  }
+  OpsAlert {
+    String id PK
+    String category
+    String severity
+    String title
+    String description "nullable"
+    String entityType "nullable"
+    String entityId "nullable"
+    String assignee "nullable"
+    String status
+    DateTime acknowledgedAt "nullable"
+    DateTime resolvedAt "nullable"
+    DateTime createdAt
+  }
+  SLAConfig {
+    String id PK
+    String name
+    String serviceType
+    Int targetMinutes
+    Int warningMinutes
+    Boolean active
+    DateTime createdAt
+  }
+  SLATracking {
+    String id PK
+    String slaConfigId
+    String entityType
+    String entityId
+    DateTime startedAt
+    DateTime targetMetAt "nullable"
+    String status
+    Boolean breached
+  }
+  EscalationPolicy {
+    String id PK
+    String workflow
+    Json levels
+    Boolean active
+    DateTime createdAt
+  }
+  FeatureFlag {
+    String id PK
+    String key UK
+    String name
+    String description "nullable"
+    Boolean enabled
+    Json targets "nullable"
+    Int rolloutPercent
+    DateTime createdAt
+  }
+  Experiment {
+    String id PK
+    String name
+    String description "nullable"
+    Json variantA
+    Json variantB
+    Json_array metrics
+    Json_array guardrailMetrics
+    String status
+    DateTime startDate "nullable"
+    DateTime endDate "nullable"
+    DateTime createdAt
+  }
+  ExperimentVariant {
+    String id PK
+    String experimentId
+    String variantName
+    String exposureId
+    Boolean converted
+    Int revenue
+    DateTime createdAt
+  }
+  SearchLog {
+    String id PK
+    String query
+    Int resultsCount
+    Boolean hasResults
+    String device "nullable"
+    String location "nullable"
+    DateTime timestamp
+  }
+  DataQualityIssue {
+    String id PK
+    String entityType
+    String entityId
+    String issueType
+    String severity
+    String description "nullable"
+    Json repairAction "nullable"
+    String status
+    DateTime detectedAt
+  }
+  SyncChange {
+    String id PK
+    String entityType
+    String entityId
+    String field
+    Json oldValue "nullable"
+    Json newValue "nullable"
+    String source
+    Float confidence
+    String status
+    String reviewedBy "nullable"
+    String decision "nullable"
+    DateTime createdAt
+  }
+  IntegrationConfig {
+    String id PK
+    String provider
+    String name
+    String status
+    Json config "nullable"
+    DateTime lastSuccess "nullable"
+    DateTime lastFailure "nullable"
+    String error "nullable"
+    DateTime createdAt
+  }
+  IntegrationLog {
+    String id PK
+    String integrationId
+    String direction
+    Json payload
+    String status
+    Int responseCode "nullable"
+    Int durationMs "nullable"
+    String error "nullable"
+    DateTime createdAt
+  }
+  WebhookLog {
+    String id PK
+    String provider
+    String event
+    DateTime receivedAt
+    String signatureStatus
+    String processingStatus
+    Int attempts
+    String entityType "nullable"
+    String entityId "nullable"
+    String error "nullable"
+    Boolean replayed
+  }
+  APIClient {
+    String id PK
+    String name
+    String description "nullable"
+    String keyHash UK
+    String keyPrefix
+    String_array scopes
+    Int rateLimitRPM
+    Int rateLimitDPM
+    String_array allowedOrigins
+    DateTime expiresAt "nullable"
+    Boolean revoked
+    DateTime createdAt
+  }
+  OutboxMessage {
+    String id PK
+    String eventType
+    Json payload
+    String status
+    Int attempts
+    String lastError "nullable"
+    DateTime createdAt
+  }
+  Forecast {
+    String id PK
+    String type
+    String entityId "nullable"
+    String period
+    Json predicted
+    Float confidence "nullable"
+    Json actual "nullable"
+    DateTime createdAt
+  }
+  Simulation {
+    String id PK
+    String name
+    Json scenario
+    Json results "nullable"
+    DateTime createdAt
+  }
+  ServiceStatus {
+    String id PK
+    String service UK
+    String status
+    DateTime degradedAt "nullable"
+    DateTime resolvedAt "nullable"
+    String message "nullable"
+    DateTime createdAt
+  }
+  Incident {
+    String id PK
+    String severity
+    String title
+    String description "nullable"
+    String status
+    String service "nullable"
+    DateTime startedAt
+    DateTime resolvedAt "nullable"
+  }
+  MigrationRun {
+    String id PK
+    String version
+    String name
+    String direction
+    Int durationMs "nullable"
+    Int rowsAffected "nullable"
+    String checksum "nullable"
+    String status
+    DateTime executedAt "nullable"
+    Json rollbackPlan "nullable"
+  }
+  WarrantyEntitlement {
+    String id PK
+    String deviceId "nullable"
+    String orderId "nullable"
+    String type
+    DateTime startDate
+    DateTime expiryDate
+    Json terms "nullable"
+    String status
+    Json_array claimHistory
+  }
+  LoyaltyLedgerEntry {
+    String id PK
+    String customerId
+    String action
+    Int amount
+    Int balance
+    DateTime expiryDate "nullable"
+    String reference "nullable"
+    String reason "nullable"
+    DateTime createdAt
+  }
+  Referral {
+    String id PK
+    String referrerId
+    String refereeId
+    String campaign "nullable"
+    String qualifyingEvent "nullable"
+    Int rewardAmount "nullable"
+    String rewardStatus
+    Json_array fraudFlags
+    DateTime reversedAt "nullable"
+    DateTime createdAt
+  }
+  AccessoryFitCheck {
+    String id PK
+    String customerId
+    String accessoryId
+    String deviceId "nullable"
+    Boolean compatible
+    String warning "nullable"
+    DateTime checkedAt
+  }
+  PartMovement {
+    String id PK
+    String partId FK
+    String repairId FK "nullable"
+    String type
+    Int quantity
+    Int unitCost
+    String reference UK
+    String actorId
+    DateTime createdAt
+  }
+  Part ||--o{ PartMovement : "part"
+  Repair |o--o{ PartMovement : "repair"
+  OrderMoneyEntry {
+    String id PK
+    String orderId FK
+    String paymentId FK "nullable"
+    String kind
+    Int amount
+    String currency
+    String eventKey UK
+    String source
+    DateTime createdAt
+  }
+  Order ||--o{ OrderMoneyEntry : "order"
+  Payment |o--o{ OrderMoneyEntry : "payment"

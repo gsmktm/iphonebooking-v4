@@ -1,233 +1,183 @@
-import { Link } from 'react-router-dom';
+import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  ArrowUpRight,
-  ShieldCheck,
-  RefreshCw,
-  Wrench,
-  MapPin,
-  Smartphone,
-  PackageCheck,
-  Gem,
-} from 'lucide-react';
-import { api, money } from '../services/api';
-import type { Product, Category, ContentPage } from '../services/types';
-import { ProductCard } from '../components/ProductCard';
-import {
-  ArrowLink,
-  ButtonLink,
-  SectionHeading,
-  ProductVisual,
-  Loading,
-  ErrorNotice,
-  Empty,
-} from '../components/ui';
+import { api } from '../services/api';
+import type { HomeFeed } from '../services/types';
+import { ErrorNotice } from '../components/ui';
 import HomeHero from '../features/home/HomeHero';
-import QuickConfigure from '../features/home/QuickConfigure';
-import WhatsNew from '../features/releases/WhatsNew';
+import {
+  HomeTrustBar,
+  HomeQuickActions,
+  HomeCollection,
+  HomeWhy,
+  HomeCare,
+  HomeNetwork,
+  HomeIntelligence,
+  HomeJourney,
+  HomeReviews,
+  HomeJournal,
+  HomeFinalCTA,
+} from '../features/home/home-sections';
+import { HomeExplore, HomeFinderIntro, HomeSpotlights } from '../features/home/HomeDiscovery';
+import DeviceFinder from '../features/home/DeviceFinder';
+import HomePersonalShelf from '../features/home/HomePersonalShelf';
+import ProductPreview, {
+  type DeviceSelection,
+  type PreviewDevice,
+} from '../features/home/ProductPreview';
+import '../features/home/home.css';
+import '../features/home/home-discovery.css';
+
 export default function Home() {
-  const products = useQuery({
-    queryKey: ['products', 'home'],
-    queryFn: () => api<Product[]>('/products'),
+  const [finderOpen, setFinderOpen] = useState(false);
+  const [selection, setSelection] = useState<DeviceSelection | null>(null);
+  const finderButton = useRef<HTMLButtonElement>(null);
+  const preview: PreviewDevice = (product, variantId) => {
+    const trigger = finderOpen
+      ? finderButton.current
+      : document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    setFinderOpen(false);
+    setSelection({ product, variantId, trigger });
+  };
+  const feed = useQuery({
+    queryKey: ['home'],
+    queryFn: ({ signal }) => api<HomeFeed>('/home', { signal }),
+    staleTime: 30000,
   });
-  const categories = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => api<Category[]>('/categories'),
-  });
-  const { data: content } = useQuery({
-    queryKey: ['content', 'home'],
-    queryFn: () => api<ContentPage>('/content/home'),
-  });
-  const hero = content?.blocks.find((b) => b.type === 'hero');
-  const featured = products.data?.filter((p) => p.featured).slice(0, 4) ?? [];
-  const configurable = featured.find((p) => p.category.slug === 'iphone' && p.variants.length);
-  const value = products.data
-    ?.filter((p) => p.category.slug === 'iphone')
-    .flatMap((p) =>
-      p.variants
-        .filter((v) => v.stock.some((s) => s.available > 0))
-        .map((v) => ({ product: p, variant: v })),
-    )
-    .sort((a, b) => a.variant.price - b.variant.price)[0];
+  const data = feed.data;
+  const visible = (key: string) =>
+    data?.sections.find((block) => block.key === key)?.enabled !== false;
+  const section = (key: string, title: string, body = '', href?: string) => {
+    const block = data?.sections.find((item) => item.key === key);
+    return { title: block?.title || title, body: block?.body || body, href: block?.href || href };
+  };
+  const iphones = section(
+    'iphones',
+    'Find your next chapter.',
+    'Choose your iPhone. Make it yours. Explore the configurations in our current collection.',
+  );
+  const ecosystem = section(
+    'ecosystem',
+    'Better, together.',
+    'The devices you love. Connected to the things you do.',
+  );
+  const spotlights = section(
+    'spotlights',
+    'Big ideas. Beautiful possibilities.',
+    'Meet the devices that give your everyday a little more room.',
+  );
+  const finder = section(
+    'finder',
+    'Which device feels like you?',
+    'Tell us your budget and device family. We’ll find configurations in the current collection that fit.',
+  );
+  const saved = section(
+    'saved',
+    'Still on your mind?',
+    'A few favorites. A fresh look. Your next chapter is waiting.',
+  );
+  const why = section(
+    'why',
+    'Considered from the first click.',
+    'A clearer way to discover, reserve and care for your next device.',
+  );
+  const tradein = section(
+    'trade-in',
+    'Good things deserve a second life.',
+    'Start with an estimate. After inspection, review your offer and decide what comes next.',
+  );
+  const repair = section(
+    'repair',
+    'A little care. A lot more life.',
+    'Tell us what needs attention. Follow your repair, review the quote and approve the work from your account.',
+  );
+  const network = section(
+    'network',
+    'From the Himalayas. To your world.',
+    'Find a pickup location or explore joining our retailer network. Built around the people who use it.',
+  );
+  const intelligence = section(
+    'intelligence',
+    'A clearer view of your next move.',
+    'Compare catalog configurations and explore published international price observations, with sources you can inspect.',
+  );
+  const journey = section('journey', 'Your next device, in three steps.');
+  const reviews = section(
+    'reviews',
+    'Every experience has a story.',
+    'Reviews from customers who received their devices.',
+  );
+  const news = section(
+    'news',
+    'A little inspiration. A lot to discover.',
+    'Buying guides, device care and stories from our community.',
+  );
+  const final = section(
+    'final',
+    'Your next chapter starts here.',
+    'Discover a device that fits your world. We’ll help you take the next step.',
+  );
   return (
-    <div className="luxe-content">
-      <HomeHero title={hero?.title} body={hero?.body} href={hero?.href} />
-      <WhatsNew products={products.data} />
-      <section className="container home-section">
-        <div className="compact-heading">
-          <h2 className="text-balance">Shop what you love.</h2>
-          <ArrowLink to="/store">All categories</ArrowLink>
-        </div>
-        {categories.isLoading ? (
-          <Loading />
-        ) : categories.error ? (
-          <ErrorNotice error={categories.error} />
-        ) : (
-          <div className="category-grid">
-            {categories.data?.map((c) => (
-              <Link to={`/${c.slug}`} className="category-tile" key={c.id}>
-                <ProductVisual image={c.image} name={c.name} />
-                <span>
-                  {c.name}
-                  <ArrowUpRight size={13} />
-                </span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-      <section className="container home-section products-section">
-        <SectionHeading
-          title="Your next favourite starts here."
-          action={<ArrowLink to="/store">View all products</ArrowLink>}
-        />
-        {products.isLoading ? (
-          <Loading />
-        ) : products.error ? (
-          <ErrorNotice error={products.error} retry={() => void products.refetch()} />
-        ) : !featured.length ? (
-          <Empty
-            title="The collection is being updated."
-            link="/store"
-            action="Explore the store"
-          />
-        ) : (
-          <div className="product-grid">
-            {featured.map((p) => (
-              <ProductCard product={p} key={p.id} />
-            ))}
-          </div>
-        )}
-      </section>
-      {configurable && (
-        <div className="container home-section">
-          <QuickConfigure key={configurable.id} product={configurable} />
+    <div className="luxe-content home-v2">
+      <HomeHero
+        title={data?.hero?.title}
+        body={data?.hero?.body}
+        href={data?.hero?.href}
+        products={data?.products}
+        discoveryHref={
+          visible('iphones') ? '#collection' : visible('ecosystem') ? '#explore-devices' : '/store'
+        }
+      />
+      <HomeTrustBar />
+      <HomeQuickActions />
+      {!!feed.error && (
+        <div className="container">
+          <ErrorNotice error={feed.error} retry={() => void feed.refetch()} />
         </div>
       )}
-      <section className="container home-section grid gap-4 lg:grid-cols-2">
-        <article className="luxe-panel service-panel">
-          <RefreshCw size={28} />
-          <span className="eyebrow">YOUR NEXT CHAPTER</span>
-          <h2 className="text-balance">
-            Your old device.
-            <br />
-            New possibilities.
-          </h2>
-          <p className="text-pretty">
-            Get an estimate, review your inspection offer, and put your device toward your next
-            upgrade.
-          </p>
-          <ButtonLink to="/trade-in">Check trade-in value</ButtonLink>
-        </article>
-        <article className="luxe-panel service-panel">
-          <span className="eyebrow">A CLEARER CHOICE</span>
-          <h2 className="text-balance">A good place to start.</h2>
-          {value ? (
-            <div className="value-product grid grid-cols-2 items-center gap-4">
-              <ProductVisual image={value.product.image} name={value.product.name} />
-              <div>
-                <h3>{value.product.name}</h3>
-                <p>
-                  {value.variant.storage} · {value.variant.color}
-                </p>
-                <strong className="value-price tabular-nums">{money(value.variant.price)}</strong>
-                <ArrowLink to={`/products/${value.product.slug}`}>View configuration</ArrowLink>
-              </div>
-            </div>
-          ) : (
-            <>
-              <p>Compare configurations and current availability.</p>
-              <ButtonLink to="/compare">Compare devices</ButtonLink>
-            </>
-          )}
-        </article>
-      </section>
-      <section className="container home-section grid gap-4 md:grid-cols-2">
-        {[
-          {
-            Icon: Wrench,
-            title: 'Expert care. More life.',
-            body: 'Book a repair, approve your quote, and follow every service update.',
-            to: '/repair',
-            cta: 'Book a repair',
-          },
-          {
-            Icon: ShieldCheck,
-            title: 'Your device. Its whole story.',
-            body: 'Purchases, masked serials, warranty and service history, together in My Devices.',
-            to: '/account/devices',
-            cta: 'Open My Devices',
-          },
-        ].map(({ Icon, title, body, to, cta }) => (
-          <article className="luxe-panel service-panel compact-service" key={to}>
-            <Icon size={30} />
-            <h2 className="text-balance">{title}</h2>
-            <p className="text-pretty">{body}</p>
-            <ArrowLink to={to}>{cta}</ArrowLink>
-          </article>
-        ))}
-      </section>
-      <section className="container home-section">
-        <SectionHeading title="One account. Your entire Apple world." />
-        <div className="ecosystem-links grid grid-cols-2 gap-3 md:grid-cols-5">
-          {[
-            { Icon: Gem, label: 'Discover', note: 'Find your next device', to: '/store' },
-            { Icon: RefreshCw, label: 'Upgrade', note: 'Explore trade-in', to: '/trade-in' },
-            { Icon: Wrench, label: 'Care', note: 'Track your repair', to: '/account/repairs' },
-            { Icon: PackageCheck, label: 'Track', note: 'Follow your order', to: '/track' },
-            { Icon: Smartphone, label: 'Own', note: 'Manage your devices', to: '/account/devices' },
-          ].map(({ Icon, label, note, to }) => (
-            <Link className="luxe-panel" key={label} to={to}>
-              <Icon size={25} />
-              <strong>{label}</strong>
-              <small>{note}</small>
-            </Link>
-          ))}
-        </div>
-      </section>
-      <section className="himalayan-story">
-        <div className="container story-content">
-          <span className="eyebrow">FROM 8848. FOR NEPAL.</span>
-          <h2 className="text-balance">
-            Same roots.
-            <br />
-            Higher possibilities.
-          </h2>
-          <p>Technology moves forward. Connection stays.</p>
-          <ArrowLink to="/stores" light>
-            Find your nearest store
-          </ArrowLink>
-        </div>
-      </section>
-      <section className="container home-section grid gap-4 md:grid-cols-2">
-        <article className="luxe-panel service-panel">
-          <MapPin size={28} />
-          <h2 className="text-balance">
-            Online convenience.
-            <br />
-            Local connection.
-          </h2>
-          <p>Explore store locations, opening hours, pickup and available services.</p>
-          <ButtonLink to="/stores">Find a store</ButtonLink>
-        </article>
-        <article className="luxe-panel service-panel">
-          <h2 className="text-balance">
-            A little guidance.
-            <br />A better decision.
-          </h2>
-          <div className="guide-links">
-            {[
-              ['Buying & booking', '/support'],
-              ['Compare your options', '/compare'],
-              ['Warranty & care', '/policies/warranty'],
-            ].map(([label, to]) => (
-              <ArrowLink key={to} to={to}>
-                {label}
-              </ArrowLink>
-            ))}
-          </div>
-        </article>
-      </section>
+      {visible('spotlights') && (
+        <HomeSpotlights data={data} copy={spotlights} onPreview={preview} />
+      )}
+      {visible('iphones') && (
+        <HomeCollection
+          data={data}
+          copy={iphones}
+          loading={feed.isLoading}
+          failed={Boolean(feed.error)}
+        />
+      )}
+      {visible('finder') && (
+        <HomeFinderIntro
+          copy={finder}
+          onOpen={() => setFinderOpen(true)}
+          ready={Boolean(data?.categories.length)}
+          buttonRef={finderButton}
+        />
+      )}
+      {visible('ecosystem') && <HomeExplore data={data} copy={ecosystem} onPreview={preview} />}
+      {visible('saved') && <HomePersonalShelf copy={saved} onPreview={preview} />}
+      {visible('why') && <HomeWhy copy={why} />}
+      {(visible('trade-in') || visible('repair')) && (
+        <HomeCare
+          tradein={visible('trade-in') ? tradein : undefined}
+          repair={visible('repair') ? repair : undefined}
+        />
+      )}
+      {visible('network') && <HomeNetwork data={data} copy={network} />}
+      {visible('intelligence') && <HomeIntelligence data={data} copy={intelligence} />}
+      {visible('journey') && <HomeJourney copy={journey} />}
+      {visible('reviews') && <HomeReviews data={data} copy={reviews} />}
+      {visible('news') && <HomeJournal data={data} copy={news} />}
+      {visible('final') && <HomeFinalCTA copy={final} />}
+      {finderOpen && data && (
+        <DeviceFinder
+          categories={data.categories}
+          onClose={() => setFinderOpen(false)}
+          onPreview={preview}
+        />
+      )}
+      {selection && <ProductPreview selection={selection} onClose={() => setSelection(null)} />}
     </div>
   );
 }

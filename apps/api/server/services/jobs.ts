@@ -1,5 +1,7 @@
 import { db } from '../db.js';
+import { reconcilePendingPayments } from './payments.js';
 import { expireReservations } from './orders.js';
+import { deliverAccountEmail } from './account-recovery.js';
 const MAX_ATTEMPTS = 5;
 const LEASE_MS = 5 * 60_000;
 /** Database-backed jobs; a conditional claim prevents two workers from processing one job. */
@@ -38,7 +40,10 @@ export async function runJobs() {
     });
     if (!claimed.count) continue;
     try {
-      if (job.type === 'RESERVATION_CLEANUP') await expireReservations();
+      if (job.type === 'RESERVATION_CLEANUP') {
+        await reconcilePendingPayments();
+        await expireReservations();
+      } else if (job.type === 'AUTH_EMAIL') await deliverAccountEmail(job.payload);
       else throw new Error('UNCONFIGURED_JOB_HANDLER');
       await db.job.update({
         where: { id: job.id },

@@ -1,12 +1,27 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-test('configure a product and complete an unpaid guest reservation', async ({ page }) => {
+import type { Product } from '../../apps/web/src/services/types';
+test('configure a product and complete an unpaid guest reservation', async ({ page, request }) => {
+  const product: Product = await (await request.get('/api/v1/products/iphone-16-pro')).json();
+  const available = product.variants.filter((variant) =>
+    variant.stock.some((stock) => stock.available > 0),
+  );
+  const variant =
+    available.find((option) => option.storage === '256GB' && !option.preorder) ??
+    available.find((option) => !option.preorder) ??
+    available[0];
+  expect(variant, 'The development catalog needs an available iPhone configuration.').toBeTruthy();
   await page.goto('/products/iphone-16-pro');
   await expect(page.getByRole('heading', { name: 'iPhone 16 Pro', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '256GB', exact: false }).click();
-  await page.locator('.purchase-actions').getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: variant.color, exact: true }).click();
+  await page.locator('.storage-selectors button').filter({ hasText: variant.storage }).click();
+  await page
+    .locator('.purchase-actions')
+    .getByRole('button', { name: variant.preorder ? 'Reserve your device' : 'Add to bag' })
+    .click();
   await page.getByRole('link', { name: 'View your bag' }).click();
-  await expect(page.locator('.cart-line-details')).toContainText('256GB');
+  await expect(page.locator('.cart-line-details')).toContainText(variant.storage);
+  await expect(page.locator('.cart-line-details')).toContainText(variant.color);
   await page.getByRole('link', { name: 'Continue to checkout' }).click();
   await page.getByLabel('Full name').fill('Browser Test');
   await page
@@ -28,13 +43,15 @@ test('search and comparison are interactive', async ({ page }) => {
   await expect(page.locator('.search-results')).toContainText('MacBook Air');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Find your next great thing' })).not.toBeVisible();
-  await page.getByRole('button', { name: 'Compare iPhone 16 Pro' }).click();
+  await page.goto('/store?q=iPhone%2016%20Pro');
+  await page.getByRole('button', { name: 'Compare iPhone 16 Pro', exact: true }).click();
+  await page.goto('/store?q=MacBook%20Air');
   await page.getByRole('button', { name: 'Compare MacBook Air' }).click();
   await page.locator('.compare-floating').click();
   await expect(page.locator('.comparison-table')).toContainText('iPhone 16 Pro');
   await expect(page.locator('.comparison-table')).toContainText('MacBook Air');
 });
-for (const width of [375, 414, 768, 1024, 1440])
+for (const width of [375, 414, 430, 768, 1024, 1440, 1920])
   test(`homepage and product fit ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     for (const path of ['/', '/products/iphone-16-pro', '/store', '/repair', '/account']) {
@@ -83,6 +100,7 @@ test('staff can open operational modules and edit dialogs', async ({ page }) => 
     'repairs',
     'trade-ins',
     'content',
+    'reviews',
     'roles',
     'audit-logs',
     'device-identity',
@@ -97,7 +115,7 @@ test('staff can open operational modules and edit dialogs', async ({ page }) => 
     'reconciliation',
   ]) {
     await page.goto(`/admin/${path}`);
-    await expect(page.locator('.admin-page-heading h1')).toBeVisible();
+    await expect(page.locator('.admin-page-heading h1')).toBeVisible({ timeout: 15000 });
     await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15000 });
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
   }

@@ -1,5 +1,7 @@
 # Complete function reference — full stack
 
+> Historical implementation note. The 6 October 2026 refresh is documented in [ARCHITECTURE.md](../ARCHITECTURE.md), [API.md](../API.md), [DEPLOYMENT.md](../DEPLOYMENT.md) and [TESTING.md](../TESTING.md). Those files supersede older payment/mail, homepage, build-command and verification claims below.
+
 > Deep-research inventory of every function in the iPhoneBooking V2 monorepo: server foundation,
 > business services, all API endpoints with their guards and behavior, the Prisma data model, every
 > client-side function, the admin resource engine, PWA assets, seed/scripts/tests, and the complete

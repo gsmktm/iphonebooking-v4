@@ -1,5 +1,7 @@
 # API reference and role matrix
 
+> Historical implementation note. The 6 October 2026 refresh is documented in [ARCHITECTURE.md](../ARCHITECTURE.md), [API.md](../API.md), [DEPLOYMENT.md](../DEPLOYMENT.md) and [TESTING.md](../TESTING.md). Those files supersede older payment/mail, homepage, build-command and verification claims below.
+
 All business endpoints begin with `/api/v1`. Mutations use JSON and `X-Requested-With: iPhoneBooking`; browser requests must come from `APP_ORIGIN`. Authentication uses the session cookie. Errors have `{error:{code,message,requestId}}`. API responses are `Cache-Control: no-store`.
 
 | Area             | Endpoints                                                                                                        | Access                                                           |

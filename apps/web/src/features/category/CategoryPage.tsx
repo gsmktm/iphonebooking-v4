@@ -129,12 +129,14 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
                 <strong>{activeVariant ? money(activeVariant.price) : money(minPrice)}</strong>
                 <span>
                   {configBits.join(' · ')}
-                  {configBits.length > 0 && ' · '}NPR, tax included
+                  {configBits.length > 0 && ' · '}Catalog price in NPR
                 </span>
               </div>
 
               <div className="cat-actions">
-                <ButtonLink to={`/products/${hero.slug}`}>
+                <ButtonLink
+                  to={`/products/${hero.slug}${activeVariant ? `?variant=${activeVariant.id}` : ''}`}
+                >
                   {isPrebook ? 'Pre-book now' : 'Buy now'}
                 </ButtonLink>
                 <ButtonLink to="/compare" secondary>
@@ -161,13 +163,19 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
                 <li>
                   <BadgeCheck size={16} aria-hidden />
                   <span>
-                    <strong>{hero.badge ?? 'In stock'}</strong> · warranty backed
+                    <strong>
+                      {activeVariant?.stock.some((stock) => stock.available > 0)
+                        ? isPrebook
+                          ? 'Pre-booking'
+                          : 'In stock'
+                        : 'Check availability'}
+                    </strong>
                   </span>
                 </li>
               </ul>
             </div>
             <div className="cat-hero-visual">
-              <ProductVisual image={hero.image} name={hero.name} />
+              <ProductVisual image={activeVariant?.image ?? hero.image} name={hero.name} />
               {hero.badge && <span className="cat-hero-badge">{hero.badge}</span>}
             </div>
           </div>
@@ -204,7 +212,22 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
 
       {!products.isLoading && !products.error && lineup.length > 0 && (
         <>
-          <FeatureBand copy={config.features} items={config.features.items} />
+          <FeatureBand
+            copy={{
+              eyebrow: 'A CLOSER LOOK',
+              title: `The details of ${hero.name}.`,
+              description:
+                'Specifications from the current catalog. Check your chosen configuration before purchase.',
+            }}
+            items={Object.entries(hero.specs)
+              .slice(0, 6)
+              .map(([key, value], index) => ({
+                Icon: config.features.items[index % config.features.items.length].Icon,
+                tag: key,
+                name: value,
+                body: `${key} for ${hero.name}. Configuration-specific details are shown on the product page.`,
+              }))}
+          />
           <SpecTable products={lineup} copy={config.specs} />
         </>
       )}

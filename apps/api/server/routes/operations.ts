@@ -16,6 +16,7 @@ operations.post('/orders/:id/collect', permit('payment.collect'), async (req, re
     .parse(req.body);
   await db.$transaction(
     async (tx) => {
+      await tx.$queryRaw`SELECT "id" FROM "Order" WHERE "id" = ${String(req.params.id)} FOR UPDATE`;
       const order = owned(
         await tx.order.findUnique({
           where: { id: String(req.params.id) },
@@ -33,10 +34,28 @@ operations.post('/orders/:id/collect', permit('payment.collect'), async (req, re
       const paid = order.payments
         .filter((p) => p.status === 'CONFIRMED')
         .reduce((sum, p) => sum + p.amount, 0);
+      if (
+        order.payments.some(
+          (p) =>
+            p.provider === 'KHALTI' &&
+            [
+              'INITIALIZING',
+              'INITIALIZATION_UNCERTAIN',
+              'PENDING',
+              'VERIFICATION_PENDING',
+              'REVIEW_REQUIRED',
+            ].includes(p.status),
+        )
+      )
+        throw new AppError(
+          409,
+          'ONLINE_PAYMENT_PENDING',
+          'Verify the open online payment before collecting another payment.',
+        );
       if (amount > order.total - paid)
         throw new AppError(409, 'OVERPAYMENT', 'The amount exceeds the remaining balance.');
       await tx.payment.updateMany({
-        where: { orderId: order.id, status: 'PENDING' },
+        where: { orderId: order.id, status: 'PENDING', provider: 'STORE' },
         data: { status: 'SUPERSEDED' },
       });
       const payment = await tx.payment.create({

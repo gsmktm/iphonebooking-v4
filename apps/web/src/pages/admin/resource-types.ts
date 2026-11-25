@@ -12,6 +12,7 @@ export interface Action {
   initial?: Record<string, unknown>;
   permission: string;
   help?: string;
+  values?: Row;
 }
 export type Row = Record<string, unknown>;
 export interface Resource {

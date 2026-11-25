@@ -1,5 +1,7 @@
 # Architecture
 
+> Historical implementation note. The 6 October 2026 refresh is documented in [ARCHITECTURE.md](../ARCHITECTURE.md), [API.md](../API.md), [DEPLOYMENT.md](../DEPLOYMENT.md) and [TESTING.md](../TESTING.md). Those files supersede older payment/mail, homepage, build-command and verification claims below.
+
 The storefront uses React 19, Vite, strict TypeScript, React Router, TanStack Query for server data, and Zustand for the anonymous bag, wishlist, and comparison selection. Filters live in URL parameters. Account credentials are never placed in browser storage. Styles are split into design tokens, storefront, workflow pages, and operations UI.
 
 Express 5 exposes `/api/v1`. Zod validates mutation bodies, Prisma issues parameterized database queries, and PostgreSQL owns transactional state. Presentation components use the typed API client rather than database calls. Routes are grouped into authentication, catalog, commerce, account, services, admin reads, admin creation, and operations. Money is integer NPR paisa throughout. Browser totals are estimates; the server uses current variant prices.

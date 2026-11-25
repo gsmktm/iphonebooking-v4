@@ -20,10 +20,14 @@ model User {
   email                 String             @unique
   name                  String
   passwordHash          String
+  status                AccountStatus      @default(ACTIVE)
+  emailVerifiedAt       DateTime?
+  passwordChangedAt     DateTime?
   roleId                String?
   role                  Role?              @relation(fields: [roleId], references: [id])
   createdAt             DateTime           @default(now())
   sessions              UserSession[]
+  accountTokens         AccountToken[]
   addresses             Address[]
   orders                Order[]
   devices               Device[]
@@ -37,6 +41,36 @@ model User {
   wishlist              Wishlist[]
   cart                  CartItem[]
   appointments          Appointment[]
+  retailerMemberships   RetailerMember[]
+  retailerApplication   RetailerApplication?
+  reviews               Review[]
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum AccountTokenPurpose {
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
+}
+
+model AccountToken {
+  id          String              @id @default(cuid())
+  userId      String
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose     AccountTokenPurpose
+  tokenHash   String              @unique
+  requestKey  String              @unique
+  email       String
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime            @default(now())
+
+  @@index([userId, purpose, expiresAt])
 }
 
 model UserSession {
@@ -95,6 +129,7 @@ model Product {
   accessories         AccessoryCompatibility[] @relation("CompatibleDevice")
   deviceIdentities    DeviceIdentity[]
   partCompatibilities PartCompatibility[]
+  reviews             Review[]
 }
 
 model ProductVariant {
@@ -136,6 +171,11 @@ model Store {
   phone    String
   services String[]
   stocks   InventoryStock[]
+  retailerId         String?
+  retailer           Retailer? @relation(fields: [retailerId], references: [id], onDelete: Restrict)
+  retailerAssignedAt DateTime?
+
+  @@index([retailerId])
 }
 
 model InventoryStock {
@@ -216,6 +256,7 @@ model Order {
   currency         String               @default("NPR")
   trackingHash     String               @unique
   idempotencyKey   String               @unique
+  requestHash      String?
   expiresAt        DateTime
   createdAt        DateTime             @default(now())
   items            OrderItem[]
@@ -243,6 +284,33 @@ model OrderItem {
   quantity  Int
   unitPrice Int
   stockId   String
+  review    Review?
+}
+
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  REJECTED
+}
+
+model Review {
+  id          String       @id @default(cuid())
+  productId   String
+  product     Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  orderItemId String       @unique
+  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  rating      Int
+  title       String
+  body        String
+  status      ReviewStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([userId, productId])
+  @@index([productId, status, createdAt])
+  @@index([status, createdAt])
 }
 
 model OrderStatusHistory {
@@ -270,6 +338,13 @@ model Payment {
   order        Order             @relation(fields: [orderId], references: [id])
   provider     String
   externalId   String?           @unique
+  transactionId String?          @unique
+  idempotencyKey String?          @unique
+  currency     String            @default("NPR")
+  checkoutUrl  String?
+  expiresAt    DateTime?
+  verifiedAt   DateTime?
+  failureCode  String?
   amount       Int
   status       String            @default("PENDING")
   createdAt    DateTime          @default(now())
@@ -1151,14 +1226,22 @@ model InventoryAging {
 model PriceIntelligence {
   id            String   @id @default(cuid())
   productId     String?
+  variantId     String?
   source        String
   sourceUrl     String?
+  countryCode   String?
+  currency      String?
+  priceKind     String?
   observedPrice Int?
   observedAt    DateTime
   availability  String?
   confidence    Float    @default(0.8)
   trend         Json[]
   active        Boolean  @default(true)
+  published     Boolean  @default(false)
+
+  @@index([published, active, observedAt])
+  @@index([productId, variantId])
 }
 
 // ── SECTION 132: Pricing Guardrails ───────────────────────────────
@@ -1260,6 +1343,46 @@ model Retailer {
   settlementPeriod String?
   status           String   @default("ACTIVE")
   createdAt        DateTime @default(now())
+  stores           Store[]
+  members          RetailerMember[]
+  application      RetailerApplication?
+}
+
+model RetailerMember {
+  id         String   @id @default(cuid())
+  retailerId String
+  retailer   Retailer @relation(fields: [retailerId], references: [id], onDelete: Restrict)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  role       String   @default("VIEWER")
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([retailerId, userId])
+  @@index([userId, active])
+}
+
+model RetailerApplication {
+  id           String    @id @default(cuid())
+  applicantId  String    @unique
+  applicant    User      @relation(fields: [applicantId], references: [id], onDelete: Restrict)
+  businessName String
+  contactName  String
+  contactPhone String
+  city         String
+  address      String
+  note         String
+  status       String    @default("PENDING")
+  reviewNote   String?
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  retailerId   String?   @unique
+  retailer     Retailer? @relation(fields: [retailerId], references: [id], onDelete: Restrict)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([status, createdAt])
 }
 
 model RetailerSettlement {

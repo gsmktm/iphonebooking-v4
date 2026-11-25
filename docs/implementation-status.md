@@ -1,5 +1,7 @@
 # Implementation status against the master specification
 
+> Historical implementation note. The 6 October 2026 refresh is documented in [ARCHITECTURE.md](../ARCHITECTURE.md), [API.md](../API.md), [DEPLOYMENT.md](../DEPLOYMENT.md) and [TESTING.md](../TESTING.md). Those files supersede older payment/mail, homepage, build-command and verification claims below.
+
 This file is intentionally explicit: **the full 90-section Production V2 specification is not complete**. See [Device OS progress](device-os-progress.md) for subsequent V3 work that supersedes parts of the list below, and [all 203 requirements](requirements-register.md) for combined scope. The repository contains real database-backed workflows and a polished local UI, not a claim that every enterprise feature is launch-ready.
 
 ## Implemented and exercised

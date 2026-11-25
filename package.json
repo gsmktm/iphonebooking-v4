@@ -1,6 +1,6 @@
 {
   "name": "iphonebooking-v2",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.6.0",
@@ -21,9 +21,12 @@
     "db:migrate": "pnpm --filter api db:migrate",
     "db:seed": "pnpm --filter api db:seed",
     "db:test:migrate": "pnpm --filter api db:test:migrate",
-    "lint": "prettier --check *.ts *.json docs README.md tests apps/web/src apps/web/scripts apps/web/vite.config.ts apps/web/package.json apps/api/server apps/api/prisma/seed.ts apps/api/scripts apps/api/package.json apps/api/tsconfig.server.json",
-    "format": "prettier --write *.ts *.json docs README.md tests apps/web/src apps/web/scripts apps/web/vite.config.ts apps/web/package.json apps/api/server apps/api/prisma/seed.ts apps/api/scripts apps/api/package.json apps/api/tsconfig.server.json",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "docs:generate": "node scripts/generate-reference.mjs",
+    "lint": "prettier --check *.ts *.json README.md ARCHITECTURE.md DATABASE.md API.md DESIGN-SYSTEM.md ADMIN.md SECURITY.md DEPLOYMENT.md TESTING.md docs tests apps/web/src apps/web/scripts apps/web/vite.config.ts apps/web/package.json apps/api/server apps/api/prisma/seed.ts apps/api/scripts apps/api/package.json apps/api/tsconfig.server.json scripts deployment/cpanel/app.cjs",
+    "format": "prettier --write *.ts *.json README.md ARCHITECTURE.md DATABASE.md API.md DESIGN-SYSTEM.md ADMIN.md SECURITY.md DEPLOYMENT.md TESTING.md docs tests apps/web/src apps/web/scripts apps/web/vite.config.ts apps/web/package.json apps/api/server apps/api/prisma/seed.ts apps/api/scripts apps/api/package.json apps/api/tsconfig.server.json scripts deployment/cpanel/app.cjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "release:package": "node scripts/package-release.mjs",
+    "test:release": "node scripts/check-release.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

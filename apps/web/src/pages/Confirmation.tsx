@@ -1,26 +1,43 @@
-import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Check, Download } from 'lucide-react';
 import type { Order } from '../services/types';
 import { money } from '../services/api';
+import { PaymentPanel } from '../features/checkout/PaymentPanel';
 import { PageIntro, ButtonLink, Empty } from '../components/ui';
 export default function Confirmation() {
   const { state } = useLocation();
-  const order = (state as { order?: Order } | null)?.order;
+  const [params] = useSearchParams();
+  const [saved] = useState<Order | undefined>(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem('iphonebooking-receipt') ?? 'null') ?? undefined;
+    } catch {
+      return undefined;
+    }
+  });
+  const requestedOrder = params.get('order');
+  const order =
+    (state as { order?: Order } | null)?.order ??
+    (requestedOrder && saved?.id !== requestedOrder ? undefined : saved);
   if (!order)
     return (
       <div className="container page">
-        <Empty
-          title="Find your reservation."
-          description="Your saved reservations are available in your account."
-          link="/account/orders"
-          action="View your orders"
-        />
+        {params.get('order') ? (
+          <PaymentPanel orderId={params.get('order')!} />
+        ) : (
+          <Empty
+            title="Find your reservation."
+            description="Your saved reservations are available in your account."
+            link="/account/orders"
+            action="View your orders"
+          />
+        )}
       </div>
     );
   const download = () => {
     const file = new Blob(
       [
-        `iPhoneBooking — UNPAID RESERVATION\nOrder: ${order.number}\nTotal: ${money(order.total)}\nDue at store: ${money(order.dueNow)}\nPrivate receipt key: ${order.trackingToken}\n\nNo payment has been collected. Reservation expires in 24 hours.\nTrack: ${location.origin}/track\nKeep this key private. It allows access to order status and account claiming.`,
+        `iPhoneBooking — RESERVATION RECORD\nOrder: ${order.number}\nProduct total at reservation: ${money(order.total)}\nInitial amount due: ${money(order.dueNow)}\nPrivate receipt key: ${order.trackingToken}\n\nThis is a reservation record, not proof of payment. Check the current status online. Unpaid reservations are normally held for 24 hours; unresolved provider payments need review.\nTrack: ${location.origin}/track\nKeep this key private. It allows access to order status and account claiming.`,
       ],
       { type: 'text/plain' },
     );
@@ -38,8 +55,16 @@ export default function Confirmation() {
       </div>
       <PageIntro
         eyebrow="A GREAT BEGINNING"
-        title="Your next chapter is reserved."
-        description="No payment has been collected. Complete payment with store staff within 24 hours to keep your reservation."
+        title={
+          order.status === 'PAID'
+            ? 'Your reservation is confirmed.'
+            : 'Your next chapter is reserved.'
+        }
+        description={
+          order.status === 'PAID'
+            ? 'Accepted trade-in credit covers this order. Track your next steps below.'
+            : 'Your reservation is saved. Review its current status below and choose an available payment option.'
+        }
       />
       <div className="record-card">
         <h2>{order.number}</h2>
@@ -48,7 +73,7 @@ export default function Confirmation() {
           <strong>{money(order.total)}</strong>
         </div>
         <div className="summary-row">
-          <span>Due at store</span>
+          <span>Initial amount due</span>
           <strong>{money(order.dueNow)}</strong>
         </div>
         <label>
@@ -61,9 +86,10 @@ export default function Confirmation() {
         </p>
         <button className="button secondary" onClick={download}>
           <Download size={16} />
-          Save reservation receipt
+          Save reservation record
         </button>
       </div>
+      <PaymentPanel orderId={order.id} receiptKey={order.trackingToken} />
       <div className="button-row">
         <ButtonLink to="/account/orders">Your orders</ButtonLink>
         <ButtonLink secondary to="/track">

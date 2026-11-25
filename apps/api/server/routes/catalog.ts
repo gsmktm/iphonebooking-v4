@@ -2,80 +2,151 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { db } from '../db.js';
 import { owned } from '../core.js';
+import { khaltiConfig } from '../services/khalti.js';
+import {
+  catalogFacets,
+  catalogQuery,
+  contentHref,
+  findCatalog,
+  productInclude,
+  publicStoreSelect,
+  serviceResults,
+} from '../services/catalog-discovery.js';
 export const catalog = Router();
-const include = { category: true, variants: { include: { stock: { include: { store: true } } } } };
-catalog.get('/config', (_req, res) =>
+catalog.get('/config', (_req, res) => {
+  const onlinePayments = Boolean(khaltiConfig());
   res.json({
     environment: process.env.NODE_ENV ?? 'development',
     developmentData: process.env.SEED_DEVELOPMENT === 'true',
     currency: 'NPR',
-    payments: ['STORE'],
-    onlinePaymentsConfigured: false,
-  }),
-);
-catalog.get('/categories', async (_req, res) => res.json(await db.category.findMany()));
-catalog.get('/products', async (req, res) => {
-  const q = z
-    .object({
-      category: z.string().optional(),
-      q: z.string().max(100).optional(),
-      sort: z.enum(['featured', 'price-low', 'price-high', 'newest']).optional(),
-      storage: z.string().optional(),
-      color: z.string().optional(),
-      stock: z.string().optional(),
-    })
-    .parse(req.query);
-  const products = await db.product.findMany({
-    where: {
-      active: true,
-      ...(q.category ? { category: { slug: q.category } } : {}),
-      ...(q.q
-        ? {
-            OR: [
-              { name: { contains: q.q, mode: 'insensitive' } },
-              { variants: { some: { sku: { contains: q.q, mode: 'insensitive' } } } },
-            ],
-          }
-        : {}),
-      variants: {
-        some: {
-          ...(q.storage ? { storage: q.storage } : {}),
-          ...(q.color ? { color: q.color } : {}),
-          ...(q.stock === 'in-stock' ? { stock: { some: { available: { gt: 0 } } } } : {}),
-        },
-      },
-    },
-    include,
-    orderBy:
-      q.sort === 'newest' ? [{ createdAt: 'desc' }] : [{ featured: 'desc' }, { createdAt: 'desc' }],
-    take: 100,
+    payments: onlinePayments ? ['STORE', 'KHALTI'] : ['STORE'],
+    onlinePaymentsConfigured: onlinePayments,
+    onlinePayments,
+    paymentProvider: onlinePayments ? 'KHALTI' : null,
   });
-  if (q.sort?.startsWith('price'))
-    products.sort(
-      (a, b) =>
-        (Math.min(...a.variants.map((v) => v.price)) -
-          Math.min(...b.variants.map((v) => v.price))) *
-        (q.sort === 'price-high' ? -1 : 1),
-    );
+});
+catalog.get('/categories', async (_req, res) => res.json(await db.category.findMany()));
+catalog.get('/catalog', async (req, res) => {
+  const query = catalogQuery.parse(req.query);
+  const [result, facets] = await Promise.all([findCatalog(query), catalogFacets(query)]);
+  res.json({ ...result, pageCount: Math.ceil(result.total / result.pageSize), facets });
+});
+catalog.get('/products', async (req, res) => {
+  // Existing category, comparison and home consumers expect an array.
+  const query = catalogQuery.parse({ pageSize: 100, ...req.query });
+  const { products } = await findCatalog(query);
   res.json(products);
 });
-catalog.get('/products/:slug', async (req, res) =>
-  res.json(
-    owned(
-      await db.product.findFirst({
-        where: { slug: String(req.params.slug), active: true, variants: { some: {} } },
-        include: {
-          ...include,
-          accessories: {
-            where: { accessory: { active: true, variants: { some: {} } } },
-            include: { accessory: { include } },
-          },
+catalog.get('/search', async (req, res) => {
+  const { q } = z.object({ q: z.string().trim().max(100).default('') }).parse(req.query);
+  const query = catalogQuery.parse({ q, pageSize: 6 });
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const [result, facets, content, categories] = await Promise.all([
+    findCatalog(query),
+    catalogFacets(query),
+    db.cMSPage.findMany({
+      where: {
+        published: true,
+        AND: terms.map((term) => ({
+          OR: [
+            { title: { contains: term, mode: 'insensitive' } },
+            { description: { contains: term, mode: 'insensitive' } },
+            { slug: { contains: term, mode: 'insensitive' } },
+          ],
+        })),
+      },
+      select: { slug: true, title: true, description: true },
+      orderBy: [{ updatedAt: 'desc' }, { slug: 'asc' }],
+      take: 5,
+    }),
+    db.category.findMany({
+      where: {
+        products: { some: { active: true, variants: { some: {} } } },
+        ...(q
+          ? {
+              OR: [
+                { name: { contains: q, mode: 'insensitive' } },
+                { slug: { contains: q, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+      },
+      select: { slug: true, name: true },
+      orderBy: { name: 'asc' },
+      take: 8,
+    }),
+  ]);
+  res.json({
+    query: q,
+    products: result.products,
+    total: result.total,
+    suggestions: [
+      ...facets.models.slice(0, 6).map((model) => ({
+        type: 'model',
+        label: model.name,
+        href: `/catalog?model=${encodeURIComponent(model.slug)}`,
+      })),
+      ...facets.storages
+        .filter((value) => q && value.toLowerCase().includes(q.toLowerCase()))
+        .slice(0, 4)
+        .map((storage) => ({
+          type: 'storage',
+          label: storage,
+          href: `/catalog?storage=${encodeURIComponent(storage)}`,
+        })),
+      ...facets.colors
+        .filter((value) => q && value.name.toLowerCase().includes(q.toLowerCase()))
+        .slice(0, 4)
+        .map((color) => ({
+          type: 'color',
+          label: color.name,
+          href: `/catalog?color=${encodeURIComponent(color.name)}`,
+        })),
+      ...categories.map((category) => ({
+        type: 'category',
+        label: category.name,
+        href: `/catalog?category=${encodeURIComponent(category.slug)}`,
+      })),
+    ],
+    content: content.map((page) => ({ ...page, href: contentHref(page.slug) })),
+    services: serviceResults
+      .filter((service) =>
+        terms.every((term) =>
+          `${service.title} ${service.description} ${service.terms}`.toLowerCase().includes(term),
+        ),
+      )
+      .map(({ terms: _terms, ...service }) => service),
+  });
+});
+catalog.get('/products/:slug', async (req, res) => {
+  const product = owned(
+    await db.product.findFirst({
+      where: { slug: String(req.params.slug), active: true, variants: { some: {} } },
+      include: {
+        ...productInclude,
+        accessories: {
+          where: { accessory: { active: true, variants: { some: {} } } },
+          include: { accessory: { include: productInclude } },
         },
-      }),
-    ),
-  ),
+      },
+    }),
+  );
+  const related = await db.product.findMany({
+    where: {
+      active: true,
+      categoryId: product.categoryId,
+      id: { not: product.id },
+      variants: { some: {} },
+    },
+    include: productInclude,
+    orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
+    take: 4,
+  });
+  res.json({ ...product, related });
+});
+catalog.get('/stores', async (_req, res) =>
+  res.json(await db.store.findMany({ select: publicStoreSelect, orderBy: { name: 'asc' } })),
 );
-catalog.get('/stores', async (_req, res) => res.json(await db.store.findMany()));
 catalog.get('/content/:slug', async (req, res) =>
   res.json(
     owned(

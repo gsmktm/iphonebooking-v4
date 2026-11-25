@@ -1,5 +1,7 @@
 # Design system and asset provenance
 
+> Historical implementation note. The 6 October 2026 refresh is documented in [ARCHITECTURE.md](../ARCHITECTURE.md), [API.md](../API.md), [DEPLOYMENT.md](../DEPLOYMENT.md) and [TESTING.md](../TESTING.md). Those files supersede older payment/mail, homepage, build-command and verification claims below.
+
 Original direction (retained on internal store pages): warm neutral storefront, graphite typography, restrained crimson, pale sage service surfaces, and deep Himalayan navy for the brand story. Product presentation leads; Nepal identity is limited to the mountain mark, geographic reference, altitude motif, and one campaign section.
 
 CSS token source: `src/styles/tokens.css`. Layout rules use 640, 768, 1024, and 1280 px enhancement breakpoints. The main container caps at 1320 px. The store uses a category strip, product grid, two service panels, ownership benefits, and a Himalayan brand story. The operations interface uses a separate compact workspace/sidebar/table system. Interaction states include focus rings, native modal focus management, pending/disabled actions, skeletons, empty states, and contextual errors. Reduced motion disables transitions and animations.

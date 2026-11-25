@@ -43,7 +43,10 @@ export default function ResourcePage({ resource, user }: { resource: string; use
   });
   const can = (p: string) => user.permissions.includes('*') || user.permissions.includes(p);
   const creator = createAction(resource);
-  const serverSearch = ['products', 'variants', 'orders', 'customers'].includes(resource);
+  const serverSearch = ['products', 'variants', 'orders', 'customers', 'reviews'].includes(
+    resource,
+  );
+  const pageSize = result.data?.pageSize ?? 50;
   const displayedRows = (result.data?.rows ?? []).filter(
     (row) =>
       serverSearch ||
@@ -199,7 +202,7 @@ export default function ResourcePage({ resource, user }: { resource: string; use
         )}
         <div className="pagination">
           <span>
-            Page {page} of {Math.max(1, Math.ceil((result.data?.total ?? 0) / 50))}
+            Page {page} of {Math.max(1, Math.ceil((result.data?.total ?? 0) / pageSize))}
           </span>
           <div>
             <button
@@ -218,7 +221,7 @@ export default function ResourcePage({ resource, user }: { resource: string; use
             <button
               className="icon-button"
               aria-label="Next page"
-              disabled={page * 50 >= (result.data?.total ?? 0)}
+              disabled={page * pageSize >= (result.data?.total ?? 0)}
               onClick={() =>
                 setParams((p) => {
                   p.set('page', String(page + 1));
@@ -357,7 +360,7 @@ export default function ResourcePage({ resource, user }: { resource: string; use
                 setError(null);
                 try {
                   const fd = new FormData(e.currentTarget);
-                  const data: Row = {};
+                  const data: Row = { ...action.values };
                   for (const f of action.fields) {
                     const raw = fd.get(f.key);
                     data[f.key] =
@@ -371,6 +374,11 @@ export default function ResourcePage({ resource, user }: { resource: string; use
                   }
                   await api(action.path, { method: action.method, body: JSON.stringify(data) });
                   await qc.invalidateQueries({ queryKey: ['admin'] });
+                  if (resource === 'reviews')
+                    await Promise.all([
+                      qc.invalidateQueries({ queryKey: ['reviews'] }),
+                      qc.invalidateQueries({ queryKey: ['home'] }),
+                    ]);
                   setAction(null);
                   setSelected(null);
                 } catch (e) {

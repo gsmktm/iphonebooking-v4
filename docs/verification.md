@@ -1,5 +1,7 @@
 # Local verification — 22 September 2026
 
+> Historical implementation note. The 6 October 2026 refresh is documented in [ARCHITECTURE.md](../ARCHITECTURE.md), [API.md](../API.md), [DEPLOYMENT.md](../DEPLOYMENT.md) and [TESTING.md](../TESTING.md). Those files supersede older payment/mail, homepage, build-command and verification claims below.
+
 These results apply to the local implementation. The complete V2/V3 specification remains unfinished; schema-only domains are not completed workflows.
 
 | Check                                    | Result                                                 |

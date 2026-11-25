@@ -1,0 +1,11 @@
+# Production V2 local release notes — 6 October 2026
+
+The existing pnpm React/Express/Prisma/PostgreSQL architecture and uncommitted business work are retained. This change adds a catalog-driven Himalayan home composition, semantic navy/gold identity, self-hosted Inter/Instrument Serif, a bounded published homepage feed, verified delivered-purchase reviews, independent audited moderation and CMS section copy. Customer repair tracking now has a private detail route. Search/news/product/policy/account/admin aliases connect to existing journeys and canonical production documents.
+
+The homepage enhancement adds paired catalog spotlights, family/offer/stock/pre-booking collection filters, a budget finder, fresh quick-look configuration, pickup availability and saved/recently viewed shelves. Native dialogs restore keyboard focus; configuration links preserve the selected variant. Published CMS blocks can show or hide fourteen keyed sections. New API/browser regression cases cover filter intersection, public store projection, draft visibility, device discovery, carousel behavior, cart actions and clearable tab-local history.
+
+Migration `202610060001_verified_reviews` adds relational reviews and hides only three marked unverified development catalog fixtures; it deletes no historical commercial records. No reviews, orders or financial metrics are seeded. Apply all 17 migrations and deploy API/worker from the same revision. The homepage enhancement needs no additional database migration. Use `apps/web/dist` and `apps/api/dist-server` for the current build.
+
+The release verifier checks compiled artifacts, live database readiness, public data bounds, security headers, canonical metadata, private indexing boundaries and genuine 404 responses. The archive excludes environment secrets, dependency directories, logs and private database snapshots. See [TESTING.md](../TESTING.md) for the final actual check results.
+
+No public deployment or live merchant/mail acceptance is claimed. Development catalog/assets/policies require commercial approval. Shipping, provider refund execution, eSewa/cards, media pipelines, promotions, full localization and schema-only enterprise modules remain explicit scope in [DEPLOYMENT.md](../DEPLOYMENT.md).

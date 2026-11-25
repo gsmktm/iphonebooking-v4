@@ -20,7 +20,7 @@ test('home configurator uses catalog prices and adds the chosen variant to the b
     new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(variant.price / 100),
   );
   await config.getByRole('button', { name: 'Add to bag', exact: true }).click();
-  await expect(config.getByRole('status')).toContainText('Review your bag');
+  await expect(config.locator('.config-result')).toContainText('Review your bag');
   const saved = await page.evaluate(
     () => JSON.parse(localStorage.getItem('iphonebooking-shop-v2')!).state.cart,
   );
@@ -33,7 +33,7 @@ test('home configurator uses catalog prices and adds the chosen variant to the b
 test('mobile home fits small screens, supports app navigation and explains installation', async ({
   page,
 }) => {
-  for (const width of [320, 375, 414, 768, 1024, 1440, 1920]) {
+  for (const width of [320, 375, 414, 430, 768, 1024, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     await page.locator('.quick-config').waitFor();
