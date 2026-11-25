@@ -55,18 +55,25 @@ jobs:
           pnpm db:migrate
           pnpm db:seed
           pnpm exec playwright install --with-deps chrome
-          pnpm dev > /tmp/iphonebooking-browser.log 2>&1 &
+          # Run processes independently; Turbo's interactive dev scheduler can
+          # stall without launching package tasks in this non-interactive CI job.
+          pnpm --filter api dev > /tmp/iphonebooking-api.log 2>&1 &
+          pnpm --filter web dev > /tmp/iphonebooking-web.log 2>&1 &
           for attempt in $(seq 1 60); do
-            if curl --fail --silent http://localhost:5173/api/health > /dev/null; then exit 0; fi
+            if curl --fail --silent http://127.0.0.1:4000/api/health > /dev/null &&
+               curl --fail --silent http://127.0.0.1:5173/api/health > /dev/null; then
+              echo "API and proxied Vite storefront are healthy."
+              exit 0
+            fi
             sleep 1
           done
-          echo "::error::Browser development server did not become healthy at http://localhost:5173/api/health"
-          echo "Server startup diagnostics (private URL credentials redacted):"
-          if [ -f /tmp/iphonebooking-browser.log ]; then
-            sed -E 's#(postgresql://)[^@ ]+@#\1[REDACTED]@#g' /tmp/iphonebooking-browser.log | tail -n 120
-          fi
-          echo "Direct backend health:"
-          curl --max-time 3 --silent --show-error -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4000/api/health || true
+          echo "::error::The API and storefront did not become healthy."
+          for file in /tmp/iphonebooking-api.log /tmp/iphonebooking-web.log; do
+            echo "Diagnostics from ${file}:"
+            if [ -f "${file}" ]; then
+              sed -E 's#(postgresql://)[^@ ]+@#\1[REDACTED]@#g' "${file}" | tail -n 120
+            fi
+          done
           exit 1
       - run: pnpm test:e2e
         env:
