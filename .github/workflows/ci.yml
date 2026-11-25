@@ -80,6 +80,28 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/iphonebooking_browser?schema=public
           ADMIN_EMAIL: browser-admin@example.test
           ADMIN_PASSWORD: Browser-only-ci-password-2026
+      - name: Diagnose Playwright failures
+        if: failure()
+        run: |
+          for file in test-results/*/error-context.md; do
+            if [ -f "$file" ]; then
+              echo "---- Page context: $file"
+              sed -n '1,160p' "$file"
+            fi
+          done
+          for file in /tmp/iphonebooking-api.log /tmp/iphonebooking-web.log; do
+            if [ -f "$file" ]; then
+              echo "---- Recent server output: $file"
+              sed -E 's#(postgresql://)[^@ ]+@#\1[REDACTED]@#g' "$file" | tail -n 70
+            fi
+          done
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-traces
+          path: test-results/
+          retention-days: 3
       - name: Verify compiled application
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/iphonebooking_browser?schema=public
