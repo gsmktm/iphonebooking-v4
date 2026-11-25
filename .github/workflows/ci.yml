@@ -57,7 +57,7 @@ jobs:
           pnpm exec playwright install --with-deps chrome
           # Run processes independently; Turbo's interactive dev scheduler can
           # stall without launching package tasks in this non-interactive CI job.
-          pnpm --filter api dev > /tmp/iphonebooking-api.log 2>&1 &
+          E2E_BROWSER_FIXTURE=true pnpm --filter api dev > /tmp/iphonebooking-api.log 2>&1 &
           pnpm --filter web dev > /tmp/iphonebooking-web.log 2>&1 &
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:4000/api/health > /dev/null &&

@@ -68,11 +68,18 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api')) res.setHeader('Cache-Control', 'no-store');
   next();
 });
+// Browser E2E reuses one localhost IP for dozens of navigation and data requests.
+// Keep the production/normal 200 req/min guard unchanged; allow a finite higher
+// budget only for an explicitly marked development fixture in GitHub CI.
+const ciBrowserFixture =
+  process.env.CI === 'true' &&
+  process.env.NODE_ENV === 'development' &&
+  process.env.E2E_BROWSER_FIXTURE === 'true';
 app.use(
   '/api',
   rateLimit({
     windowMs: 60000,
-    limit: 200,
+    limit: ciBrowserFixture ? 2000 : 200,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     handler: (req, res) =>
