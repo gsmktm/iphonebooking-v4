@@ -26,7 +26,8 @@
     "format": "prettier --write *.ts *.json README.md ARCHITECTURE.md DATABASE.md API.md DESIGN-SYSTEM.md ADMIN.md SECURITY.md DEPLOYMENT.md TESTING.md docs tests apps/web/src apps/web/scripts apps/web/vite.config.ts apps/web/package.json apps/api/server apps/api/prisma/seed.ts apps/api/scripts apps/api/package.json apps/api/tsconfig.server.json scripts deployment/cpanel/app.cjs",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "release:package": "node scripts/package-release.mjs",
-    "test:release": "node scripts/check-release.mjs"
+    "test:release": "node scripts/check-release.mjs",
+    "skills:verify": "node scripts/check-agent-skills.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
@@ -39,7 +40,7 @@
     "supertest": "^7.1.4",
     "turbo": "^2.11.3",
     "typescript": "^5.9.2",
-    "vite": "^7.1.4",
-    "vitest": "^4.1.11"
+    "vite": "^7.3.7",
+    "vitest": "^4.1.12"
   }
 }

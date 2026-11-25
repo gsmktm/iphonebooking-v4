@@ -35,6 +35,7 @@ jobs:
       - run: pnpm --filter api exec prisma validate
       - run: pnpm db:migrate
       - run: pnpm lint
+      - run: pnpm skills:verify
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
