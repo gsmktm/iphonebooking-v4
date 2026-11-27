@@ -1,3 +1,4 @@
+import { displaySpecValue } from '../services/product-spec';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -228,7 +229,7 @@ export default function Product() {
           {Object.entries(p.specs).map(([key, value]) => (
             <div key={key}>
               <span>{key}</span>
-              <strong>{value}</strong>
+              <strong>{displaySpecValue(value)}</strong>
             </div>
           ))}
         </div>
