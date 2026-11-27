@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test';
 
 const families = ['iphone', 'ipad', 'ipod', 'mac'] as const;
 
-test('history API exposes a separate source-backed archive, not merchant stock', async ({ request }) => {
+test('history API exposes a separate source-backed archive, not merchant stock', async ({
+  request,
+}) => {
   const summary = await request.get('/api/v1/apple-history/summary');
   expect(summary.status()).toBe(200);
   const stats = await summary.json();
@@ -46,9 +48,15 @@ test('original iPhone 2007 archival photo has attribution and Apple record', asy
   await page.goto('/history/apple/device/iphone-iphone-2007');
   await expect(page.getByRole('heading', { name: 'iPhone', exact: true })).toBeVisible();
   await expect(page.getByText('2007', { exact: true }).first()).toBeVisible();
-  await expect(page.locator('.apple-history-photo img')).toHaveAttribute('src', /^https:\/\/thumb\.wikimedia\.org\//);
+  await expect(page.locator('.apple-history-photo img')).toHaveAttribute(
+    'src',
+    /^https:\/\/thumb\.wikimedia\.org\//,
+  );
   await expect(page.getByText('CC BY-SA 2.0')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Official Apple record' })).toHaveAttribute('href', /^https:\/\/support\.apple\.com\//);
+  await expect(page.getByRole('link', { name: 'Official Apple record' })).toHaveAttribute(
+    'href',
+    /^https:\/\/support\.apple\.com\//,
+  );
 });
 
 for (const width of [320, 375, 768, 1440]) {
