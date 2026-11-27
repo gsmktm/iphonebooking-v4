@@ -1,0 +1,25 @@
+name: Format product-frame upgrade (temporary)
+on: [push]
+jobs:
+  format-preview:
+    if: github.ref == 'refs/heads/design/product-frames-all-shop-services-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Print formatted files for versioned GitHub update
+        run: |
+          pnpm exec prettier --write apps/web/src/features/home/HomeDeviceFrames.tsx apps/web/src/components/ProductCard.tsx apps/web/src/components/product-frame.css apps/web/src/components/DeviceCollectionStrip.tsx apps/web/src/components/device-collection.css apps/web/src/pages/Catalog.tsx apps/web/src/features/category/CategoryPage.tsx apps/web/src/components/ServiceDeviceShelf.tsx apps/web/src/pages/Services.tsx tests/e2e/product-frames-all-routes.spec.ts
+          for file in apps/web/src/features/home/HomeDeviceFrames.tsx apps/web/src/components/ProductCard.tsx apps/web/src/components/product-frame.css apps/web/src/components/DeviceCollectionStrip.tsx apps/web/src/components/device-collection.css apps/web/src/pages/Catalog.tsx apps/web/src/features/category/CategoryPage.tsx apps/web/src/components/ServiceDeviceShelf.tsx apps/web/src/pages/Services.tsx tests/e2e/product-frames-all-routes.spec.ts; do
+            echo "FORMATTED_BEGIN:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
