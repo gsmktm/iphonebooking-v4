@@ -91,27 +91,38 @@ function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?
   );
 }
 
-function ArchiveCredit({ device }: { device: HistoryDevice }) {
-  if (!device.imageUrl || !device.imageCredit) return null;
+type ArchivePhotoCredit = {
+  url: string;
+  sourceCredit: string;
+  sourceUrl: string | null;
+  license: string | null;
+  licenseUrl: string | null;
+};
+function ArchiveCredit({ device, credit }: { device: HistoryDevice; credit?: ArchivePhotoCredit }) {
+  const photographer = credit?.sourceCredit ?? device.imageCredit;
+  const source = credit?.sourceUrl ?? device.imageSourceUrl;
+  const license = credit?.license ?? device.imageLicense;
+  const licenseUrl = credit?.licenseUrl ?? device.imageLicenseUrl;
+  if (!device.imageUrl || !photographer) return null;
   return (
     <div className="apple-history-credit">
-      Photo: {device.imageCredit || 'Wikimedia Commons contributor'} ·{' '}
-      {device.imageSourceUrl ? (
-        <a href={device.imageSourceUrl} rel="noopener noreferrer" target="_blank">
+      Photo: {photographer} ·{' '}
+      {source ? (
+        <a href={source} rel="noopener noreferrer" target="_blank">
           Original image source
         </a>
       ) : (
         'Original photograph'
       )}
-      {device.imageLicense && (
+      {license && (
         <>
           {' · '}
-          {device.imageLicenseUrl ? (
-            <a href={device.imageLicenseUrl} rel="noopener noreferrer" target="_blank">
-              {device.imageLicense}
+          {licenseUrl ? (
+            <a href={licenseUrl} rel="noopener noreferrer" target="_blank">
+              {license}
             </a>
           ) : (
-            device.imageLicense
+            license
           )}
         </>
       )}
@@ -466,7 +477,10 @@ export function AppleHistoryDetail() {
         </div>
         <div>
           <ArchivePhoto device={device} large />
-          <ArchiveCredit device={device} />
+          <ArchiveCredit
+            device={device}
+            credit={mediaCredits.data?.find((photo) => photo.url === device.imageUrl)}
+          />
           {device.gallery.length > 0 && (
             <div className="apple-history-additional-images">
               <h2>Additional historical views</h2>
