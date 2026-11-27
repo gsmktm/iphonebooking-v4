@@ -121,13 +121,17 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
         }}
       >
         <span className="eyebrow">
-          {admin ? 'OPERATIONS ACCESS' : supabase ? 'SUPABASE EMAIL AUTH' : 'WELCOME TO IPHONEBOOKING'}
+          {admin
+            ? 'OPERATIONS ACCESS'
+            : supabase
+              ? 'SUPABASE EMAIL AUTH'
+              : 'WELCOME TO IPHONEBOOKING'}
         </span>
         <h2>{register ? 'Make yourself at home.' : 'Good to see you.'}</h2>
         {confirmationSent && supabase && (
           <p className="notice" role="status">
-            Registration requested. Check your email for a confirmation link, then sign in.
-            Email delivery depends on the Supabase Auth settings.
+            Registration requested. Check your email for a confirmation link, then sign in. Email
+            delivery depends on the Supabase Auth settings.
           </p>
         )}
         {register && (
