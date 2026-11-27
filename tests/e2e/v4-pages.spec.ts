@@ -12,10 +12,7 @@ test('V4 route wayfinding changes with the customer journey', async ({ page }) =
     await page.goto(route.path);
     const nav = page.getByRole('navigation', { name: 'Page location and related links' });
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Home', exact: true })).toHaveAttribute(
-      'href',
-      '/',
-    );
+    await expect(nav.getByRole('link', { name: 'Home', exact: true })).toHaveAttribute('href', '/');
     await expect(nav.locator('[aria-current="page"]')).toHaveText(route.label);
     await expect(nav.getByRole('link', { name: route.related, exact: true })).toBeVisible();
   }
