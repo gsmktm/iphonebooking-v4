@@ -1,0 +1,50 @@
+name: Verify Railway frame pages (temporary)
+on: [push]
+jobs:
+  public-route-smoke:
+    if: github.ref == 'refs/heads/design/product-frames-all-shop-services-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Verify live public routes, device frames and JS errors
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from '@playwright/test';
+          const browser = await chromium.launch({ headless: true });
+          const routes = ['/store', '/iphone', '/mac', '/ipad', '/watch', '/airpods', '/accessories', '/prebook', '/trade-in', '/repair', '/deals'];
+          const base = 'https://iphonebooking-web-api-production.up.railway.app';
+          let failed = false;
+          for (const route of routes) {
+            const page = await browser.newPage();
+            const errors = [];
+            page.on('pageerror', (err) => errors.push(String(err.stack || err.message)));
+            let status = 'navigation-error';
+            let frameCount = 0;
+            let body = '';
+            try {
+              const response = await page.goto(base + route, { waitUntil: 'domcontentloaded', timeout: 30000 });
+              status = response?.status() ?? 'no-response';
+              await page.locator('.device-framed-card, .device-family-placeholder').first().waitFor({ state: 'visible', timeout: 20000 });
+              frameCount = await page.locator('.home-device-frame').count();
+              body = (await page.locator('body').innerText()).slice(0, 300);
+            } catch (e) {
+              errors.push(String(e.stack || e));
+              body = (await page.locator('body').innerText().catch(() => '')).slice(0, 300);
+            }
+            const broken = status !== 200 || frameCount < 1 || body.includes('Let’s get you back on track') || errors.length > 0;
+            if (broken) failed = true;
+            console.log(JSON.stringify({ route, status, frameCount, broken, errors, body }));
+            await page.close();
+          }
+          await browser.close();
+          if (failed) process.exitCode = 1;
+          NODE
