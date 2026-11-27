@@ -187,7 +187,11 @@ export default function HomeDeviceFrames({
                   className="home-device-family-frame-link"
                   aria-label={product ? `View ${product.name}` : `Explore ${family.label}`}
                 >
-                  <DeviceFrame kind={family.kind} image={variant?.image || product?.image} realOnly />
+                  <DeviceFrame
+                    kind={family.kind}
+                    image={variant?.image || product?.image}
+                    realOnly
+                  />
                 </Link>
                 <div className="home-device-family-details">
                   <span className="eyebrow">{family.eyebrow}</span>
