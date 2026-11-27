@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
@@ -55,28 +56,36 @@ const families: { slug: Family; name: string; era: string }[] = [
 const validFamilies: Family[] = families.map((item) => item.slug);
 
 function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?: boolean }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const label = `${device.name} (${device.introducedYear})`;
+  const hasPhoto = Boolean(
+    device.imageUrl && device.imageSourceUrl && device.imageUrl !== failedUrl,
+  );
   return (
     <div
       className={`apple-history-photo apple-history-photo--${device.family} ${large ? 'apple-history-photo--large' : ''}`}
     >
-      <div className="apple-history-placeholder" aria-label="Archival photograph not yet licensed">
-        <ImageOff aria-hidden="true" size={large ? 46 : 32} />
-        <span>
-          {device.family.toUpperCase()} · {device.introducedYear}
-        </span>
-      </div>
-      {device.imageUrl && device.imageSourceUrl ? (
+      {hasPhoto ? (
         <img
-          src={device.imageUrl}
+          src={device.imageUrl ?? undefined}
           alt={`Licensed historical photograph: ${label}`}
           loading={large ? 'eager' : 'lazy'}
           decoding="async"
-          onError={(event) => {
-            event.currentTarget.hidden = true;
-          }}
+          onError={() => setFailedUrl(device.imageUrl)}
         />
-      ) : null}
+      ) : (
+        <div
+          className="apple-history-placeholder"
+          aria-label={
+            device.imageUrl ? 'Historical photograph temporarily unavailable' : 'Archival photograph not yet licensed'
+          }
+        >
+          <ImageOff aria-hidden="true" size={large ? 46 : 32} />
+          <span>
+            {device.family.toUpperCase()} · {device.introducedYear}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
