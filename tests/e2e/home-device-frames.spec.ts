@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('homepage presents four recognizable device frames with real product links', async ({ page }) => {
+test('homepage presents four recognizable device frames with real product links', async ({
+  page,
+}) => {
   await page.goto('/');
   const section = page.getByRole('region', { name: 'Four worlds. One destination.' });
   await expect(section).toBeVisible();
@@ -31,7 +33,9 @@ for (const width of [320, 375, 430, 768, 1024, 1440, 1920]) {
     }
     await expect
       .poll(() =>
-        page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        ),
       )
       .toBe(true);
   });
