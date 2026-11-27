@@ -26,6 +26,7 @@ model User {
   roleId                String?
   role                  Role?              @relation(fields: [roleId], references: [id])
   createdAt             DateTime           @default(now())
+  supabaseIdentity      SupabaseIdentity?
   sessions              UserSession[]
   accountTokens         AccountToken[]
   addresses             Address[]
@@ -44,6 +45,15 @@ model User {
   retailerMemberships   RetailerMember[]
   retailerApplication   RetailerApplication?
   reviews               Review[]
+}
+
+// Optional, non-privileged Supabase Auth link; local roles remain authoritative.
+// Never link an existing account by matching its email automatically.
+model SupabaseIdentity {
+  supabaseUserId String @id
+  userId         String @unique
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
 }
 
 enum AccountStatus {
