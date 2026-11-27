@@ -170,9 +170,7 @@ export default function Catalog() {
           </Link>
         ))}
       </div>
-      {['store', 'catalog', 'prebook', 'deals'].includes(mode) && (
-        <OfficialAppleModels compact />
-      )}
+      {['store', 'catalog', 'prebook', 'deals'].includes(mode) && <OfficialAppleModels compact />}
       <form
         className="catalog-search"
         key={filters.get('q') ?? ''}
