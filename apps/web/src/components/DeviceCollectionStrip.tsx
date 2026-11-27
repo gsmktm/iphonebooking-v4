@@ -13,14 +13,7 @@ const labels: Record<DeviceKind, string> = {
   airpods: 'AirPods',
   accessories: 'Accessories',
 };
-const allFamilies: DeviceKind[] = [
-  'iphone',
-  'mac',
-  'ipad',
-  'watch',
-  'airpods',
-  'accessories',
-];
+const allFamilies: DeviceKind[] = ['iphone', 'mac', 'ipad', 'watch', 'airpods', 'accessories'];
 
 /**
  * Every selected category has a recognisable device frame.
@@ -49,11 +42,7 @@ export function DeviceCollectionStrip({
           const product = products.find((item) => item.category.slug === kind);
           if (product) return <ProductCard key={product.id} product={product} />;
           return (
-            <article
-              className="device-family-placeholder"
-              data-device-family={kind}
-              key={kind}
-            >
+            <article className="device-family-placeholder" data-device-family={kind} key={kind}>
               <Link to={`/${kind}`} className="device-family-placeholder-visual">
                 <DeviceFrame kind={kind} />
               </Link>
