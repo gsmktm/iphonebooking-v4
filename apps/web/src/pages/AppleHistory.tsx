@@ -59,9 +59,7 @@ const validFamilies: Family[] = families.map((item) => item.slug);
 function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?: boolean }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const label = `${device.name} (${device.introducedYear})`;
-  const hasPhoto = Boolean(
-    device.imageUrl && device.imageUrl !== failedUrl,
-  );
+  const hasPhoto = Boolean(device.imageUrl && device.imageUrl !== failedUrl);
   return (
     <div
       className={`apple-history-photo apple-history-photo--${device.family} ${large ? 'apple-history-photo--large' : ''}`}
@@ -378,13 +376,15 @@ export function AppleHistoryDetail() {
   const mediaCredits = useQuery({
     queryKey: ['apple-history-media-credits', slug],
     queryFn: () =>
-      api<{
-        url: string;
-        sourceCredit: string;
-        sourceUrl: string | null;
-        license: string | null;
-        licenseUrl: string | null;
-      }[]>('/media/credits?archive=' + encodeURIComponent(slug ?? '')),
+      api<
+        {
+          url: string;
+          sourceCredit: string;
+          sourceUrl: string | null;
+          license: string | null;
+          licenseUrl: string | null;
+        }[]
+      >('/media/credits?archive=' + encodeURIComponent(slug ?? '')),
     enabled: Boolean(slug),
   });
   if (result.isLoading)
@@ -486,7 +486,11 @@ export function AppleHistoryDetail() {
                           {attribution.sourceUrl && (
                             <>
                               {' · '}
-                              <a href={attribution.sourceUrl} target="_blank" rel="noopener noreferrer">
+                              <a
+                                href={attribution.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
                                 Source
                               </a>
                             </>
@@ -495,7 +499,11 @@ export function AppleHistoryDetail() {
                             <>
                               {' · '}
                               {attribution.licenseUrl ? (
-                                <a href={attribution.licenseUrl} target="_blank" rel="noopener noreferrer">
+                                <a
+                                  href={attribution.licenseUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
                                   {attribution.license}
                                 </a>
                               ) : (
