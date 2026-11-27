@@ -4,7 +4,6 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { db } from '../db.js';
 import { AppError, owned, permit } from '../core.js';
-import { mediaPath } from '../services/product-media-storage.js';
 
 export const productStudio = Router();
 
@@ -25,8 +24,7 @@ const commonsPhoto = z.string().url().max(1500).refine(
 );
 const archivePhoto = z.union([imagePath, commonsPhoto]);
 const optionalText = (length: number) => z.string().trim().max(length).nullable().optional();
-const archiveEdit = z
-  .object({
+const archiveFields = z.object({
     family: z.enum(['iphone', 'ipad', 'ipod', 'mac']),
     name: z.string().trim().min(2).max(200),
     introducedYear: z.number().int().min(1984).max(2100),
@@ -41,23 +39,34 @@ const archiveEdit = z
     imageLicense: optionalText(120),
     imageLicenseUrl: httpsUrl.nullable().optional(),
     gallery: z.array(imagePath).max(16).optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (
-      data.imageUrl &&
-      !mediaUploadPath.test(data.imageUrl) &&
-      (!data.imageSourceUrl || !data.imageCredit || !data.imageLicense)
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['imageUrl'],
-        message: 'External archive photos must include source, photographer and license.',
-      });
-    }
   });
-const archiveCreate = archiveEdit.extend({
-  slug: z.string().regex(/^[a-z0-9-]{5,120}$/),
-});
+const validExternalImage = (
+  data: {
+    imageUrl?: string | null;
+    imageSourceUrl?: string | null;
+    imageCredit?: string | null;
+    imageLicense?: string | null;
+  },
+  ctx: z.RefinementCtx,
+) => {
+  if (
+    data.imageUrl &&
+    !mediaUploadPath.test(data.imageUrl) &&
+    (!data.imageSourceUrl || !data.imageCredit || !data.imageLicense)
+  )
+    ctx.addIssue({
+      code: 'custom',
+      path: ['imageUrl'],
+      message: 'External archive photos need source, photographer and license.',
+    });
+};
+const archiveCreate = archiveFields
+  .extend({ slug: z.string().regex(/^[a-z0-9-]{5,120}$/) })
+  .superRefine(validExternalImage);
+const archivePatch = archiveFields
+  .partial()
+  .extend({ expectedUpdatedAt: z.string().datetime().optional() })
+  .superRefine(validExternalImage);
 
 export async function checkMediaReferences(urls: (string | null | undefined)[]) {
   const ids = [
@@ -156,9 +165,7 @@ productStudio.post('/studio/history', permit('product.create'), async (req, res)
 
 productStudio.patch('/studio/history/:id', permit('product.update'), async (req, res) => {
   const id = productId.parse(req.params.id);
-  const { expectedUpdatedAt, ...update } = archiveEdit.partial().extend({
-    expectedUpdatedAt: z.string().datetime().optional(),
-  }).parse(req.body);
+  const { expectedUpdatedAt, ...update } = archivePatch.parse(req.body);
   if (!Object.keys(update).length) throw new AppError(422, 'NO_CHANGES', 'Nothing to save.');
   await checkMediaReferences([update.imageUrl, ...(update.gallery ?? [])]);
   const photo = await archivePhotoMetadata(update.imageUrl);
