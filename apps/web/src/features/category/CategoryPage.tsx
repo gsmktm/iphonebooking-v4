@@ -7,13 +7,7 @@ import type { Product } from '../../services/types';
 import { ProductCard } from '../../components/ProductCard';
 import { DeviceCollectionStrip } from '../../components/DeviceCollectionStrip';
 import { DeviceFrame } from '../home/HomeDeviceFrames';
-import {
-  ButtonLink,
-  ArrowLink,
-  Loading,
-  ErrorNotice,
-  Empty,
-} from '../../components/ui';
+import { ButtonLink, ArrowLink, Loading, ErrorNotice, Empty } from '../../components/ui';
 import { FeatureBand, SpecTable, ServicesBand, Faq } from './sections';
 import { CONFIGS, type CategorySlug } from './config';
 import './category.css';
@@ -176,7 +170,10 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
               </ul>
             </div>
             <div className="cat-hero-visual">
-              <DeviceFrame kind={slug === 'store' ? 'iphone' : slug} image={activeVariant?.image ?? hero.image} />
+              <DeviceFrame
+                kind={slug === 'store' ? 'iphone' : slug}
+                image={activeVariant?.image ?? hero.image}
+              />
               {hero.badge && <span className="cat-hero-badge">{hero.badge}</span>}
             </div>
           </div>
@@ -200,7 +197,11 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
           <>
             <DeviceCollectionStrip
               kinds={slug === 'store' ? undefined : [slug]}
-              title={slug === 'store' ? 'Choose your device family.' : `Explore the ${slug === 'watch' ? 'Watch' : slug} frame.`}
+              title={
+                slug === 'store'
+                  ? 'Choose your device family.'
+                  : `Explore the ${slug === 'watch' ? 'Watch' : slug} frame.`
+              }
               description="Product images, live NPR prices and purchase options appear when catalog inventory is published."
             />
             <Empty
