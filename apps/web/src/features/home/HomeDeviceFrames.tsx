@@ -45,12 +45,20 @@ const families: {
   },
 ];
 
-export function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string }) {
+export function DeviceFrame({
+  kind,
+  image,
+  realOnly = false,
+}: {
+  kind: DeviceKind;
+  image?: string;
+  realOnly?: boolean;
+}) {
   // Product pictures may already show the whole device. In that case the
   // product art is contained within the frame rather than cropped into a fake UI.
   const artwork = image?.startsWith('/images/') ? (
     <img src={image} alt="" loading="lazy" />
-  ) : (
+  ) : realOnly ? null : (
     <ProductVisual
       image={image || (kind === 'iphone' ? 'phone' : kind)}
       name=""
