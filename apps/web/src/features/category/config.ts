@@ -242,7 +242,7 @@ const mac: CategoryConfig = {
       },
       {
         q: 'Is AppleCare+ available for Mac?',
-        a: 'AppleCare+ eligibility and regional service coverage depend on the exact device and local terms. Check Apple's coverage information before paying.',
+        a: 'AppleCare+ eligibility and regional service coverage depend on the exact device and local terms. Check Apple’s coverage information before paying.',
       },
       {
         q: 'Where do you deliver?',
@@ -544,7 +544,7 @@ const airpods: CategoryConfig = {
       },
       {
         q: 'Do you deliver and support returns?',
-        a: 'Delivery and return eligibility must be confirmed against the store's published policy and your order details.',
+        a: 'Delivery and return eligibility must be confirmed against the store’s published policy and your order details.',
       },
     ],
   },
@@ -733,7 +733,7 @@ const store: CategoryConfig = {
       },
       {
         q: 'How do I know a listing is genuine?',
-        a: 'Check the specific item's IMEI or serial (where applicable), invoice and warranty terms. Apple.com references do not prove merchant authorization or stock.',
+        a: 'Check the specific item’s IMEI or serial (where applicable), invoice and warranty terms. Apple.com references do not prove merchant authorization or stock.',
       },
       {
         q: 'Can I pick up in store instead?',
