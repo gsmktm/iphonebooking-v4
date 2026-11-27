@@ -23,6 +23,7 @@ import { SearchDialog } from '../features/search/SearchDialog';
 import { cn } from '../utils/cn';
 import { InstallApp, MobileNavigation } from '../features/pwa/MobileApp';
 import { AppearanceControl } from '../features/appearance/AppearanceControl';
+import { RouteWayfinding } from './RouteWayfinding';
 const links = [
   ['Shop', '/store'],
   ['iPhone', '/iphone'],
@@ -176,6 +177,7 @@ export function Shell() {
         </div>
       )}
       <main id="main">
+        <RouteWayfinding />
         <Outlet />
       </main>
       {home && <InstallApp />}
