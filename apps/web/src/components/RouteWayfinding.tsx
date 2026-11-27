@@ -95,10 +95,21 @@ const retailer: RouteFamily = {
 };
 
 function getFamily(path: string): RouteFamily {
-  if (/^\/(trade-in|exchange|sell-device|repair|track|imei-check|world-price-map)(\/|$)/.test(path)) return care;
-  if (/^\/(account|login|register|forgot-password|reset-password|verify-email|dashboard)(\/|$)/.test(path)) return account;
+  if (/^\/(trade-in|exchange|sell-device|repair|track|imei-check|world-price-map)(\/|$)/.test(path))
+    return care;
+  if (
+    /^\/(account|login|register|forgot-password|reset-password|verify-email|dashboard)(\/|$)/.test(
+      path,
+    )
+  )
+    return account;
   if (/^\/retailer(-network)?(\/|$)/.test(path)) return retailer;
-  if (/^\/(store|catalog|search|deals|prebook|wishlist|iphone|mac|ipad|watch|airpods|accessories|vision|home|products|cart|checkout|confirmation|compare)(\/|$)/.test(path)) return shop;
+  if (
+    /^\/(store|catalog|search|deals|prebook|wishlist|iphone|mac|ipad|watch|airpods|accessories|vision|home|products|cart|checkout|confirmation|compare)(\/|$)/.test(
+      path,
+    )
+  )
+    return shop;
   return discover;
 }
 
