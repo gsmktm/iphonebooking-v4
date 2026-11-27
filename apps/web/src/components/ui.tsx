@@ -61,7 +61,7 @@ export function ProductVisual({
   className?: string;
   priority?: boolean;
 }) {
-  return image.startsWith('/images/') ? (
+  return image.startsWith('/images/') || image.startsWith('/api/v1/media/') ? (
     <img
       src={image}
       alt={name}
