@@ -3,9 +3,7 @@ import { expect, test } from '@playwright/test';
 for (const path of ['/admin/product-studio', '/admin/history-studio', '/admin/media-library']) {
   test('image management requires a signed-in staff account: ' + path, async ({ page }) => {
     await page.goto(path);
-    await expect(
-      page.getByRole('heading', { name: /sign in|welcome back|account/i }).first(),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Good to see you.' })).toBeVisible();
     await expect(page.locator('.studio-uploader')).toHaveCount(0);
   });
 }
