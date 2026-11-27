@@ -90,7 +90,11 @@ export function MediaUploader({
           }}
         />
       </label>
-      {file && <small>{file.name} · {(file.size / 1024 / 1024).toFixed(2)} MB</small>}
+      {file && (
+        <small>
+          {file.name} · {(file.size / 1024 / 1024).toFixed(2)} MB
+        </small>
+      )}
       <div className="studio-fields studio-fields--two">
         <label>
           Place after upload
@@ -167,11 +171,17 @@ export function MediaUploader({
           onChange={(event) => setAltText(event.target.value)}
         />
       </label>
-      {error && <p role="alert" className="studio-error">{error}</p>}
+      {error && (
+        <p role="alert" className="studio-error">
+          {error}
+        </p>
+      )}
       <button className="button" type="submit" disabled={!file || busy || disabled}>
         <UploadCloud size={16} /> {busy ? 'Uploading securely…' : 'Upload image'}
       </button>
-      <small>Uploading does not publish a photo. Save the product or history record to link it.</small>
+      <small>
+        Uploading does not publish a photo. Save the product or history record to link it.
+      </small>
     </form>
   );
 }
