@@ -552,10 +552,7 @@ export function Compare() {
                   ))}
                 </tr>
                 {[...new Set(list.flatMap((p) => Object.keys(p.specs)))].map((key) => (
-                  <tr
-                    key={key}
-                    className={specValuesDiffer(list, key) ? 'different' : ''}
-                  >
+                  <tr key={key} className={specValuesDiffer(list, key) ? 'different' : ''}>
                     <th>{key}</th>
                     {list.map((p) => (
                       <td key={p.id}>{displaySpecValue(p.specs[key] ?? 'Not specified')}</td>
