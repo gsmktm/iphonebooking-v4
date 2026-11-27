@@ -192,19 +192,24 @@ export default function HomeDeviceFrames({
                     {product && variant ? (
                       <button
                         type="button"
-                        className="home-device-family-action"
+                        className="home-device-family-action home-device-action-wide"
                         onClick={() => onPreview(product, variant.id)}
                         aria-label={`Configure ${product.name}`}
                       >
-                        <ArrowRight size={20} aria-hidden="true" />
+                        {variant.preorder
+                          ? 'Pre-book'
+                          : variant.stock.some((stock) => stock.available > 0)
+                            ? 'Buy now'
+                            : 'View options'}
+                        <ArrowRight size={17} aria-hidden="true" />
                       </button>
                     ) : (
                       <Link
-                        className="home-device-family-action"
+                        className="home-device-family-action home-device-action-wide"
                         to={family.href}
                         aria-label={`Browse ${family.label} collection`}
                       >
-                        <ArrowRight size={20} aria-hidden="true" />
+                        Explore <ArrowRight size={17} aria-hidden="true" />
                       </Link>
                     )}
                   </div>
