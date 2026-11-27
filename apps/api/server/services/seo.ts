@@ -136,6 +136,7 @@ export async function storefrontDocument(req: Request, res: Response) {
     'iPhoneBooking';
   let description =
     'Discover, compare, pre-book, trade in, and care for your Apple devices. From the Himalayas to the World.';
+  let unpublishedCategory = false;
   let known =
     Boolean(pageTitles[req.path]) ||
     privateRoute(req.path) ||
@@ -214,14 +215,32 @@ export async function storefrontDocument(req: Request, res: Response) {
     }
   }
   if (/^\/(iphone|mac|ipad|watch|airpods|accessories|vision|home)$/.test(req.path)) {
+    const slug = req.path.slice(1);
     const category = await db.category.findUnique({
-      where: { slug: req.path.slice(1) },
+      where: { slug },
       select: { name: true, description: true },
     });
+    // Public SPA category pages stay reachable before the first verified
+    // catalog item is published; empty categories must not be indexed.
+    known = true;
     if (category) {
-      known = true;
       title = category.name;
       description = category.description;
+    } else {
+      unpublishedCategory = true;
+      title =
+        {
+          iphone: 'iPhone',
+          mac: 'Mac',
+          ipad: 'iPad',
+          watch: 'Apple Watch',
+          airpods: 'AirPods',
+          accessories: 'Accessories',
+          vision: 'Apple Vision',
+          home: 'TV & Home',
+        }[slug] ?? 'Devices';
+      description =
+        'Explore the collection. Product availability and verified Nepal prices appear when the catalog is published.';
     }
   }
   if (!known) {
@@ -235,6 +254,7 @@ export async function storefrontDocument(req: Request, res: Response) {
   const canonical = origin() + req.path;
   const noindex =
     !known ||
+    unpublishedCategory ||
     privateRoute(req.path) ||
     process.env.SEED_DEVELOPMENT === 'true' ||
     Object.keys(req.query).length > 0;
