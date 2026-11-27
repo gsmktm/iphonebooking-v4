@@ -90,13 +90,15 @@ catalog.get('/apple-history/summary', async (_req, res) => {
   });
 });
 catalog.get('/apple-history', async (req, res) => {
-  const query = z.object({
-    family: appleHistoryFamily.optional(),
-    year: z.coerce.number().int().min(1976).max(2100).optional(),
-    q: z.string().trim().max(100).optional(),
-    page: z.coerce.number().int().min(1).max(9999).default(1),
-    pageSize: z.coerce.number().int().min(1).max(60).default(24),
-  }).parse(req.query);
+  const query = z
+    .object({
+      family: appleHistoryFamily.optional(),
+      year: z.coerce.number().int().min(1976).max(2100).optional(),
+      q: z.string().trim().max(100).optional(),
+      page: z.coerce.number().int().min(1).max(9999).default(1),
+      pageSize: z.coerce.number().int().min(1).max(60).default(24),
+    })
+    .parse(req.query);
   const where = {
     ...(query.family ? { family: query.family } : {}),
     ...(query.year ? { introducedYear: query.year } : {}),
@@ -122,7 +124,10 @@ catalog.get('/apple-history', async (req, res) => {
   });
 });
 catalog.get('/apple-history/:slug', async (req, res) => {
-  const slug = z.string().regex(/^[a-z0-9-]{3,110}$/).parse(req.params.slug);
+  const slug = z
+    .string()
+    .regex(/^[a-z0-9-]{3,110}$/)
+    .parse(req.params.slug);
   const device = await db.appleHistoryDevice.findUnique({
     where: { slug },
     select: appleHistorySelect,
