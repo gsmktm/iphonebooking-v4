@@ -106,6 +106,7 @@ export function Shell() {
             <NavLink to="/trade-in">Trade In</NavLink>
             <NavLink to="/repair">Repair</NavLink>
             <NavLink to="/deals">Deals</NavLink>
+            <NavLink to="/history/apple">History</NavLink>
           </nav>
           <div className="header-utilities">
             <button
@@ -149,6 +150,7 @@ export function Shell() {
               ['Repair', '/repair'],
               ['Pre-book', '/prebook'],
               ['Deals', '/deals'],
+              ['Apple history', '/history/apple'],
               ['Wishlist', '/wishlist'],
               ['Retailer workspace', '/retailer'],
               ['Compare', '/compare'],
@@ -256,6 +258,7 @@ export function Shell() {
               title: 'Explore',
               items: [
                 ['iPhone', '/iphone'],
+                ['Apple history', '/history/apple'],
                 ['Mac', '/mac'],
                 ['iPad', '/ipad'],
                 ['Watch & AirPods', '/watch'],
