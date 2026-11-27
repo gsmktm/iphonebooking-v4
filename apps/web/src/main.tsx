@@ -11,6 +11,7 @@ import './styles/admin.css';
 import './styles/luxe.css';
 import './styles/appearance.css';
 import './styles/world.css';
+import './styles/v4-pages.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000, refetchOnWindowFocus: false },
