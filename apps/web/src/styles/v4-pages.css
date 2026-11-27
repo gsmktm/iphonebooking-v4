@@ -1,0 +1,439 @@
+/* iPhoneBooking V4 — shared refinement for all routes.
+ * Imported after legacy styles; scoped to preserve application behavior.
+ * Colors deliberately reuse DESIGN-SYSTEM.md semantic tokens.
+ */
+:root {
+  --v4-line-soft: color-mix(in srgb, var(--line) 70%, transparent);
+  --v4-accent-soft: color-mix(in srgb, var(--gold) 12%, var(--surface));
+  --v4-elevation: 0 18px 52px rgb(0 0 0 / 0.12);
+}
+
+/* Navigation, path context and consistent reading rhythm */
+.storefront > main {
+  min-width: 0;
+}
+.storefront:not(.luxe-home) > main {
+  background:
+    radial-gradient(
+      ellipse 70% 20rem at 95% 0%,
+      color-mix(in srgb, var(--gold) 7%, transparent),
+      transparent 78%
+    ),
+    var(--canvas);
+}
+.storefront .page {
+  min-width: 0;
+}
+.storefront .page-intro {
+  position: relative;
+  padding: clamp(1.25rem, 3vw, 2.75rem) 0 1.4rem;
+  margin-bottom: clamp(1.25rem, 3vw, 2.5rem);
+}
+.storefront .page-intro:before {
+  content: '';
+  display: block;
+  width: 3.5rem;
+  height: 2px;
+  background: var(--gold);
+  margin-bottom: 1.5rem;
+}
+.storefront .page-intro .eyebrow {
+  color: var(--accent-text);
+  margin-bottom: 0.75rem;
+}
+.storefront .page-intro h1 {
+  max-width: 15ch;
+  font-size: clamp(2.65rem, 5.4vw, 5.2rem);
+  line-height: 1.02;
+  margin-bottom: 1rem;
+  text-wrap: balance;
+}
+.storefront .page-intro p {
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  line-height: 1.7;
+  max-width: 40rem;
+  text-wrap: pretty;
+}
+.storefront .desktop-nav a {
+  position: relative;
+  transition: color var(--motion) var(--ease);
+}
+.storefront .desktop-nav a:after {
+  content: '';
+  position: absolute;
+  height: 2px;
+  background: var(--gold);
+  bottom: 0.45rem;
+  left: 0;
+  right: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--motion) var(--ease);
+}
+.storefront .desktop-nav a:is(:hover, :focus-visible, .active):after {
+  transform: scaleX(1);
+}
+.storefront .site-header {
+  box-shadow: 0 5px 18px rgb(0 0 0 / 0.035);
+}
+
+.page-wayfinding {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.45rem 1.5rem;
+  border-bottom: 1px solid var(--v4-line-soft);
+  padding-block: 0.8rem;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+.page-wayfinding .wayfinding-trail,
+.page-wayfinding .wayfinding-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  min-width: 0;
+}
+.page-wayfinding a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+.page-wayfinding a:hover {
+  color: var(--accent-text);
+}
+.page-wayfinding [aria-current='page'] {
+  color: var(--ink);
+  font-weight: 600;
+}
+.page-wayfinding .wayfinding-actions a {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--v4-line-soft);
+  line-height: 1.3;
+}
+.page-wayfinding .wayfinding-actions a:is(:hover, :focus-visible) {
+  border-color: var(--gold);
+  background: var(--v4-accent-soft);
+}
+
+/* Discovery pages: category, catalog, search, comparison and services */
+.storefront .category-chips {
+  scrollbar-width: thin;
+}
+.storefront .category-chips a {
+  display: inline-flex;
+  align-items: center;
+  border-color: var(--v4-line-soft);
+  background: var(--surface);
+  border-radius: 999px;
+  transition:
+    background var(--motion),
+    border-color var(--motion),
+    transform var(--motion);
+}
+.storefront .category-chips a:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+.storefront .category-chips a.active {
+  background: var(--gold);
+  color: #101719;
+  border-color: var(--gold);
+}
+.storefront .catalog-toolbar {
+  border-color: var(--v4-line-soft);
+  padding-block: 0.95rem;
+}
+.storefront .catalog-search,
+.storefront .support-search {
+  border-radius: var(--radius-panel);
+}
+.storefront .product-card,
+.storefront .record-card,
+.storefront .store-card {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--v4-line-soft);
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  transition:
+    border-color var(--motion),
+    box-shadow var(--motion),
+    transform var(--motion);
+}
+.storefront .product-card:hover,
+.storefront .record-card:hover,
+.storefront .store-card:hover {
+  border-color: color-mix(in srgb, var(--gold) 48%, var(--line));
+  box-shadow: var(--v4-elevation);
+  transform: translateY(-2px);
+}
+.storefront .product-card-info {
+  min-width: 0;
+}
+.storefront .product-card-info h3,
+.storefront .store-card h2 {
+  color: var(--ink);
+}
+.storefront .product-card-bottom strong,
+.storefront .detail-price {
+  font-variant-numeric: tabular-nums;
+}
+.storefront .product-gallery > .product-visual {
+  border: 1px solid var(--v4-line-soft);
+  border-radius: var(--radius-panel);
+}
+.storefront .storage-selectors button,
+.storefront .color-selectors button,
+.storefront .choice,
+.storefront .checkout-steps button {
+  border-radius: var(--radius-control);
+}
+.storefront .storage-selectors button:is(:hover, :focus-visible),
+.storefront .color-selectors button:is(:hover, :focus-visible),
+.storefront .choice:is(:hover, :focus-visible) {
+  border-color: var(--gold);
+}
+.storefront .storage-selectors .chosen,
+.storefront .color-selectors .chosen,
+.storefront .choice.selected {
+  border-color: var(--gold);
+}
+
+/* Booking, trade-in, repair and account: real forms retain their handlers */
+.storefront .form-panel,
+.storefront .summary-card,
+.storefront .valuation-card,
+.storefront .buying-guide {
+  border: 1px solid var(--v4-line-soft);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  min-width: 0;
+}
+.storefront .form-panel,
+.storefront .summary-card {
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.035);
+}
+.storefront .service-intro {
+  border-bottom: 1px solid var(--v4-line-soft);
+  margin-bottom: 1.5rem;
+}
+.storefront .service-intro-icon {
+  color: var(--accent-text);
+}
+.storefront .form-panel label {
+  color: var(--ink);
+}
+.storefront :is(input:not([type='checkbox']):not([type='radio']), textarea, select) {
+  max-width: 100%;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.storefront :is(input, textarea, select):disabled {
+  opacity: 0.65;
+}
+.storefront .account-sidebar {
+  border-color: var(--v4-line-soft);
+}
+.storefront .account-sidebar nav a.active {
+  background: var(--v4-accent-soft);
+  color: var(--accent-text);
+}
+.storefront .account-sidebar nav a:hover {
+  background: var(--warm);
+}
+.storefront .auth-page .auth-story h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 5.5vw, 5.4rem);
+  line-height: 1.01;
+}
+.storefront .content-page section {
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--v4-line-soft);
+}
+.storefront .content-page section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  font-weight: 400;
+}
+.storefront .support-grid,
+.storefront .stores-grid {
+  align-items: stretch;
+}
+.storefront .notice.error {
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 38%, var(--line));
+}
+.storefront .newsletter {
+  border-top: 1px solid var(--v4-line-soft);
+  margin-top: clamp(2rem, 5vw, 4.5rem);
+}
+.storefront .newsletter h2 {
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+.storefront .site-footer {
+  background: var(--surface);
+  color: var(--ink);
+}
+.storefront .footer-grid h3 {
+  color: var(--ink);
+}
+.storefront .footer-grid a:hover {
+  color: var(--accent-text);
+}
+
+/* Admin has the same visual language without changing permissions or data. */
+.admin-app .admin-header,
+.admin-app .admin-sidebar {
+  background: var(--surface);
+  color: var(--ink);
+}
+.admin-app .admin-header {
+  border-bottom-color: var(--v4-line-soft);
+}
+.admin-app .admin-sidebar {
+  border-right-color: var(--v4-line-soft);
+}
+.admin-app .admin-page-heading h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 4vw, 3.4rem);
+}
+.admin-app .admin-nav-group a {
+  min-height: 44px;
+  border-radius: var(--radius-control);
+}
+.admin-app .admin-nav-group a:hover {
+  background: var(--warm);
+}
+.admin-app .admin-nav-group a.active {
+  color: var(--accent-text);
+  background: var(--v4-accent-soft);
+  box-shadow: inset 2px 0 var(--gold);
+}
+.admin-app .admin-metrics > a,
+.admin-app .admin-panel {
+  border: 1px solid var(--v4-line-soft);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+.admin-app .admin-metrics > a {
+  transition:
+    border-color var(--motion),
+    transform var(--motion);
+}
+.admin-app .admin-metrics > a:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+.admin-app .admin-metrics strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.admin-app .panel-heading h2 {
+  color: var(--ink);
+  font-size: 1rem;
+}
+.admin-app .table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.admin-app :is(input, textarea, select) {
+  max-width: 100%;
+}
+.admin-app .notice.error {
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+
+/* Small-screen and motion safeguards across storefront and administration. */
+@media (max-width: 767px) {
+  .storefront .page {
+    padding-top: 1.35rem;
+    padding-bottom: 3.5rem;
+  }
+  .storefront .page-intro {
+    padding-top: 1.25rem;
+  }
+  .storefront .page-intro h1 {
+    font-size: clamp(2.4rem, 10vw, 3.4rem);
+  }
+  .page-wayfinding .wayfinding-actions {
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+  }
+  .page-wayfinding .wayfinding-actions a {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  .storefront .form-panel,
+  .storefront .summary-card,
+  .storefront .valuation-card,
+  .storefront .buying-guide {
+    padding: 1.3rem;
+  }
+  .admin-app .admin-page-heading h1 {
+    font-size: 2.4rem;
+  }
+  .admin-app .admin-body {
+    min-width: 0;
+    padding-inline: 1rem;
+  }
+}
+@media (max-width: 380px) {
+  .storefront .page-intro h1 {
+    font-size: 2.35rem;
+  }
+  .page-wayfinding .wayfinding-actions {
+    gap: 0.4rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .storefront .product-card,
+  .storefront .record-card,
+  .storefront .store-card,
+  .storefront .category-chips a,
+  .storefront .desktop-nav a:after,
+  .admin-app .admin-metrics > a {
+    transition: none;
+    transform: none;
+  }
+  .storefront .product-card:hover,
+  .storefront .record-card:hover,
+  .storefront .store-card:hover,
+  .storefront .category-chips a:hover,
+  .admin-app .admin-metrics > a:hover {
+    transform: none;
+  }
+}
+/* On compact screens, a closed operations sidebar must not keep hidden focusable links. */
+.admin-app .admin-sidebar {
+  visibility: hidden;
+}
+.admin-app .admin-sidebar.open {
+  visibility: visible;
+}
+.admin-app .admin-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  display: block;
+  z-index: 55;
+  cursor: default;
+  background: rgb(0 0 0 / 0.58);
+  border: 0;
+}
+@media (min-width: 1024px) {
+  .admin-app .admin-sidebar {
+    visibility: visible;
+  }
+  .admin-app .admin-nav-backdrop {
+    display: none;
+  }
+}
