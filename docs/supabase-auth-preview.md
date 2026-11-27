@@ -37,6 +37,7 @@ Supabase password recovery, cross-device signout revocation, MFA/social provider
 The shared database password must be rotated, followed by updating the service DATABASE_URL. The existing commerce schema stays unexposed to Supabase Data API; enabling Auth does not grant public table access.
 
 References:
+
 - https://supabase.com/docs/guides/auth
 - https://supabase.com/docs/guides/auth/passwords
 - https://supabase.com/docs/guides/auth/redirect-urls
