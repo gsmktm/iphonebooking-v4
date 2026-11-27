@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { checkImage, detectImageType, MAX_IMAGE_BYTES } from '../apps/api/server/services/product-media-storage';
+import {
+  checkImage,
+  detectImageType,
+  MAX_IMAGE_BYTES,
+} from '../apps/api/server/services/product-media-storage';
 
 const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, ...Array(12).fill(0)]);
 const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, ...Array(10).fill(0)]);
