@@ -48,6 +48,93 @@ catalog.get('/official-apple-models', async (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=900');
   res.json(models);
 });
+// The Apple device history is independent of Product, ProductVariant and checkout.
+// Sources are official Apple identification pages with separately licensed Commons photos.
+const appleHistoryFamily = z.enum(['iphone', 'ipad', 'ipod', 'mac']);
+const appleHistorySelect = {
+  id: true,
+  slug: true,
+  family: true,
+  name: true,
+  introducedYear: true,
+  modelNumbers: true,
+  capacity: true,
+  chip: true,
+  sourceUrl: true,
+  referenceUrl: true,
+  imageUrl: true,
+  imageSourceUrl: true,
+  imageCredit: true,
+  imageLicense: true,
+  imageLicenseUrl: true,
+  checkedAt: true,
+} as const;
+catalog.get('/apple-history/summary', async (_req, res) => {
+  const [groups, dates] = await Promise.all([
+    db.appleHistoryDevice.groupBy({
+      by: ['family'],
+      _count: { id: true },
+    }),
+    db.appleHistoryDevice.aggregate({
+      _count: { id: true },
+      _min: { introducedYear: true },
+      _max: { introducedYear: true },
+    }),
+  ]);
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.json({
+    total: dates._count.id,
+    earliest: dates._min.introducedYear,
+    latest: dates._max.introducedYear,
+    families: groups.map((item) => ({ family: item.family, count: item._count.id })),
+  });
+});
+catalog.get('/apple-history', async (req, res) => {
+  const query = z.object({
+    family: appleHistoryFamily.optional(),
+    year: z.coerce.number().int().min(1976).max(2100).optional(),
+    q: z.string().trim().max(100).optional(),
+    page: z.coerce.number().int().min(1).max(9999).default(1),
+    pageSize: z.coerce.number().int().min(1).max(60).default(24),
+  }).parse(req.query);
+  const where = {
+    ...(query.family ? { family: query.family } : {}),
+    ...(query.year ? { introducedYear: query.year } : {}),
+    ...(query.q ? { name: { contains: query.q, mode: 'insensitive' as const } } : {}),
+  };
+  const [items, total] = await Promise.all([
+    db.appleHistoryDevice.findMany({
+      where,
+      select: appleHistorySelect,
+      orderBy: [{ introducedYear: 'asc' }, { name: 'asc' }, { id: 'asc' }],
+      skip: (query.page - 1) * query.pageSize,
+      take: query.pageSize,
+    }),
+    db.appleHistoryDevice.count({ where }),
+  ]);
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.json({
+    items,
+    total,
+    page: query.page,
+    pageSize: query.pageSize,
+    pageCount: Math.ceil(total / query.pageSize),
+  });
+});
+catalog.get('/apple-history/:slug', async (req, res) => {
+  const slug = z.string().regex(/^[a-z0-9-]{3,110}$/).parse(req.params.slug);
+  const device = await db.appleHistoryDevice.findUnique({
+    where: { slug },
+    select: appleHistorySelect,
+  });
+  if (!device) {
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Historical device not found' } });
+    return;
+  }
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.json(device);
+});
+
 catalog.get('/categories', async (_req, res) => res.json(await db.category.findMany()));
 catalog.get('/catalog', async (req, res) => {
   const query = catalogQuery.parse(req.query);
