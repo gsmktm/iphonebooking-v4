@@ -126,7 +126,7 @@ const iphone: CategoryConfig = {
     items: [
       {
         q: 'Are these iPhones genuine for Nepal?',
-        a: 'Every iPhone sold here is an official, warranty-backed unit with an IMEI you can check before you buy. Your device, serial and warranty record are stored in your account after purchase.',
+        a: 'Check the seller, device identifiers, warranty terms and invoice for each listed iPhone before purchase. An Apple.com model reference is not proof of genuine local stock.',
       },
       {
         q: 'How does pre-order work?',
@@ -234,19 +234,19 @@ const mac: CategoryConfig = {
       },
       {
         q: 'Can I pay in instalments?',
-        a: 'EMI plans run at checkout across major cards and banks. Choose your plan, and the total — including any interest — is shown before you confirm.',
+        a: 'EMI is available only if a participating bank or payment partner explicitly offers it at checkout. Do not assume instalment approval.',
       },
       {
         q: 'Can I trade in my old laptop?',
-        a: 'Yes. Share the model, year and condition for an instant estimate; the credit applies against your new Mac. Any condition accepted — free doorstep pickup across Nepal.',
+        a: 'Submit the device details for an estimate. Final trade-in value and any pickup service must be confirmed after inspection.',
       },
       {
         q: 'Is AppleCare+ available for Mac?',
-        a: 'AppleCare+ can be added at purchase for extended hardware cover and priority support. Our repair desk also handles out-of-warranty work with a quote you approve first.',
+        a: 'AppleCare+ eligibility and regional service coverage depend on the exact device and local terms. Check Apple’s coverage information before paying.',
       },
       {
         q: 'Where do you deliver?',
-        a: 'Across Nepal — same-day in Kathmandu where stock allows, nationwide courier elsewhere. International shipping is available on request.',
+        a: 'Delivery coverage, timing and fees depend on verified stock, the delivery address and a confirmed carrier quote.',
       },
     ],
   },
@@ -334,7 +334,7 @@ const ipad: CategoryConfig = {
       },
       {
         q: 'Can I pay in instalments?',
-        a: 'Yes — EMI plans run at checkout across major cards and banks, with the full cost shown before you confirm.',
+        a: 'EMI must be confirmed by a participating bank or payment partner at checkout before it is offered.',
       },
       {
         q: 'Can I trade in my old tablet?',
@@ -342,11 +342,11 @@ const ipad: CategoryConfig = {
       },
       {
         q: 'Is the warranty valid in Nepal?',
-        a: 'Every iPad is an official, warranty-backed unit. Your serial and warranty dates live in your account after purchase, and repairs are handled by our authorised service desk.',
+        a: 'Before purchase, verify the model, serial, seller invoice and the specific Nepal warranty and service terms.',
       },
       {
         q: 'Do you deliver outside Kathmandu?',
-        a: 'Yes — nationwide courier across Nepal, same-day in Kathmandu where stock allows, and international shipping on request.',
+        a: 'Delivery depends on verified stock and confirmed coverage for the destination. Ask for the total and expected date before payment.',
       },
     ],
   },
@@ -439,7 +439,7 @@ const watch: CategoryConfig = {
       },
       {
         q: 'Is the warranty valid in Nepal?',
-        a: 'Yes — official warranty-backed units, with serial and warranty dates saved to your account after purchase and service handled by our authorised repair desk.',
+        a: 'Check the serial, original invoice and warranty eligibility for each listed watch. We do not claim Apple-authorised service status without evidence.',
       },
       {
         q: 'Can I trade in my current watch?',
@@ -532,7 +532,7 @@ const airpods: CategoryConfig = {
     items: [
       {
         q: 'Are these AirPods genuine for Nepal?',
-        a: 'Yes — every pair is an official, warranty-backed unit with a serial you can verify. Your purchase and warranty record are saved to your account.',
+        a: 'Verify the product serial, seller invoice and warranty coverage for the specific pair before buying.',
       },
       {
         q: 'Can batteries be replaced?',
@@ -540,11 +540,11 @@ const airpods: CategoryConfig = {
       },
       {
         q: 'Which model is right for me?',
-        a: 'AirPods 4 are the everyday open fit, Pro adds the strongest ANC and silicone tips, Max is over-ear with big sound. Compare specs side by side, or ask in store.',
+        a: 'Compare the currently listed AirPods models and their features on Apple.com, then check which models are actually available in our Nepal catalog.',
       },
       {
         q: 'Do you deliver and support returns?',
-        a: 'Nationwide delivery across Nepal, same-day in Kathmandu where stock allows. Unopened items can be returned within the window on our returns policy.',
+        a: 'Delivery and return eligibility must be confirmed against the store’s published policy and your order details.',
       },
     ],
   },
@@ -559,12 +559,12 @@ const accessories: CategoryConfig = {
   eyebrow: 'ACCESSORIES · MAGSAFE & MORE',
   headline: 'The finishing touches.',
   intro: (h) =>
-    `${h.name} — “${h.tagline}”. Genuine accessories with live pricing — chargers, cables and protection that just fit.`,
+    `${h.name} — “${h.tagline}”. Browse chargers, cables and protection with verified compatibility and locally published prices when available.`,
   lineup: {
     eyebrow: 'THE LINE-UP',
     title: 'Everything around the device.',
     description:
-      'Chargers, cables, cases and more — live stock and Nepal pricing, all genuine and warrantied.',
+      'Chargers, cables and cases — verify compatibility, seller warranty terms and local inventory for each listing.',
   },
   features: {
     eyebrow: "WHAT'S NEW",
@@ -605,8 +605,8 @@ const accessories: CategoryConfig = {
       {
         Icon: BadgeCheck,
         tag: 'Trust',
-        name: 'Genuine & warrantied',
-        body: 'Every accessory is an official unit with its own warranty record — no grey-market surprises at the till.',
+        name: 'Check authenticity',
+        body: 'Check the brand, compatibility and warranty on the individual listing. Third-party accessories are identified separately.',
       },
     ],
   },
@@ -633,7 +633,7 @@ const accessories: CategoryConfig = {
       },
       {
         q: 'Are these genuine Apple accessories?',
-        a: 'Yes — official units with warranty records saved to your account, alongside a curated selection of quality third-party options clearly labelled as such.',
+        a: 'Apple-branded accessories and third-party accessories must be clearly identified on each listing. Verify the seller invoice and warranty before purchase.',
       },
       {
         q: 'Can I return an accessory?',
@@ -641,7 +641,7 @@ const accessories: CategoryConfig = {
       },
       {
         q: 'How fast do accessories arrive?',
-        a: 'Same-day delivery in Kathmandu where stock allows, nationwide courier across Nepal everywhere else.',
+        a: 'Delivery times and regions are confirmed against stock and carrier availability before an order is accepted.',
       },
     ],
   },
@@ -655,10 +655,10 @@ const store: CategoryConfig = {
   eyebrow: 'THE IPHONEBOOKING STORE',
   headline: 'Your next great thing.',
   intro: (h) =>
-    `Every device under one roof — starting with ${h.name}, “${h.tagline}”. Live stock, Nepal pricing, EMI and trade-in across the whole catalogue.`,
+    `Every device under one roof — starting with ${h.name}, “${h.tagline}”. Browse actual catalog prices, confirmed stock, and service options as they become available.`,
   lineup: {
     eyebrow: 'THE WHOLE FLOOR',
-    title: 'Everything, in stock.',
+    title: 'Your local catalog.',
     description:
       'iPhone, Mac, iPad, Watch, AirPods and accessories — live stock and pricing straight from the catalogue.',
   },
@@ -666,43 +666,43 @@ const store: CategoryConfig = {
     eyebrow: 'WHY IPHONEBOOKING',
     title: 'The whole experience. One place.',
     description:
-      'Buying Apple in Nepal should feel effortless — genuine stock, fair pricing and support that stays after the sale.',
+      'Explore Apple devices with transparent sources, actual merchant inventory and clearly stated service terms.',
     items: [
       {
         Icon: BadgeCheck,
         tag: 'Trust',
-        name: 'Genuine, warranty-backed',
-        body: 'Official units with an IMEI or serial you can check before you buy — warranty dates stored in your account.',
+        name: 'Check before purchase',
+        body: 'Verify the serial or IMEI where applicable, invoice and warranty coverage for each individual device.',
       },
       {
         Icon: CreditCard,
         tag: 'Payments',
-        name: 'EMI & every way to pay',
-        body: 'Khalti, eSewa, cards, bank transfer and cash on delivery — with EMI plans shown in full before you confirm.',
+        name: 'Verified payment methods',
+        body: 'Only methods enabled at checkout are currently available. Online gateway and EMI options are not implied until configured.',
       },
       {
         Icon: Truck,
         tag: 'Delivery',
         name: 'Delivery across Nepal',
-        body: 'Same-day in Kathmandu where stock allows, nationwide courier everywhere else, international shipping on request.',
+        body: 'Delivery availability and timing are confirmed after the merchant verifies stock and carrier service.',
       },
       {
         Icon: Store,
         tag: 'Pickup',
         name: 'Reserve, pick up in store',
-        body: 'Reserve any in-stock configuration and collect it from our Kathmandu studio — no queue, no waiting.',
+        body: 'Store pickup applies only to confirmed stock and a verified collection location and appointment.',
       },
       {
         Icon: RefreshCw,
         tag: 'Trade-in',
         name: 'Value from your old device',
-        body: 'Instant estimates on your current phone, laptop or tablet, applied as credit against whatever comes next.',
+        body: 'Submit a trade-in valuation request; final credit is subject to documented inspection and approval.',
       },
       {
         Icon: Wrench,
         tag: 'Service',
         name: 'Repair that keeps you going',
-        body: 'Book a repair, approve the quote and follow the work live — genuine parts and warranted labour.',
+        body: 'Book a repair and approve the itemised quote; parts provenance and warranty terms must be recorded per job.',
       },
     ],
   },
@@ -716,7 +716,7 @@ const store: CategoryConfig = {
     eyebrow: 'KEEP IT GOING',
     title: 'The rest of the story.',
     description:
-      'Upgrade, protect and repair — trade-in credit, authorised service and side-by-side compare, one tap away.',
+      'Compare devices and request trade-in or repair services with clear terms and documented status.',
   },
   faq: {
     eyebrow: 'GOOD TO KNOW',
@@ -725,19 +725,19 @@ const store: CategoryConfig = {
     items: [
       {
         q: 'How can I pay?',
-        a: 'Khalti, eSewa, cards, bank transfer and cash on delivery — plus EMI plans from card issuers and bank partners at checkout, with the total shown before you confirm.',
+        a: 'Only payment methods currently enabled in checkout can be used. Online gateways and EMI are subject to partner activation.',
       },
       {
         q: 'How fast is delivery?',
-        a: 'Same-day in Kathmandu where stock allows, nationwide courier across Nepal otherwise, and international shipping on request. Every order is tracked from your account.',
+        a: 'Shipping dates and coverage depend on stock, carrier service and your confirmed order; available tracking is shown in your account.',
       },
       {
         q: 'How do I know a listing is genuine?',
-        a: 'Every device is an official, warranty-backed unit with an IMEI or serial you can check before you buy. Your purchase and warranty record are stored in your account.',
+        a: 'Check the specific item’s IMEI or serial (where applicable), invoice and warranty terms. Apple.com references do not prove merchant authorization or stock.',
       },
       {
         q: 'Can I pick up in store instead?',
-        a: 'Yes — reserve any in-stock configuration and choose store pickup at checkout. We will hold it for you at the Kathmandu studio.',
+        a: 'Pickup is possible only when checkout offers a verified location and the merchant confirms the item is reserved.',
       },
       {
         q: 'What if I change my mind?',

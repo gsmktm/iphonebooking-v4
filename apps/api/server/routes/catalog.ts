@@ -25,6 +25,29 @@ catalog.get('/config', (_req, res) => {
     paymentProvider: onlinePayments ? 'KHALTI' : null,
   });
 });
+catalog.get('/official-apple-models', async (req, res) => {
+  const { category } = z
+    .object({
+      category: z.enum(['iphone', 'mac', 'ipad', 'watch', 'airpods', 'accessories']).optional(),
+    })
+    .parse(req.query);
+  // Editorial reference records only. Never join these rows to live stock,
+  // booking, price, checkout, or official reseller status.
+  const models = await db.appleReferenceModel.findMany({
+    where: category ? { category } : undefined,
+    orderBy: [{ category: 'asc' }, { sortOrder: 'asc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      category: true,
+      name: true,
+      summary: true,
+      officialUrl: true,
+      sourceCheckedAt: true,
+    },
+  });
+  res.setHeader('Cache-Control', 'public, max-age=900');
+  res.json(models);
+});
 catalog.get('/categories', async (_req, res) => res.json(await db.category.findMany()));
 catalog.get('/catalog', async (req, res) => {
   const query = catalogQuery.parse(req.query);

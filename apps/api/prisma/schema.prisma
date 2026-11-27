@@ -108,6 +108,21 @@ model Category {
   products    Product[]
 }
 
+/// Read-only editorial references, verified against Apple.com.
+/// Never mix these records with merchant stock, prices, bookings, or orders.
+model AppleReferenceModel {
+  id              String   @id
+  category        String
+  name            String
+  summary         String
+  officialUrl     String
+  sourceCheckedAt DateTime
+  sortOrder       Int      @default(0)
+  updatedAt       DateTime @default(now()) @updatedAt
+
+  @@index([category, sortOrder])
+}
+
 model Product {
   id                  String                   @id @default(cuid())
   slug                String                   @unique

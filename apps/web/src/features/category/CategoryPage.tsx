@@ -6,6 +6,7 @@ import type { Product } from '../../services/types';
 import { ProductCard } from '../../components/ProductCard';
 import { DeviceCollectionStrip } from '../../components/DeviceCollectionStrip';
 import { CategoryCinematicHero } from './CategoryCinematicHero';
+import { OfficialAppleModels } from '../apple/OfficialAppleModels';
 import { ArrowLink, Loading, ErrorNotice, Empty } from '../../components/ui';
 import { FeatureBand, SpecTable, ServicesBand, Faq } from './sections';
 import { CONFIGS, type CategorySlug } from './config';
@@ -51,6 +52,10 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
           </div>
         </div>
       )}
+
+      <div className="container">
+        <OfficialAppleModels category={slug === 'store' ? undefined : slug} />
+      </div>
 
       <section className="container cat-section" id="lineup">
         <div className="section-heading">

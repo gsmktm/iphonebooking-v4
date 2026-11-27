@@ -1,0 +1,189 @@
+/* iPhoneBooking's original editorial treatment for factual Apple.com model references.
+ * This section deliberately does not reproduce Apple's logos, photography or trade dress.
+ */
+.official-apple-models {
+  margin-block: clamp(2.5rem, 5.5vw, 5rem);
+  min-width: 0;
+}
+.official-apple-models-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+  margin-bottom: clamp(1.3rem, 2.3vw, 2.25rem);
+}
+.official-apple-models-header > div {
+  max-width: 54rem;
+  min-width: 0;
+}
+.official-apple-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent-text);
+}
+.official-apple-models-header h2 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.3rem, 4.2vw, 4rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin: 0.75rem 0 0.7rem;
+}
+.official-apple-models-header p {
+  font-size: 0.9rem;
+  max-width: 45rem;
+  line-height: 1.75;
+  color: var(--muted);
+  margin: 0;
+}
+.official-apple-category-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  gap: 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-text);
+  border-bottom: 1px solid var(--gold);
+}
+.official-apple-category-link:hover,
+.official-apple-category-link:focus-visible {
+  color: var(--ink);
+}
+.official-apple-models-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+.official-apple-model {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--gold) 17%, var(--line));
+  border-radius: 1rem;
+  padding: clamp(1.15rem, 2vw, 1.7rem);
+  background:
+    radial-gradient(
+      ellipse 70% 65% at 95% 0%,
+      color-mix(in srgb, var(--gold) 8%, transparent),
+      transparent 100%
+    ),
+    var(--surface);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.official-apple-model:hover,
+.official-apple-model:focus-within {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--gold) 58%, var(--line));
+  box-shadow: 0 14px 40px rgb(0 0 0 / 0.08);
+}
+.official-apple-model-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  font:
+    600 0.66rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+.official-apple-model-category {
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 0.25rem 0.65rem;
+  color: var(--accent-text);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.official-apple-model-body {
+  flex: 1;
+  margin: clamp(1.6rem, 2.5vw, 2.35rem) 0 1.4rem;
+}
+.official-apple-model-body h3 {
+  font-size: clamp(1.5rem, 2.3vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.05em;
+  margin: 0 0 0.7rem;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.official-apple-model-body p {
+  color: var(--muted);
+  font-size: 0.81rem;
+  line-height: 1.7;
+  margin: 0;
+}
+.official-apple-model-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.official-apple-model-footer > span {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+.official-apple-model-footer > a {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent-text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.official-apple-model-footer > a:hover,
+.official-apple-model-footer > a:focus-visible {
+  text-decoration: underline;
+}
+.official-apple-models-legal {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.71rem;
+  line-height: 1.65;
+}
+.official-apple-models--compact .official-apple-model-body {
+  margin-block: 1.1rem;
+}
+@media (min-width: 640px) {
+  .official-apple-models-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1060px) {
+  .official-apple-models-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .official-apple-models--compact .official-apple-models-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .official-apple-model {
+    transition: none;
+  }
+  .official-apple-model:hover,
+  .official-apple-model:focus-within {
+    transform: none;
+  }
+}
