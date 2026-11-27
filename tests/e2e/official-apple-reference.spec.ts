@@ -9,9 +9,7 @@ const categories = [
   ['accessories', 'apple-pencil-pro'],
 ] as const;
 
-test('Apple.com reference API is backed by separate verified catalog rows', async ({
-  request,
-}) => {
+test('Apple.com reference API is backed by separate verified catalog rows', async ({ request }) => {
   const response = await request.get('/api/v1/official-apple-models');
   expect(response.status()).toBe(200);
   const records = (await response.json()) as Array<Record<string, unknown>>;
@@ -29,9 +27,7 @@ test('Apple.com reference API is backed by separate verified catalog rows', asyn
 });
 
 for (const [category, model] of categories) {
-  test(`/${category} shows real Apple source, not fictitious Nepal stock`, async ({
-    page,
-  }) => {
+  test(`/${category} shows real Apple source, not fictitious Nepal stock`, async ({ page }) => {
     await page.goto(`/${category}`);
     const section = page.locator('[data-apple-reference-section]');
     await expect(section).toBeVisible();
