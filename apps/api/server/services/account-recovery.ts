@@ -27,8 +27,7 @@ export async function queueAccountEmail(
   await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${userId} FOR UPDATE`;
   const user = await tx.user.findUnique({ where: { id: userId } });
   // External-auth-only users must never obtain a legacy password reset token.
-  if (await tx.supabaseIdentity.findUnique({ where: { userId }, select: { userId: true } }))
-    return;
+  if (await tx.supabaseIdentity.findUnique({ where: { userId }, select: { userId: true } })) return;
   if (
     !user ||
     user.status !== 'ACTIVE' ||
@@ -166,7 +165,9 @@ export async function resetAccountPassword(rawToken: string, newPassword: string
   await db.$transaction(async (tx) => {
     const { user, now } = await consumeAccountToken(tx, rawToken, 'PASSWORD_RESET');
     // Protect against stale recovery tokens minted before external identity linking.
-    if (await tx.supabaseIdentity.findUnique({ where: { userId: user.id }, select: { userId: true } }))
+    if (
+      await tx.supabaseIdentity.findUnique({ where: { userId: user.id }, select: { userId: true } })
+    )
       throw invalidToken();
     await tx.user.update({
       where: { id: user.id },
