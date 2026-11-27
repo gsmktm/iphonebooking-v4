@@ -47,25 +47,37 @@ async function requestGoTrue(
       signal: AbortSignal.timeout(9000),
     });
   } catch {
-    throw new AppError(503, 'AUTH_PROVIDER_UNAVAILABLE', 'Sign-in service is temporarily unavailable.');
+    throw new AppError(
+      503,
+      'AUTH_PROVIDER_UNAVAILABLE',
+      'Sign-in service is temporarily unavailable.',
+    );
   }
   if (!response.ok) {
     if ([400, 401, 403, 422].includes(response.status))
-      throw new AppError(401, 'SUPABASE_SIGN_IN_FAILED', 'Sign-in failed. Verify your email and password.');
-    throw new AppError(503, 'AUTH_PROVIDER_UNAVAILABLE', 'Sign-in service is temporarily unavailable.');
+      throw new AppError(
+        401,
+        'SUPABASE_SIGN_IN_FAILED',
+        'Sign-in failed. Verify your email and password.',
+      );
+    throw new AppError(
+      503,
+      'AUTH_PROVIDER_UNAVAILABLE',
+      'Sign-in service is temporarily unavailable.',
+    );
   }
   try {
     return (await response.json()) as Record<string, unknown>;
   } catch {
-    throw new AppError(503, 'AUTH_PROVIDER_UNAVAILABLE', 'Sign-in service returned an invalid response.');
+    throw new AppError(
+      503,
+      'AUTH_PROVIDER_UNAVAILABLE',
+      'Sign-in service returned an invalid response.',
+    );
   }
 }
 
-export async function registerSupabaseAccount(
-  email: string,
-  password: string,
-  name: string,
-) {
+export async function registerSupabaseAccount(email: string, password: string, name: string) {
   // A signup must never mint an iPhoneBooking session before email verification.
   await requestGoTrue('/signup', 'POST', {
     email,
@@ -79,7 +91,11 @@ export async function verifySupabaseCredentials(email: string, password: string)
     password,
   })) as GoTrueToken;
   if (!auth.access_token || auth.access_token.length > 8192)
-    throw new AppError(401, 'SUPABASE_SIGN_IN_FAILED', 'Sign-in failed. Verify your email and password.');
+    throw new AppError(
+      401,
+      'SUPABASE_SIGN_IN_FAILED',
+      'Sign-in failed. Verify your email and password.',
+    );
 
   // Do not trust client-provided JWT claims or editable user_metadata as authority.
   // Fetch the authenticated identity directly from the Supabase Auth service.
