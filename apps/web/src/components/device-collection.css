@@ -49,8 +49,11 @@
   justify-content: center;
   align-items: center;
   min-height: 300px;
-  background:
-    radial-gradient(ellipse at center, color-mix(in srgb, var(--gold) 10%, var(--warm)), var(--surface));
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--gold) 10%, var(--warm)),
+    var(--surface)
+  );
 }
 .device-family-placeholder-visual:focus-visible {
   outline: 3px solid var(--focus);
@@ -119,6 +122,10 @@
   }
 }
 @media (max-width: 500px) {
-  .device-family-placeholder-visual { min-height: 270px; }
-  .device-family-placeholder .home-device-frame { height: 260px; }
+  .device-family-placeholder-visual {
+    min-height: 270px;
+  }
+  .device-family-placeholder .home-device-frame {
+    height: 260px;
+  }
 }
