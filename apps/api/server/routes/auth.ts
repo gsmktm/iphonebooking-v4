@@ -6,6 +6,11 @@ import { db } from '../db.js';
 import { AppError, hash, token, safeUser, requireUser, type Identity } from '../core.js';
 import { accountMailConfig } from '../services/account-mail.js';
 import {
+  registerSupabaseAccount,
+  supabaseAuthAvailable,
+  verifySupabaseCredentials,
+} from '../services/supabase-auth.js';
+import {
   queueAccountEmail,
   requestAccountEmail,
   resetAccountPassword,
@@ -44,20 +49,20 @@ function invalidCredentials() {
     'Your email or password is incorrect. Please try again.',
   );
 }
-function signedIn(res: Response, user: Identity, rawToken: string) {
+function signedIn(res: Response, user: Identity, rawToken: string, maxAge = sessionLifetime) {
   return res
     .cookie('session', rawToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: sessionLifetime,
+      maxAge,
       path: '/',
     })
     .json(safeUser(user));
 }
 
 auth.use(
-  ['/register', '/login', '/password'],
+  ['/register', '/login', '/password', '/supabase/register', '/supabase/login'],
   rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 30,
@@ -93,7 +98,11 @@ auth.use(
 
 auth.get('/capabilities', (_req, res) => {
   const available = Boolean(accountMailConfig());
-  res.json({ passwordReset: available, emailVerification: available });
+  res.json({
+    passwordReset: available,
+    emailVerification: available,
+    supabaseAuth: supabaseAuthAvailable(),
+  });
 });
 auth.post('/register', async (req, res) => {
   const data = z
@@ -155,6 +164,82 @@ auth.post('/login', async (req, res) => {
   signedIn(res, current, rawToken);
 });
 
+// Opt-in bridge for Supabase Auth in the isolated Supabase preview.
+// Local HTTP-only cookie sessions remain authoritative for account permissions.
+// Passwords and Supabase access/refresh tokens are NEVER persisted in local storage.
+auth.post('/supabase/register', async (req, res) => {
+  if (!supabaseAuthAvailable())
+    throw new AppError(503, 'SUPABASE_AUTH_UNAVAILABLE', 'Supabase sign-in is not available.');
+  const data = z
+    .object({ email, password: newPassword, name: z.string().trim().min(2).max(100) })
+    .parse(req.body);
+  await registerSupabaseAccount(data.email, data.password, data.name);
+  res.status(202).json({
+    ok: true,
+    message: 'If this address is eligible, check your email for verification, then sign in.',
+  });
+});
+
+auth.post('/supabase/login', async (req, res) => {
+  if (!supabaseAuthAvailable())
+    throw new AppError(503, 'SUPABASE_AUTH_UNAVAILABLE', 'Supabase sign-in is not available.');
+  const data = z.object({ email, password: z.string().min(1).max(128) }).parse(req.body);
+  const profile = await verifySupabaseCredentials(data.email, data.password);
+  const rawToken = token();
+  // Short-lived app sessions limit the window after a Supabase user is revoked.
+  // No local privilege, retailer access, or admin permissions are imported.
+  const maxAge = 60 * 60 * 1000;
+  const user = await db.$transaction(async (tx) => {
+    const link = await tx.supabaseIdentity.findUnique({
+      where: { supabaseUserId: profile.id },
+      include: { user: { include: { role: true } } },
+    });
+    let linkedUser: Identity;
+    if (link) {
+      if (link.user.status !== 'ACTIVE' || link.user.email !== profile.email)
+        throw new AppError(
+          403,
+          'ACCOUNT_ACCESS_DENIED',
+          'This account is unavailable. Contact support.',
+        );
+      linkedUser = link.user;
+    } else {
+      // Do not auto-link to an existing local user by email. Such a shortcut
+      // would enable cross-provider account takeover and permission inheritance.
+      const existing = await tx.user.findUnique({ where: { email: profile.email } });
+      if (existing)
+        throw new AppError(
+          409,
+          'ACCOUNT_LINK_REQUIRED',
+          'An account already uses this address. Use the original sign-in or contact support.',
+        );
+      const created = await tx.user.create({
+        data: {
+          email: profile.email,
+          name: profile.displayName,
+          emailVerifiedAt: profile.verifiedAt,
+          passwordHash: 'external-supabase-disabled-' + token(),
+        },
+        include: { role: true },
+      });
+      await tx.supabaseIdentity.create({
+        data: { supabaseUserId: profile.id, userId: created.id },
+      });
+      linkedUser = created;
+    }
+    await tx.userSession.create({
+      data: {
+        tokenHash: hash(rawToken),
+        userId: linkedUser.id,
+        expiresAt: new Date(Date.now() + maxAge),
+        userAgent: req.get('user-agent')?.slice(0, 250),
+      },
+    });
+    return linkedUser;
+  });
+  signedIn(res, user, rawToken, maxAge);
+});
+
 auth.post('/forgot-password', async (req, res) => {
   const data = z.object({ email }).parse(req.body);
   await requestAccountEmail(data.email, 'PASSWORD_RESET');
@@ -195,6 +280,17 @@ auth.delete('/sessions/:id', requireUser, async (req, res) => {
   res.json({ ok: true });
 });
 auth.post('/password', requireUser, async (req, res) => {
+  if (
+    await db.supabaseIdentity.findUnique({
+      where: { userId: req.user!.id },
+      select: { userId: true },
+    })
+  )
+    throw new AppError(
+      409,
+      'EXTERNAL_AUTH_PASSWORD',
+      'This password is managed by Supabase Auth. Contact support for recovery.',
+    );
   const data = z
     .object({ currentPassword: z.string().min(1).max(128), newPassword })
     .parse(req.body);
