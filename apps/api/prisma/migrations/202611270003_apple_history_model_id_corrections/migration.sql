@@ -1,0 +1,44 @@
+-- Correct historical model identifiers from explicitly labeled Apple Support model number fields.
+-- Forward-only correction because archive migration 002 has already been applied.
+-- Does not touch commerce Product, ProductVariant, orders, media or pricing.
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1203' WHERE "slug"='iphone-iphone-2007' AND "modelNumbers" IS DISTINCT FROM 'A1203';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro4,1' WHERE "slug"='mac-mac-pro-early-2009-2009' AND "modelNumbers" IS DISTINCT FROM 'MacPro4,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacBook5,2' WHERE "slug"='mac-macbook-13-inch-early-2009-2009' AND "modelNumbers" IS DISTINCT FROM 'MacBook5,2';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacBook5,2' WHERE "slug"='mac-macbook-13-inch-mid-2009-2009' AND "modelNumbers" IS DISTINCT FROM 'MacBook5,2';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro5,1' WHERE "slug"='mac-mac-pro-mid-2010-2010' AND "modelNumbers" IS DISTINCT FROM 'MacPro5,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro5,1' WHERE "slug"='mac-mac-pro-server-mid-2010-2010' AND "modelNumbers" IS DISTINCT FROM 'MacPro5,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1416, A1430, A1403' WHERE "slug"='ipad-ipad-3rd-generation-2012' AND "modelNumbers" IS DISTINCT FROM 'A1416, A1430, A1403';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1458, A1459, A1460' WHERE "slug"='ipad-ipad-4th-generation-2012' AND "modelNumbers" IS DISTINCT FROM 'A1458, A1459, A1460';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1432, A1454, A1455' WHERE "slug"='ipad-ipad-mini-2012' AND "modelNumbers" IS DISTINCT FROM 'A1432, A1454, A1455';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro5,1' WHERE "slug"='mac-mac-pro-mid-2012-2012' AND "modelNumbers" IS DISTINCT FROM 'MacPro5,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro5,1' WHERE "slug"='mac-mac-pro-server-mid-2012-2012' AND "modelNumbers" IS DISTINCT FROM 'MacPro5,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1474, A1475, A1476' WHERE "slug"='ipad-ipad-air-2013' AND "modelNumbers" IS DISTINCT FROM 'A1474, A1475, A1476';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1489, A1490, A1491' WHERE "slug"='ipad-ipad-mini-2-2013' AND "modelNumbers" IS DISTINCT FROM 'A1489, A1490, A1491';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro6,1' WHERE "slug"='mac-mac-pro-late-2013-2013' AND "modelNumbers" IS DISTINCT FROM 'MacPro6,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1566, A1567' WHERE "slug"='ipad-ipad-air-2-2014' AND "modelNumbers" IS DISTINCT FROM 'A1566, A1567';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1599, A1600' WHERE "slug"='ipad-ipad-mini-3-2014' AND "modelNumbers" IS DISTINCT FROM 'A1599, A1600';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='A1538, A1550' WHERE "slug"='ipad-ipad-mini-4-2015' AND "modelNumbers" IS DISTINCT FROM 'A1538, A1550';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='iMacPro1,1' WHERE "slug"='mac-imac-pro-2017-2017' AND "modelNumbers" IS DISTINCT FROM 'iMacPro1,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro7,1' WHERE "slug"='mac-mac-pro-2019-2019' AND "modelNumbers" IS DISTINCT FROM 'MacPro7,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='MacPro7,1' WHERE "slug"='mac-mac-pro-rack-2019-2019' AND "modelNumbers" IS DISTINCT FROM 'MacPro7,1';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac14,12' WHERE "slug"='mac-mac-mini-2023-2023-2' AND "modelNumbers" IS DISTINCT FROM 'Mac14,12';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac14,13' WHERE "slug"='mac-mac-studio-2023-2023' AND "modelNumbers" IS DISTINCT FROM 'Mac14,13';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac14,14' WHERE "slug"='mac-mac-studio-2023-2023-2' AND "modelNumbers" IS DISTINCT FROM 'Mac14,14';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac14,15' WHERE "slug"='mac-macbook-air-15-inch-m2-2023-2023' AND "modelNumbers" IS DISTINCT FROM 'Mac14,15';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac15,6, Mac15,8, Mac15,10' WHERE "slug"='mac-macbook-pro-14-inch-nov-2023-2023-2' AND "modelNumbers" IS DISTINCT FROM 'Mac15,6, Mac15,8, Mac15,10';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac14,6, Mac14,10' WHERE "slug"='mac-macbook-pro-16-inch-2023-2023' AND "modelNumbers" IS DISTINCT FROM 'Mac14,6, Mac14,10';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac15,7, Mac15,9, Mac15,11' WHERE "slug"='mac-macbook-pro-16-inch-nov-2023-2023' AND "modelNumbers" IS DISTINCT FROM 'Mac15,7, Mac15,9, Mac15,11';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac16,10, Mac16,11' WHERE "slug"='mac-mac-mini-2024-2024' AND "modelNumbers" IS DISTINCT FROM 'Mac16,10, Mac16,11';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac15,12' WHERE "slug"='mac-macbook-air-13-inch-m3-2024-2024' AND "modelNumbers" IS DISTINCT FROM 'Mac15,12';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac15,13' WHERE "slug"='mac-macbook-air-15-inch-m3-2024-2024' AND "modelNumbers" IS DISTINCT FROM 'Mac15,13';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac15,14' WHERE "slug"='mac-mac-studio-2025-2025-2' AND "modelNumbers" IS DISTINCT FROM 'Mac15,14';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac16,12' WHERE "slug"='mac-macbook-air-13-inch-m4-2025-2025' AND "modelNumbers" IS DISTINCT FROM 'Mac16,12';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac16,13' WHERE "slug"='mac-macbook-air-15-inch-m4-2025-2025' AND "modelNumbers" IS DISTINCT FROM 'Mac16,13';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac18,2' WHERE "slug"='mac-imac-24-inch-m6-four-ports-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac18,2';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac18,2' WHERE "slug"='mac-imac-24-inch-m6-two-ports-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac18,2';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac17,16' WHERE "slug"='mac-mac-mini-m5-pro-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac17,16';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac18,5' WHERE "slug"='mac-mac-mini-m6-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac18,5';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac17,14' WHERE "slug"='mac-mac-studio-m5-max-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac17,14';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac17,15' WHERE "slug"='mac-mac-studio-m5-ultra-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac17,15';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac17,11, Mac17,13' WHERE "slug"='mac-macbook-pro-14-inch-proled-xdr-m5-pro-or-m5-max-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac17,11, Mac17,13';
+UPDATE "AppleHistoryDevice" SET "modelNumbers"='Mac17,10, Mac17,12' WHERE "slug"='mac-macbook-pro-16-inch-proled-xdr-m5-pro-or-m5-max-2026' AND "modelNumbers" IS DISTINCT FROM 'Mac17,10, Mac17,12';

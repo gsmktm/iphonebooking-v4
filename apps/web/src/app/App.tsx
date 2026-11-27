@@ -8,6 +8,10 @@ const Catalog = lazy(() => import('../pages/Catalog'));
 const IPhone = lazy(() => import('../pages/IPhone'));
 const Category = lazy(() => import('../pages/Category'));
 const Product = lazy(() => import('../pages/Product'));
+const AppleHistory = lazy(() => import('../pages/AppleHistory'));
+const AppleHistoryDetail = lazy(() =>
+  import('../pages/AppleHistory').then((m) => ({ default: m.AppleHistoryDetail })),
+);
 const Account = lazy(() => import('../pages/Account'));
 const Admin = lazy(() => import('../pages/Admin'));
 const Confirmation = lazy(() => import('../pages/Confirmation'));
@@ -138,6 +142,9 @@ export default function App() {
               ).map(([from, to]) => (
                 <Route key={from} path={from} element={<Navigate to={to} replace />} />
               ))}
+              <Route path="/history/apple" element={<AppleHistory />} />
+              <Route path="/history/apple/device/:slug" element={<AppleHistoryDetail />} />
+              <Route path="/history/apple/:family" element={<AppleHistory />} />
               <Route path="/products/:slug" element={<Product />} />
               <Route path="/iphone/:slug" element={<Product />} />
               <Route path="/cart" element={<Cart />} />
