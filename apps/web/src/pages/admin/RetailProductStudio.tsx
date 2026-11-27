@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Plus, Search, Save } from 'lucide-react';
@@ -13,7 +13,7 @@ type Page = { rows: RetailProduct[]; total: number; page: number; pageSize: numb
 
 const paise = (amount: string) => {
   const n = Number(amount);
-  if (!Number.isFinite(n) || n < 0 || Math.round(n * 100) !== n * 100)
+  if (!Number.isFinite(n) || n < 0 || Math.abs(Math.round(n * 100) - n * 100) > 0.000001)
     throw new Error('Enter a valid NPR amount with up to two decimal places.');
   return Math.round(n * 100);
 };
@@ -42,7 +42,7 @@ function VariantEditor({
   const [image, setImage] = useState(variant?.image ?? '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const save = async (event: React.FormEvent<HTMLFormElement>) => {
+  const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
     setBusy(true);
@@ -180,7 +180,7 @@ function RetailForm({
   const [notice, setNotice] = useState('');
   const qc = useQueryClient();
   const canSave = product ? canEdit : canCreate;
-  const save = async (event: React.FormEvent<HTMLFormElement>) => {
+  const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
     setNotice('');
