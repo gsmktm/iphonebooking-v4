@@ -1,0 +1,25 @@
+name: Format media studio (temporary)
+on: [push]
+jobs:
+  format:
+    if: github.ref == 'refs/heads/feature/product-media-studio-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Format source and print only modified files
+        run: |
+          pnpm exec prettier --write apps/api/server/services/product-media-storage.ts apps/api/server/routes/product-media.ts apps/api/server/routes/product-studio.ts apps/api/server/routes/admin.ts apps/api/server/app.ts apps/web/src/pages/admin/ProductMediaGallery.tsx apps/web/src/pages/admin/MediaUploader.tsx apps/web/src/pages/admin/media-types.ts apps/web/src/pages/admin/RetailProductStudio.tsx apps/web/src/pages/admin/HistoryProductStudio.tsx apps/web/src/pages/admin/MediaLibraryStudio.tsx apps/web/src/pages/admin/ProductStudio.tsx apps/web/src/pages/admin/product-studio.css apps/web/src/pages/AppleHistory.tsx apps/web/src/pages/apple-history.css apps/web/src/pages/Product.tsx apps/web/src/pages/product-media-credits.css apps/web/src/components/ui.tsx apps/web/src/features/home/HomeDeviceFrames.tsx apps/web/src/pages/Admin.tsx tests/media-validation.test.ts tests/e2e/media-studio.spec.ts apps/api/package.json
+          for file in $(git diff --name-only); do
+            echo "FORMATTED_BEGIN:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
