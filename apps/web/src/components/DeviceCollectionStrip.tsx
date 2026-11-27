@@ -44,7 +44,7 @@ export function DeviceCollectionStrip({
           return (
             <article className="device-family-placeholder" data-device-family={kind} key={kind}>
               <Link to={`/${kind}`} className="device-family-placeholder-visual">
-                <DeviceFrame kind={kind} />
+                <DeviceFrame kind={kind} realOnly />
               </Link>
               <div className="device-family-placeholder-details">
                 <h3>{labels[kind]}</h3>
