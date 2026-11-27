@@ -43,7 +43,10 @@ export function ProductCard({
   const compared = compare.includes(product.id);
 
   return (
-    <article className="product-card device-framed-card" data-product-category={product.category.slug}>
+    <article
+      className="product-card device-framed-card"
+      data-product-category={product.category.slug}
+    >
       <div className="product-image-wrap device-card-stage">
         <span className="product-badge">{product.badge ?? product.category.name}</span>
         <button
@@ -56,7 +59,10 @@ export function ProductCard({
           <Heart size={18} fill={saved ? 'currentColor' : 'none'} />
         </button>
         <Link className="device-card-visual-link" to={path} aria-label={`View ${product.name}`}>
-          <DeviceFrame kind={frameKind(product.category.slug)} image={preferred?.image || product.image} />
+          <DeviceFrame
+            kind={frameKind(product.category.slug)}
+            image={preferred?.image || product.image}
+          />
         </Link>
         <div className="color-dots">
           {[...new Map(variants.map((v) => [v.color, v])).values()].map((v) => (
@@ -71,7 +77,9 @@ export function ProductCard({
         <p>{product.tagline}</p>
         <div className="product-card-bottom">
           <span>
-            {price === null ? 'Price on request' : (
+            {price === null ? (
+              'Price on request'
+            ) : (
               <>
                 From <strong>{money(price)}</strong>
               </>
