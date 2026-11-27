@@ -232,7 +232,13 @@ export default function Catalog() {
         <>
           {mode !== 'wishlist' && mode !== 'search' && (
             <DeviceCollectionStrip
-              title={mode === 'prebook' ? 'Pre-book the next generation.' : mode === 'deals' ? 'Discover our device families.' : 'Choose your device family.'}
+              title={
+                mode === 'prebook'
+                  ? 'Pre-book the next generation.'
+                  : mode === 'deals'
+                    ? 'Discover our device families.'
+                    : 'Choose your device family.'
+              }
               description="Real product images, prices and Buy Now links appear as soon as published inventory is available."
             />
           )}
