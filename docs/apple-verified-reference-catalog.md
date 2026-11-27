@@ -6,14 +6,14 @@
 
 The `AppleReferenceModel` table holds factual product-family names, short independently written descriptions and source links checked on Apple.com on **2026-11-27**. The initial 20 public records are introduced in migration `202611270001_apple_reference_catalog`.
 
-| Family | Verified official references |
-| --- | --- |
-| iPhone | iPhone 18 Pro, iPhone 18 Pro Max, iPhone Air, iPhone 17e |
-| Mac | MacBook Air (M5), MacBook Pro, Mac mini |
-| iPad | iPad Pro, iPad Air, iPad mini, iPad |
-| Apple Watch | Series 12, Ultra 4, SE 3 |
-| AirPods | AirPods 5, AirPods Pro 3, AirPods Max 2 |
-| Accessories | Apple Pencil Pro, Magic Keyboard, MagSafe accessories |
+| Family      | Verified official references                             |
+| ----------- | -------------------------------------------------------- |
+| iPhone      | iPhone 18 Pro, iPhone 18 Pro Max, iPhone Air, iPhone 17e |
+| Mac         | MacBook Air (M5), MacBook Pro, Mac mini                  |
+| iPad        | iPad Pro, iPad Air, iPad mini, iPad                      |
+| Apple Watch | Series 12, Ultra 4, SE 3                                 |
+| AirPods     | AirPods 5, AirPods Pro 3, AirPods Max 2                  |
+| Accessories | Apple Pencil Pro, Magic Keyboard, MagSafe accessories    |
 
 ### Sources
 
@@ -42,7 +42,7 @@ Do not create a checkout/buy/reservation button from an Apple reference. A Buy N
 Apple's third-party copyright/trademark guidelines are at
 https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html
 
-Apple requires express permission for Apple-owned or licensed product photographs used in third-party marketing and prohibits imitation of distinctive site design, logos or fonts. **Do not scrape/hotlink/mirror Apple.com assets into the retailer site without rights.** Use authorized distributor assets under a license or independently photographed genuine devices with permission and provenance. Existing CSS silhouettes are structural illustrations, *not genuine SKU photographs*. Show a true uploaded image only after the merchandising team verifies accuracy and usage rights. Do not imply Apple-authorized reseller or Apple-certified repair status without documentation.
+Apple requires express permission for Apple-owned or licensed product photographs used in third-party marketing and prohibits imitation of distinctive site design, logos or fonts. **Do not scrape/hotlink/mirror Apple.com assets into the retailer site without rights.** Use authorized distributor assets under a license or independently photographed genuine devices with permission and provenance. Existing CSS silhouettes are structural illustrations, _not genuine SKU photographs_. Show a true uploaded image only after the merchandising team verifies accuracy and usage rights. Do not imply Apple-authorized reseller or Apple-certified repair status without documentation.
 
 ## Database decision
 
