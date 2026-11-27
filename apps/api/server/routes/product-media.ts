@@ -203,19 +203,27 @@ async function isPublicImage(url: string) {
   return Boolean(product || historical);
 }
 media.get('/media/credits', async (req, res) => {
-  const { slug } = z.object({ slug: z.string().max(120).regex(/^[a-z0-9-]+$/) }).parse(req.query);
-  const product = await db.product.findFirst({
-    where: { slug, active: true },
-    select: { image: true, gallery: true, variants: { select: { image: true } } },
-  });
-  if (!product) throw new AppError(404, 'NOT_FOUND', 'Product not found.');
-  const ids = [
-    product.image,
-    ...product.gallery,
-    ...product.variants.map((v) => v.image).filter((v): v is string => Boolean(v)),
-  ]
-    .map((v) => v.match(/^\/api\/v1\/media\/([0-9a-f-]{36})$/i)?.[1])
-    .filter((id): id is string => Boolean(id));
+  const { slug, archive } = z.object({
+    slug: z.string().max(120).regex(/^[a-z0-9-]+$/).optional(),
+    archive: z.string().max(120).regex(/^[a-z0-9-]+$/).optional(),
+  }).refine((data) => Boolean(data.slug) !== Boolean(data.archive)).parse(req.query);
+  let paths: (string | null)[] = [];
+  if (slug) {
+    const product = await db.product.findFirst({
+      where: { slug, active: true },
+      select: { image: true, gallery: true, variants: { select: { image: true } } },
+    });
+    if (!product) throw new AppError(404, 'NOT_FOUND', 'Product not found.');
+    paths = [product.image, ...product.gallery, ...product.variants.map((item) => item.image)];
+  } else if (archive) {
+    const device = await db.appleHistoryDevice.findUnique({
+      where: { slug: archive },
+      select: { imageUrl: true, gallery: true },
+    });
+    if (!device) throw new AppError(404, 'NOT_FOUND', 'Archival device not found.');
+    paths = [device.imageUrl, ...device.gallery];
+  }
+  const ids = [...new Set(paths.map((v) => v?.match(/^\/api\/v1\/media\/([0-9a-f-]{36})$/i)?.[1]).filter((id): id is string => Boolean(id)))];
   const items = await db.mediaAsset.findMany({
     where: { id: { in: ids } },
     select: {
