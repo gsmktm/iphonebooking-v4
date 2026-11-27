@@ -38,9 +38,17 @@ import {
 export function SignIn({ admin = false }: { admin?: boolean }) {
   const location = useLocation();
   const [register, setRegister] = useState(location.pathname === '/register'),
+    [supabase, setSupabase] = useState(
+      new URLSearchParams(location.search).get('provider') === 'supabase',
+    ),
+    [confirmationSent, setConfirmationSent] = useState(false),
     [error, setError] = useState<Error | null>(null),
     [busy, setBusy] = useState(false);
   const [params] = useSearchParams();
+  const capabilities = useQuery({
+    queryKey: ['auth', 'capabilities'],
+    queryFn: () => api<{ supabaseAuth?: boolean }>('/auth/capabilities'),
+  });
   const qc = useQueryClient(),
     navigate = useNavigate();
   return (
@@ -80,11 +88,21 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
           setBusy(true);
           setError(null);
           try {
-            const user = await post<User>(`/auth/${register ? 'register' : 'login'}`, {
+            const destination = supabase
+              ? `/auth/supabase/${register ? 'register' : 'login'}`
+              : `/auth/${register ? 'register' : 'login'}`;
+            const payload = {
               email: data.get('email'),
               password: data.get('password'),
               ...(register ? { name: data.get('name') } : {}),
-            });
+            };
+            if (supabase && register) {
+              await post<{ ok: boolean; message: string }>(destination, payload);
+              setRegister(false);
+              setConfirmationSent(true);
+              return;
+            }
+            const user = await post<User>(destination, payload);
             qc.setQueryData(['me'], user);
             await qc.invalidateQueries({ queryKey: ['account'] });
             const redirect = params.get('redirect');
@@ -102,8 +120,16 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
           }
         }}
       >
-        <span className="eyebrow">{admin ? 'OPERATIONS ACCESS' : 'WELCOME TO IPHONEBOOKING'}</span>
+        <span className="eyebrow">
+          {admin ? 'OPERATIONS ACCESS' : supabase ? 'SUPABASE EMAIL AUTH' : 'WELCOME TO IPHONEBOOKING'}
+        </span>
         <h2>{register ? 'Make yourself at home.' : 'Good to see you.'}</h2>
+        {confirmationSent && supabase && (
+          <p className="notice" role="status">
+            Registration requested. Check your email for a confirmation link, then sign in.
+            Email delivery depends on the Supabase Auth settings.
+          </p>
+        )}
         {register && (
           <label>
             Your name
@@ -130,7 +156,7 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
             Use at least 12 characters. Your password is securely hashed.
           </p>
         )}
-        {!register && (
+        {!register && !supabase && (
           <Link className="text-button" to="/forgot-password">
             Forgot your password?
           </Link>
@@ -154,6 +180,26 @@ export function SignIn({ admin = false }: { admin?: boolean }) {
               {register ? 'Sign in' : 'Create an account'}
             </button>
           </p>
+        )}
+        {!admin && (capabilities.data?.supabaseAuth || supabase) && (
+          <div className="notice">
+            <p>
+              {supabase
+                ? 'Supabase accounts are separate from existing iPhoneBooking passwords.'
+                : 'You can also use a verified Supabase email account on this preview.'}
+            </p>
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => {
+                setSupabase(!supabase);
+                setError(null);
+                setConfirmationSent(false);
+              }}
+            >
+              {supabase ? 'Use original sign-in' : 'Use Supabase Auth'}
+            </button>
+          </div>
         )}
         <p className="fine-print">
           By continuing, you agree to our <Link to="/policies/terms">Terms</Link> and{' '}
