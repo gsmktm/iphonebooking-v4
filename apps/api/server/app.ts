@@ -18,6 +18,8 @@ import { commerce } from './routes/commerce.js';
 import { account } from './routes/account.js';
 import { services } from './routes/services.js';
 import { admin } from './routes/admin.js';
+import { media, adminMedia } from './routes/product-media.js';
+import { productStudio } from './routes/product-studio.js';
 import { adminCreate } from './routes/admin-create.js';
 import { operations } from './routes/operations.js';
 import { shopState } from './routes/shop-state.js';
@@ -119,6 +121,7 @@ app.get(['/api/health', '/ready'], async (_req, res) => {
 });
 app.use('/api/v1', identity);
 app.use('/api/v1/auth', auth);
+app.use('/api/v1', media);
 app.use('/api/v1', catalog);
 app.use('/api/v1', home);
 app.use('/api/v1', commerce);
@@ -130,6 +133,8 @@ app.use('/api/v1', information);
 app.use('/api/v1', reviews);
 app.use('/api/v1', legacyScaffolds);
 app.use('/api/v1', deviceLifecycle);
+app.use('/api/v1/admin', adminMedia);
+app.use('/api/v1/admin', productStudio);
 app.use('/api/v1/admin', adminCreate);
 app.use('/api/v1/admin', operations);
 app.use('/api/v1/admin', repairOperations);
@@ -162,6 +167,10 @@ const errors: ErrorRequestHandler = (error, req, res, _next) => {
     status = error.status;
     code = error.code;
     message = error.message;
+  } else if (error?.type === 'entity.too.large') {
+    status = 413;
+    code = 'UPLOAD_TOO_LARGE';
+    message = 'The uploaded image exceeds the 6 MB limit.';
   } else if (error instanceof SyntaxError && 'body' in error) {
     status = 400;
     code = 'INVALID_JSON';

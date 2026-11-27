@@ -1,0 +1,11 @@
+.product-photo-attribution {
+  margin: 0.7rem 0 1.2rem;
+  color: var(--muted, #737373);
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+.product-photo-attribution a {
+  color: var(--accent-text, #9b733c);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

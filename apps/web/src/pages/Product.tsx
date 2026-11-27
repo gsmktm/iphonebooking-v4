@@ -1,3 +1,4 @@
+import '../pages/product-media-credits.css';
 import { displaySpecValue } from '../services/product-spec';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
@@ -24,6 +25,22 @@ export default function Product() {
   const result = useQuery({
     queryKey: ['product', slug],
     queryFn: () => api<ProductType & { related: ProductType[] }>(`/products/${slug}`),
+  });
+  const credits = useQuery({
+    queryKey: ['product-photo-credits', slug],
+    queryFn: () =>
+      api<
+        {
+          url: string;
+          sourceType: string;
+          sourceCredit: string;
+          sourceUrl: string | null;
+          license: string | null;
+          licenseUrl: string | null;
+          altText: string;
+        }[]
+      >('/media/credits?slug=' + encodeURIComponent(slug ?? '')),
+    enabled: Boolean(slug),
   });
   const p = result.data;
   const [color, setColor] = useState(''),
@@ -83,6 +100,9 @@ export default function Product() {
     track('variant_selected', next?.id ?? v.id);
   };
   const gallery = [...new Set([v.image ?? p.image, ...p.gallery])];
+  const currentPhotoCredit = credits.data?.find(
+    (credit) => credit.url === (gallery[galleryIndex] ?? gallery[0]),
+  );
   const addToBag = () => {
     add(p, v);
     setAdded(true);
@@ -119,8 +139,41 @@ export default function Product() {
           </div>
           <div className="gallery-caption">
             <span>{p.name}</span>
-            <span>Illustrative studio render</span>
+            <span>
+              {gallery[galleryIndex]?.startsWith('/api/v1/media/')
+                ? 'Original device photograph'
+                : 'Illustrative studio render'}
+            </span>
           </div>
+          {currentPhotoCredit && (
+            <div className="product-photo-attribution">
+              Photo: {currentPhotoCredit.sourceCredit}
+              {currentPhotoCredit.sourceUrl && (
+                <>
+                  {' · '}
+                  <a href={currentPhotoCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    Original image source
+                  </a>
+                </>
+              )}
+              {currentPhotoCredit.license && (
+                <>
+                  {' · '}
+                  {currentPhotoCredit.licenseUrl ? (
+                    <a
+                      href={currentPhotoCredit.licenseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {currentPhotoCredit.license}
+                    </a>
+                  ) : (
+                    currentPhotoCredit.license
+                  )}
+                </>
+              )}
+            </div>
+          )}
           <div className="product-benefits">
             <span>
               <ShieldCheck size={19} />

@@ -31,6 +31,7 @@ type HistoryDevice = {
   imageCredit: string | null;
   imageLicense: string | null;
   imageLicenseUrl: string | null;
+  gallery: string[];
   checkedAt: string;
 };
 type Page = {
@@ -58,9 +59,7 @@ const validFamilies: Family[] = families.map((item) => item.slug);
 function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?: boolean }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const label = `${device.name} (${device.introducedYear})`;
-  const hasPhoto = Boolean(
-    device.imageUrl && device.imageSourceUrl && device.imageUrl !== failedUrl,
-  );
+  const hasPhoto = Boolean(device.imageUrl && device.imageUrl !== failedUrl);
   return (
     <div
       className={`apple-history-photo apple-history-photo--${device.family} ${large ? 'apple-history-photo--large' : ''}`}
@@ -92,21 +91,40 @@ function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?
   );
 }
 
-function ArchiveCredit({ device }: { device: HistoryDevice }) {
-  if (!device.imageSourceUrl || !device.imageLicense) return null;
+type ArchivePhotoCredit = {
+  url: string;
+  sourceCredit: string;
+  sourceUrl: string | null;
+  license: string | null;
+  licenseUrl: string | null;
+};
+function ArchiveCredit({ device, credit }: { device: HistoryDevice; credit?: ArchivePhotoCredit }) {
+  const photographer = credit?.sourceCredit ?? device.imageCredit;
+  const source = credit?.sourceUrl ?? device.imageSourceUrl;
+  const license = credit?.license ?? device.imageLicense;
+  const licenseUrl = credit?.licenseUrl ?? device.imageLicenseUrl;
+  if (!device.imageUrl || !photographer) return null;
   return (
     <div className="apple-history-credit">
-      Photo: {device.imageCredit || 'Wikimedia Commons contributor'} ·{' '}
-      <a href={device.imageSourceUrl} rel="noopener noreferrer" target="_blank">
-        Wikimedia Commons
-      </a>{' '}
-      ·{' '}
-      {device.imageLicenseUrl ? (
-        <a href={device.imageLicenseUrl} rel="noopener noreferrer" target="_blank">
-          {device.imageLicense}
+      Photo: {photographer} ·{' '}
+      {source ? (
+        <a href={source} rel="noopener noreferrer" target="_blank">
+          Original image source
         </a>
       ) : (
-        device.imageLicense
+        'Original photograph'
+      )}
+      {license && (
+        <>
+          {' · '}
+          {licenseUrl ? (
+            <a href={licenseUrl} rel="noopener noreferrer" target="_blank">
+              {license}
+            </a>
+          ) : (
+            license
+          )}
+        </>
       )}
     </div>
   );
@@ -366,6 +384,20 @@ export function AppleHistoryDetail() {
     queryFn: () => api<HistoryDevice>(`/apple-history/${encodeURIComponent(slug ?? '')}`),
     enabled: Boolean(slug),
   });
+  const mediaCredits = useQuery({
+    queryKey: ['apple-history-media-credits', slug],
+    queryFn: () =>
+      api<
+        {
+          url: string;
+          sourceCredit: string;
+          sourceUrl: string | null;
+          license: string | null;
+          licenseUrl: string | null;
+        }[]
+      >('/media/credits?archive=' + encodeURIComponent(slug ?? '')),
+    enabled: Boolean(slug),
+  });
   if (result.isLoading)
     return (
       <div className="container page">
@@ -445,7 +477,62 @@ export function AppleHistoryDetail() {
         </div>
         <div>
           <ArchivePhoto device={device} large />
-          <ArchiveCredit device={device} />
+          <ArchiveCredit
+            device={device}
+            credit={mediaCredits.data?.find((photo) => photo.url === device.imageUrl)}
+          />
+          {device.gallery.length > 0 && (
+            <div className="apple-history-additional-images">
+              <h2>Additional historical views</h2>
+              <div className="apple-history-additional-grid">
+                {device.gallery.map((url, index) => {
+                  const attribution = mediaCredits.data?.find((photo) => photo.url === url);
+                  return (
+                    <figure key={url}>
+                      <img
+                        src={url}
+                        loading="lazy"
+                        alt={device.name + ' historic photo, view ' + (index + 2)}
+                      />
+                      {attribution && (
+                        <figcaption>
+                          Photo: {attribution.sourceCredit}
+                          {attribution.sourceUrl && (
+                            <>
+                              {' · '}
+                              <a
+                                href={attribution.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Source
+                              </a>
+                            </>
+                          )}
+                          {attribution.license && (
+                            <>
+                              {' · '}
+                              {attribution.licenseUrl ? (
+                                <a
+                                  href={attribution.licenseUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {attribution.license}
+                                </a>
+                              ) : (
+                                attribution.license
+                              )}
+                            </>
+                          )}
+                        </figcaption>
+                      )}
+                    </figure>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </article>

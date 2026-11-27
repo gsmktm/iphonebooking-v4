@@ -67,6 +67,7 @@ const appleHistorySelect = {
   imageCredit: true,
   imageLicense: true,
   imageLicenseUrl: true,
+  gallery: true,
   checkedAt: true,
 } as const;
 catalog.get('/apple-history/summary', async (_req, res) => {
