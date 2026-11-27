@@ -80,7 +80,11 @@
   gap: 1.05rem;
   margin-bottom: clamp(1.7rem, 3vw, 3rem);
   color: var(--cinema-gold);
-  font: 500 0.72rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font:
+    500 0.72rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
   letter-spacing: 0.34em;
 }
 .cinematic-category-dash {
@@ -186,7 +190,9 @@
   letter-spacing: 0.01em;
   border-radius: 5px;
   padding: 0.8rem 1.25rem;
-  transition: background-color 180ms ease, border-color 180ms ease;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
 }
 .cinematic-category-primary {
   background: #c6a348;
@@ -229,7 +235,11 @@
   font-weight: 400;
 }
 .cinematic-category-facts span {
-  font: 500 0.63rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font:
+    500 0.63rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
   letter-spacing: 0.065em;
   color: #92959e;
 }
@@ -324,10 +334,19 @@
   background: linear-gradient(130deg, #d1af59, #9b731e);
   color: #11100b;
   box-shadow: 0 12px 30px rgb(0 0 0 / 0.23);
-  clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 11px 100%, 0 calc(100% - 11px));
+  clip-path: polygon(
+    0 0,
+    calc(100% - 11px) 0,
+    100% 11px,
+    100% 100%,
+    11px 100%,
+    0 calc(100% - 11px)
+  );
 }
 .cinematic-category-price-tag small {
-  font: 600 0.64rem ui-monospace, monospace;
+  font:
+    600 0.64rem ui-monospace,
+    monospace;
   letter-spacing: 0.22em;
 }
 .cinematic-category-price-tag strong {
