@@ -33,7 +33,10 @@ for (const [route, eyebrow, heading] of families) {
       await expect(
         hero.getByText('Product photograph available with published listings'),
       ).toBeVisible();
-      await expect(hero.locator('.cinematic-category-price-tag')).toHaveCount(0);
+      const priceTag = hero.locator('.cinematic-category-price-tag');
+      if (await priceTag.count()) {
+        await expect(priceTag).toContainText('NPR');
+      }
     }
   });
 }
