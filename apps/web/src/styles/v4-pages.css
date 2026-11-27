@@ -299,3 +299,19 @@
   .storefront .category-chips a:hover,
   .admin-app .admin-metrics > a:hover { transform: none; }
 }
+/* On compact screens, a closed operations sidebar must not keep hidden focusable links. */
+.admin-app .admin-sidebar { visibility: hidden; }
+.admin-app .admin-sidebar.open { visibility: visible; }
+.admin-app .admin-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  display: block;
+  z-index: 55;
+  cursor: default;
+  background: rgb(0 0 0 / 0.58);
+  border: 0;
+}
+@media (min-width: 1024px) {
+  .admin-app .admin-sidebar { visibility: visible; }
+  .admin-app .admin-nav-backdrop { display: none; }
+}
