@@ -1,0 +1,25 @@
+name: Apple history source formatter (temporary)
+on: [push]
+jobs:
+  format:
+    if: github.ref == 'refs/heads/feature/apple-history-archive-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Print formatted source for exact patching
+        run: |
+          pnpm exec prettier --write apps/web/src/pages/AppleHistory.tsx apps/web/src/pages/apple-history.css apps/web/src/app/App.tsx apps/web/src/components/Shell.tsx apps/api/server/routes/catalog.ts tests/e2e/apple-history.spec.ts docs/apple-history-archive.md
+          for file in apps/web/src/pages/AppleHistory.tsx apps/web/src/pages/apple-history.css apps/web/src/app/App.tsx apps/web/src/components/Shell.tsx apps/api/server/routes/catalog.ts tests/e2e/apple-history.spec.ts docs/apple-history-archive.md; do
+            echo "FORMATTED_BEGIN:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
