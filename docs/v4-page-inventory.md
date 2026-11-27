@@ -13,31 +13,31 @@ Every template must render its correct backend data and distinct content, suppor
 
 ### Route inventory
 
-| Area | Routes / route families | Primary component | Shared visual layer | Per-route browser QA |
-| --- | --- | --- | --- | --- |
-| Home | `/` | `Home.tsx` and home features | Existing premium homepage; shared global components updated | NOT RUN |
-| Catalog | `/store`, `/catalog`, `/search`, `/deals`, `/prebook`, `/wishlist` | `Catalog.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Category | `/iphone` | `IPhone.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Other categories | `/mac`, `/ipad`, `/watch`, `/airpods`, `/accessories`, `/vision`, `/home` | `Category.tsx` / `Catalog.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Product details | `/products/:slug`, `/iphone/:slug` | `Product.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Cart / compare | `/cart`, `/compare` | `Commerce.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Checkout | `/checkout` | `Commerce.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Checkout outcome | `/confirmation`, `/checkout/success`, `/checkout/failure` | `Confirmation.tsx`, `PaymentFailure.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Order tracking | `/track` | `Commerce.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Trade-in | `/trade-in`, `/exchange`, `/sell-device` | `Services.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Repairs | `/repair`, `/repair/:ticketId` | `Services.tsx`, `RepairTracking.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Account access | `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email` | `Account.tsx`, `account/AuthRecovery.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Account sections | `/account`, `/account/:section` | `Account.tsx`, account features | V4 CSS + wayfinding | NOT RUN |
-| Device passport | `/account/devices/:id` | `account/Passport.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Stores | `/stores`, `/stores/:slug` | `Information.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Retailers | `/retailer-network`, `/retailer` | `Retailer.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Device intelligence | `/world-price-map`, `/imei-check` | `Intelligence.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Editorial | `/blog`, `/blog/:slug`, `/news`, `/news/:slug` | `Information.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Help / policies | `/support`, `/support/:slug`, `/policies/:slug`, `/campaign/:slug`, `/faq` | `Information.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Company | `/about`, `/about-us`, `/contact-us`, `/careers`, `/press-room`, `/history`, `/cookies`, `/accessibility` | `Information.tsx` | V4 CSS + wayfinding | NOT RUN |
-| Admin dashboard | `/admin` | `Admin.tsx`, `admin/Dashboard.tsx` | V4 CSS + mobile menu fix | NOT RUN |
-| Admin resources | `/admin/:resource` | `Admin.tsx`, `admin/ResourcePage.tsx` | V4 CSS + mobile menu fix | NOT RUN |
-| Not found | unmatched `*` | `Information.tsx` | V4 CSS + wayfinding | NOT RUN |
+| Area                | Routes / route families                                                                                   | Primary component                         | Shared visual layer                                         | Per-route browser QA |
+| ------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------- | -------------------- |
+| Home                | `/`                                                                                                       | `Home.tsx` and home features              | Existing premium homepage; shared global components updated | NOT RUN              |
+| Catalog             | `/store`, `/catalog`, `/search`, `/deals`, `/prebook`, `/wishlist`                                        | `Catalog.tsx`                             | V4 CSS + wayfinding                                         | NOT RUN              |
+| Category            | `/iphone`                                                                                                 | `IPhone.tsx`                              | V4 CSS + wayfinding                                         | NOT RUN              |
+| Other categories    | `/mac`, `/ipad`, `/watch`, `/airpods`, `/accessories`, `/vision`, `/home`                                 | `Category.tsx` / `Catalog.tsx`            | V4 CSS + wayfinding                                         | NOT RUN              |
+| Product details     | `/products/:slug`, `/iphone/:slug`                                                                        | `Product.tsx`                             | V4 CSS + wayfinding                                         | NOT RUN              |
+| Cart / compare      | `/cart`, `/compare`                                                                                       | `Commerce.tsx`                            | V4 CSS + wayfinding                                         | NOT RUN              |
+| Checkout            | `/checkout`                                                                                               | `Commerce.tsx`                            | V4 CSS + wayfinding                                         | NOT RUN              |
+| Checkout outcome    | `/confirmation`, `/checkout/success`, `/checkout/failure`                                                 | `Confirmation.tsx`, `PaymentFailure.tsx`  | V4 CSS + wayfinding                                         | NOT RUN              |
+| Order tracking      | `/track`                                                                                                  | `Commerce.tsx`                            | V4 CSS + wayfinding                                         | NOT RUN              |
+| Trade-in            | `/trade-in`, `/exchange`, `/sell-device`                                                                  | `Services.tsx`                            | V4 CSS + wayfinding                                         | NOT RUN              |
+| Repairs             | `/repair`, `/repair/:ticketId`                                                                            | `Services.tsx`, `RepairTracking.tsx`      | V4 CSS + wayfinding                                         | NOT RUN              |
+| Account access      | `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`                             | `Account.tsx`, `account/AuthRecovery.tsx` | V4 CSS + wayfinding                                         | NOT RUN              |
+| Account sections    | `/account`, `/account/:section`                                                                           | `Account.tsx`, account features           | V4 CSS + wayfinding                                         | NOT RUN              |
+| Device passport     | `/account/devices/:id`                                                                                    | `account/Passport.tsx`                    | V4 CSS + wayfinding                                         | NOT RUN              |
+| Stores              | `/stores`, `/stores/:slug`                                                                                | `Information.tsx`                         | V4 CSS + wayfinding                                         | NOT RUN              |
+| Retailers           | `/retailer-network`, `/retailer`                                                                          | `Retailer.tsx`                            | V4 CSS + wayfinding                                         | NOT RUN              |
+| Device intelligence | `/world-price-map`, `/imei-check`                                                                         | `Intelligence.tsx`                        | V4 CSS + wayfinding                                         | NOT RUN              |
+| Editorial           | `/blog`, `/blog/:slug`, `/news`, `/news/:slug`                                                            | `Information.tsx`                         | V4 CSS + wayfinding                                         | NOT RUN              |
+| Help / policies     | `/support`, `/support/:slug`, `/policies/:slug`, `/campaign/:slug`, `/faq`                                | `Information.tsx`                         | V4 CSS + wayfinding                                         | NOT RUN              |
+| Company             | `/about`, `/about-us`, `/contact-us`, `/careers`, `/press-room`, `/history`, `/cookies`, `/accessibility` | `Information.tsx`                         | V4 CSS + wayfinding                                         | NOT RUN              |
+| Admin dashboard     | `/admin`                                                                                                  | `Admin.tsx`, `admin/Dashboard.tsx`        | V4 CSS + mobile menu fix                                    | NOT RUN              |
+| Admin resources     | `/admin/:resource`                                                                                        | `Admin.tsx`, `admin/ResourcePage.tsx`     | V4 CSS + mobile menu fix                                    | NOT RUN              |
+| Not found           | unmatched `*`                                                                                             | `Information.tsx`                         | V4 CSS + wayfinding                                         | NOT RUN              |
 
 ### Account sub-sections that must be tested
 
@@ -45,12 +45,12 @@ Every template must render its correct backend data and distinct content, suppor
 
 ### Administration sub-sections that must be tested with appropriate scoped permissions
 
-| Group | Resource keys |
-| --- | --- |
-| Commerce | `orders`, `bookings`, `products`, `categories`, `variants`, `payments`, `order-ledger`, `reconciliation`, `refunds` |
+| Group            | Resource keys                                                                                                                                                                                                                                                        |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Commerce         | `orders`, `bookings`, `products`, `categories`, `variants`, `payments`, `order-ledger`, `reconciliation`, `refunds`                                                                                                                                                  |
 | Device lifecycle | `inventory`, `inventory-ledger`, `units`, `repairs`, `trade-ins`, `valuation-rules`, `device-identity`, `device-event`, `device-risk-check`, `parts`, `part-movements`, `trade-in-quote`, `repair-qc`, `repair-warranty`, `suppliers`, `purchase-orders`, `receipts` |
-| People / content | `customers`, `stores`, `retailer-applications`, `price-intelligence`, `content`, `reviews`, `tickets`, `notifications`, `subscribers` |
-| System | `roles`, `audit-logs`, `jobs` |
+| People / content | `customers`, `stores`, `retailer-applications`, `price-intelligence`, `content`, `reviews`, `tickets`, `notifications`, `subscribers`                                                                                                                                |
+| System           | `roles`, `audit-logs`, `jobs`                                                                                                                                                                                                                                        |
 
 Some resource keys may be intentionally disabled depending on permissions and implementation state. A schema or UI entry does not prove a complete backend workflow.
 
