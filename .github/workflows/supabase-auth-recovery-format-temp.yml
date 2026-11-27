@@ -1,0 +1,25 @@
+name: Format final Auth safety fixes (temporary)
+on: [push]
+jobs:
+  format-preview:
+    if: github.ref == 'refs/heads/feature/supabase-auth-bridge-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Output exact formatted recovery rules
+        run: |
+          pnpm exec prettier --write apps/api/server/routes/auth.ts apps/api/server/services/account-recovery.ts
+          for file in apps/api/server/routes/auth.ts apps/api/server/services/account-recovery.ts; do
+            echo "FORMATTED_BEGIN:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
