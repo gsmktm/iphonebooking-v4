@@ -1,0 +1,23 @@
+name: Apple history fallback format (temporary)
+on: [push]
+jobs:
+  prettier:
+    if: github.ref == 'refs/heads/feature/apple-history-archive-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Print formatted fallback component
+        run: |
+          pnpm exec prettier --write apps/web/src/pages/AppleHistory.tsx
+          echo FORMATTED_BEGIN:apps/web/src/pages/AppleHistory.tsx
+          base64 -w0 apps/web/src/pages/AppleHistory.tsx
+          echo
+          echo FORMATTED_END:apps/web/src/pages/AppleHistory.tsx
