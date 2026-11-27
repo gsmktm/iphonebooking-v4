@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { money } from '../../services/api';
+import { ProductVisual } from '../../components/ui';
 import type { HomeFeed, Product } from '../../services/types';
 import type { PreviewDevice } from './ProductPreview';
 import './device-frames.css';
 
-type DeviceKind = 'iphone' | 'mac' | 'ipad' | 'watch';
+export type DeviceKind = 'iphone' | 'mac' | 'ipad' | 'watch' | 'airpods' | 'accessories';
 
 const families: {
   kind: DeviceKind;
@@ -44,17 +45,21 @@ const families: {
   },
 ];
 
-function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string }) {
+export function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string }) {
   // Product pictures may already show the whole device. In that case the
   // product art is contained within the frame rather than cropped into a fake UI.
-  const catalogArtwork = image?.startsWith('/images/') ? image : undefined;
+  const artwork = image?.startsWith('/images/') ? (
+    <img src={image} alt="" loading="lazy" />
+  ) : (
+    <ProductVisual image={image || (kind === 'iphone' ? 'phone' : kind)} name="" className="home-frame-product-artwork" />
+  );
   return (
     <div className={`home-device-frame home-device-frame--${kind}`} aria-hidden="true">
       {kind === 'iphone' && (
         <div className="home-frame-phone">
           <div className="home-frame-screen">
             <span className="home-frame-wallpaper" />
-            {catalogArtwork && <img src={catalogArtwork} alt="" loading="lazy" />}
+            {artwork}
             <span className="home-frame-island" />
             <span className="home-frame-homebar" />
           </div>
@@ -66,7 +71,7 @@ function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string }) {
             <span className="home-frame-mac-camera" />
             <div className="home-frame-screen">
               <span className="home-frame-wallpaper" />
-              {catalogArtwork && <img src={catalogArtwork} alt="" loading="lazy" />}
+              {artwork}
             </div>
           </div>
           <span className="home-frame-mac-base">
@@ -79,8 +84,24 @@ function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string }) {
           <span className="home-frame-ipad-camera" />
           <div className="home-frame-screen">
             <span className="home-frame-wallpaper" />
-            {catalogArtwork && <img src={catalogArtwork} alt="" loading="lazy" />}
+            {artwork}
           </div>
+        </div>
+      )}
+      {kind === 'airpods' && (
+        <div className="home-frame-airpods">
+          <span className="home-frame-airpods-lid" />
+          <div className="home-frame-airpods-body">
+            <div className="home-frame-screen">{artwork}</div>
+            <span className="home-frame-airpods-status" />
+          </div>
+        </div>
+      )}
+      {kind === 'accessories' && (
+        <div className="home-frame-accessories">
+          <span className="home-frame-accessories-header" />
+          <div className="home-frame-screen">{artwork}</div>
+          <span className="home-frame-accessories-footer" />
         </div>
       )}
       {kind === 'watch' && (
@@ -89,13 +110,7 @@ function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string }) {
           <div className="home-frame-watch-case">
             <div className="home-frame-screen">
               <span className="home-frame-wallpaper" />
-              {catalogArtwork ? (
-                <img src={catalogArtwork} alt="" loading="lazy" />
-              ) : (
-                <span className="home-frame-watch-dial">
-                  <span className="home-frame-watch-dial-inner" />
-                </span>
-              )}
+              {artwork}
             </div>
           </div>
           <span className="home-frame-watch-crown" />
