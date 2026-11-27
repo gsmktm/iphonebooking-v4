@@ -529,9 +529,10 @@ const productSchema = z.object({
   description: z.string().max(4000),
   categoryId: z.string(),
   image: z.string().regex(/^\/(?:images\/[a-zA-Z0-9._-]+|api\/v1\/media\/[0-9a-f-]{36})$/i),
-  gallery: z.array(
-    z.string().regex(/^\/(?:images\/[a-zA-Z0-9._-]+|api\/v1\/media\/[0-9a-f-]{36})$/i),
-  ).max(16).default([]),
+  gallery: z
+    .array(z.string().regex(/^\/(?:images\/[a-zA-Z0-9._-]+|api\/v1\/media\/[0-9a-f-]{36})$/i))
+    .max(16)
+    .default([]),
   specs: z
     .record(z.string().max(90), z.any())
     .refine((value) => JSON.stringify(value).length <= 12000, {
@@ -580,7 +581,11 @@ admin.patch('/products/:id', permit('product.update'), async (req, res) => {
         data,
       });
       if (!changed.count)
-        throw new AppError(409, 'PRODUCT_EDIT_CONFLICT', 'This product changed elsewhere. Reload and try again.');
+        throw new AppError(
+          409,
+          'PRODUCT_EDIT_CONFLICT',
+          'This product changed elsewhere. Reload and try again.',
+        );
       const after = owned(await tx.product.findUnique({ where: { id: before.id } }));
       await tx.auditLog.create({
         data: {
@@ -603,7 +608,11 @@ admin.patch('/variants/:id', permit('product.update'), async (req, res) => {
       price: z.number().int().min(100).max(1000000000),
       deposit: z.number().int().min(0).max(1000000000),
       preorder: z.boolean(),
-      image: z.string().regex(/^\/api\/v1\/media\/[0-9a-f-]{36}$/i).nullable().optional(),
+      image: z
+        .string()
+        .regex(/^\/api\/v1\/media\/[0-9a-f-]{36}$/i)
+        .nullable()
+        .optional(),
       comparePrice: z.number().int().min(100).max(1000000000).nullable().optional(),
     })
     .refine((v) => v.deposit <= v.price)
