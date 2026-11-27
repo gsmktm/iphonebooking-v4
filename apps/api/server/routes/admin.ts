@@ -532,7 +532,12 @@ const productSchema = z.object({
   gallery: z.array(
     z.string().regex(/^\/(?:images\/[a-zA-Z0-9._-]+|api\/v1\/media\/[0-9a-f-]{36})$/i),
   ).max(16).default([]),
-  specs: z.record(z.string(), z.string()).default({}),
+  specs: z
+    .record(z.string().max(90), z.any())
+    .refine((value) => JSON.stringify(value).length <= 12000, {
+      message: 'Keep the product specifications below 12 KB.',
+    })
+    .default({}),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
   badge: z.string().max(30).nullable().optional(),
@@ -599,6 +604,7 @@ admin.patch('/variants/:id', permit('product.update'), async (req, res) => {
       deposit: z.number().int().min(0).max(1000000000),
       preorder: z.boolean(),
       image: z.string().regex(/^\/api\/v1\/media\/[0-9a-f-]{36}$/i).nullable().optional(),
+      comparePrice: z.number().int().min(100).max(1000000000).nullable().optional(),
     })
     .refine((v) => v.deposit <= v.price)
     .parse(req.body);
