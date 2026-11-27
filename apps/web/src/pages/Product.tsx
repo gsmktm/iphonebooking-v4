@@ -1,3 +1,4 @@
+import '../pages/product-media-credits.css';
 import { displaySpecValue } from '../services/product-spec';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
