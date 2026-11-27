@@ -1,0 +1,22 @@
+name: Media studio documentation format (temporary)
+on: [push]
+jobs:
+  format:
+    if: github.ref == 'refs/heads/feature/product-media-studio-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: |
+          pnpm exec prettier --write docs/product-media-studio.md
+          echo FORMATTED_BEGIN:docs/product-media-studio.md
+          base64 -w0 docs/product-media-studio.md
+          echo
+          echo FORMATTED_END:docs/product-media-studio.md
