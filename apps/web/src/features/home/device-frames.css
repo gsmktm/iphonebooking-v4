@@ -6,8 +6,16 @@
   padding-block: clamp(3.5rem, 6vw, 6rem);
   border-block: 1px solid var(--line);
   background:
-    radial-gradient(ellipse 46% 48% at 8% 6%, color-mix(in srgb, var(--gold) 9%, transparent), transparent),
-    radial-gradient(ellipse 44% 50% at 97% 96%, color-mix(in srgb, var(--info) 7%, transparent), transparent),
+    radial-gradient(
+      ellipse 46% 48% at 8% 6%,
+      color-mix(in srgb, var(--gold) 9%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 44% 50% at 97% 96%,
+      color-mix(in srgb, var(--info) 7%, transparent),
+      transparent
+    ),
     var(--canvas);
 }
 .home-device-showcase-heading {
@@ -67,9 +75,16 @@
   padding: clamp(1rem, 2vw, 1.5rem);
   border: 1px solid color-mix(in srgb, var(--gold) 24%, var(--line));
   border-radius: 1.25rem;
-  background: linear-gradient(155deg, var(--surface), color-mix(in srgb, var(--surface) 86%, var(--canvas)));
+  background: linear-gradient(
+    155deg,
+    var(--surface),
+    color-mix(in srgb, var(--surface) 86%, var(--canvas))
+  );
   box-shadow: 0 12px 36px rgb(0 0 0 / 0.085);
-  transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
   overflow: hidden;
 }
 .home-device-family:hover,
@@ -277,7 +292,9 @@
   border: 3px solid #93989c;
   border-radius: 17px;
   background: #121519;
-  box-shadow: inset 0 0 0 2px #080b0e, 8px 17px 26px rgb(0 0 0 / 0.2);
+  box-shadow:
+    inset 0 0 0 2px #080b0e,
+    8px 17px 26px rgb(0 0 0 / 0.2);
 }
 .home-frame-ipad-camera {
   position: absolute;
@@ -334,7 +351,9 @@
   border: 3px solid #a6b0af;
   border-radius: 39px;
   background: linear-gradient(120deg, #1b2023, #586361, #161c1e);
-  box-shadow: inset 0 0 0 3px #080a0b, 7px 14px 25px rgb(0 0 0 / 0.25);
+  box-shadow:
+    inset 0 0 0 3px #080a0b,
+    7px 14px 25px rgb(0 0 0 / 0.25);
 }
 .home-device-frame--watch .home-frame-screen {
   border-radius: 26px;
@@ -360,7 +379,15 @@
   border: 10px solid transparent;
   background:
     linear-gradient(#101c25, #101c25) padding-box,
-    conic-gradient(#dc8e75 0 120deg, transparent 120deg 132deg, #9bd2bf 132deg 267deg, transparent 267deg 276deg, #d4b87b 276deg 355deg, transparent 355deg) border-box;
+    conic-gradient(
+        #dc8e75 0 120deg,
+        transparent 120deg 132deg,
+        #9bd2bf 132deg 267deg,
+        transparent 267deg 276deg,
+        #d4b87b 276deg 355deg,
+        transparent 355deg
+      )
+      border-box;
   transform: rotate(-12deg);
 }
 .home-frame-watch-dial-inner {
@@ -419,7 +446,9 @@
   border-radius: 50%;
   background: var(--gold);
   color: #11181a;
-  transition: transform 200ms ease, background 200ms ease;
+  transition:
+    transform 200ms ease,
+    background 200ms ease;
 }
 .home-device-family-action:hover,
 .home-device-family-action:focus-visible {
