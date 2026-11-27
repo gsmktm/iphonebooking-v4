@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { ImagePlus, UploadCloud } from 'lucide-react';
 import { MAX_UPLOAD_SIZE, type UploadedAsset } from './media-types';
 
@@ -20,7 +20,7 @@ export function MediaUploader({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const upload = async (event: React.FormEvent<HTMLFormElement>) => {
+  const upload = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file || busy || disabled) return;
     setError('');
