@@ -55,12 +55,7 @@ app.use(
         defaultSrc: ["'self'"],
         // Historical photos are license-verified Wikimedia Commons files only.
         // Permit these two exact media hosts; keep all other external image hosts blocked.
-        imgSrc: [
-          "'self'",
-          'data:',
-          'https://thumb.wikimedia.org',
-          'https://upload.wikimedia.org',
-        ],
+        imgSrc: ["'self'", 'data:', 'https://thumb.wikimedia.org', 'https://upload.wikimedia.org'],
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         connectSrc: ["'self'"],
