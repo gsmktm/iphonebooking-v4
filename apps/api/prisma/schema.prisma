@@ -112,6 +112,29 @@ model Category {
 /// Never mix these records with merchant stock, prices, bookings, or orders.
 /// Independent editorial archive of factual Apple product history.
 /// No orders, stock, local prices, checkout or customer relations.
+/// Private, license-attributed object storage records for admin-managed photos.
+/// Publication occurs only when referenced by an active retail product or archive entry.
+model MediaAsset {
+  id              String   @id @default(uuid())
+  storageKey      String   @unique
+  originalName    String
+  mimeType        String
+  byteSize        Int
+  sha256          String
+  sourceType      String
+  sourceUrl       String?
+  sourceCredit    String
+  license         String?
+  licenseUrl      String?
+  altText         String
+  uploadedById    String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([uploadedById])
+}
+
 model AppleHistoryDevice {
   id             String   @id
   slug           String   @unique
@@ -128,6 +151,7 @@ model AppleHistoryDevice {
   imageCredit    String?
   imageLicense   String?
   imageLicenseUrl String?
+  gallery        String[] @default([])
   checkedAt      DateTime
   createdAt      DateTime @default(now())
 
