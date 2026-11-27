@@ -25,6 +25,9 @@ import {
   Status,
   Loading,
 } from '../components/ui';
+const specValuesDiffer = (products: Product[], key: string) =>
+  new Set(products.map((product) => displaySpecValue(product.specs[key]))).size > 1;
+
 export function Cart() {
   const { cart, quantity } = useShop();
   const total = cart.reduce((sum, i) => sum + i.quantity * i.price, 0);
@@ -551,7 +554,7 @@ export function Compare() {
                 {[...new Set(list.flatMap((p) => Object.keys(p.specs)))].map((key) => (
                   <tr
                     key={key}
-                    className={new Set(list.map((p) => displaySpecValue(p.specs[key]))).size > 1 ? 'different' : ''}
+                    className={specValuesDiffer(list, key) ? 'different' : ''}
                   >
                     <th>{key}</th>
                     {list.map((p) => (
