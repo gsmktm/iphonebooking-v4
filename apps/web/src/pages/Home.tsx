@@ -19,6 +19,7 @@ import {
 } from '../features/home/home-sections';
 import { HomeExplore, HomeFinderIntro, HomeSpotlights } from '../features/home/HomeDiscovery';
 import DeviceFinder from '../features/home/DeviceFinder';
+import HomeDeviceFrames from '../features/home/HomeDeviceFrames';
 import HomePersonalShelf from '../features/home/HomePersonalShelf';
 import ProductPreview, {
   type DeviceSelection,
@@ -130,6 +131,7 @@ export default function Home() {
         }
       />
       <HomeTrustBar />
+      <HomeDeviceFrames data={data} onPreview={preview} />
       <HomeQuickActions />
       {!!feed.error && (
         <div className="container">

@@ -1,0 +1,484 @@
+/* Signature home collection: each product family lives inside its own
+ * recognizable device silhouette, not a generic rectangular product card.
+ * Actual products, names and prices come exclusively from the home API.
+ */
+.home-device-showcase {
+  padding-block: clamp(3.5rem, 6vw, 6rem);
+  border-block: 1px solid var(--line);
+  background:
+    radial-gradient(
+      ellipse 46% 48% at 8% 6%,
+      color-mix(in srgb, var(--gold) 9%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 44% 50% at 97% 96%,
+      color-mix(in srgb, var(--info) 7%, transparent),
+      transparent
+    ),
+    var(--canvas);
+}
+.home-device-showcase-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  flex-wrap: wrap;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+.home-device-showcase-heading .eyebrow {
+  color: var(--accent-text);
+  font-size: 0.6875rem;
+}
+.home-device-showcase-heading h2 {
+  max-width: 19ch;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  margin: 0.7rem 0 0.85rem;
+  text-wrap: balance;
+}
+.home-device-showcase-heading h2 em {
+  color: var(--accent-text);
+  font-weight: 400;
+}
+.home-device-showcase-heading p {
+  max-width: 35rem;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  line-height: 1.75;
+  margin: 0;
+}
+.home-device-showcase-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  min-height: 44px;
+  border-bottom: 1px solid var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-text);
+  white-space: nowrap;
+}
+.home-device-showcase-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+.home-device-family {
+  --device-glow: color-mix(in srgb, var(--gold) 20%, transparent);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid color-mix(in srgb, var(--gold) 24%, var(--line));
+  border-radius: 1.25rem;
+  background: linear-gradient(
+    155deg,
+    var(--surface),
+    color-mix(in srgb, var(--surface) 86%, var(--canvas))
+  );
+  box-shadow: 0 12px 36px rgb(0 0 0 / 0.085);
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
+  overflow: hidden;
+}
+.home-device-family:hover,
+.home-device-family:focus-within {
+  border-color: color-mix(in srgb, var(--gold) 70%, var(--line));
+  transform: translateY(-3px);
+  box-shadow: 0 22px 55px rgb(0 0 0 / 0.14);
+}
+.home-device-family--mac {
+  --device-glow: color-mix(in srgb, #8cadd2 24%, transparent);
+}
+.home-device-family--ipad {
+  --device-glow: color-mix(in srgb, #ad8ecc 25%, transparent);
+}
+.home-device-family--watch {
+  --device-glow: color-mix(in srgb, #7dbdac 23%, transparent);
+}
+.home-device-family-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+}
+.home-device-family-number {
+  font-size: 0.65rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+}
+.home-device-family-name {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--accent-text);
+  font-size: 0.69rem;
+  letter-spacing: 0.035em;
+}
+.home-device-family-frame-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 296px;
+  width: 100%;
+  margin-block: 0.35rem 0.65rem;
+  border-radius: 1rem;
+  background: radial-gradient(ellipse 60% 45% at 50% 47%, var(--device-glow), transparent 100%);
+}
+.home-device-family-frame-link:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.home-device-frame {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 280px;
+  pointer-events: none;
+  filter: drop-shadow(0 22px 18px rgb(0 0 0 / 0.2));
+  transition: transform 260ms ease;
+}
+.home-device-family:hover .home-device-frame,
+.home-device-family:focus-within .home-device-frame {
+  transform: translateY(-5px) scale(1.015);
+}
+.home-frame-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  background: #07131c;
+}
+.home-frame-wallpaper {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 45% at 88% 22%, #dbaf7b 0%, transparent 90%),
+    radial-gradient(ellipse 85% 60% at 12% 92%, #325a78 0%, transparent 85%),
+    linear-gradient(145deg, #0a1b2b 10%, #59496e 54%, #d6a26b 110%);
+}
+.home-frame-screen img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  z-index: 1;
+  object-fit: contain;
+  background: #ebeae7;
+}
+.home-device-frame--iphone .home-frame-phone {
+  position: relative;
+  width: 139px;
+  height: 270px;
+  padding: 7px;
+  border: 2px solid #8a8b8e;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #202228, #0b0c0f 46%, #747a7e 100%);
+  box-shadow:
+    inset 0 0 0 2px #090b0d,
+    2px 4px 0 rgb(255 255 255 / 0.16),
+    11px 16px 27px rgb(0 0 0 / 0.2);
+}
+.home-device-frame--iphone .home-frame-phone::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 70px;
+  width: 2px;
+  height: 35px;
+  background: #5c6065;
+  border-radius: 3px 0 0 3px;
+}
+.home-device-frame--iphone .home-frame-screen {
+  border-radius: 24px;
+}
+.home-device-frame--iphone .home-frame-wallpaper {
+  background:
+    radial-gradient(ellipse 85% 40% at 30% 15%, #f6cca8 0%, transparent 90%),
+    radial-gradient(ellipse 80% 45% at 75% 72%, #594d82 0%, transparent 90%),
+    linear-gradient(160deg, #101b38, #7b6a8c 56%, #d9a578);
+}
+.home-frame-island {
+  position: absolute;
+  z-index: 2;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54px;
+  height: 14px;
+  border-radius: 100px;
+  background: #090b0d;
+  box-shadow: inset 0 0 0 1px #101316;
+}
+.home-frame-homebar {
+  position: absolute;
+  z-index: 2;
+  bottom: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 45px;
+  height: 3px;
+  background: rgb(255 255 255 / 0.78);
+  border-radius: 100px;
+}
+.home-frame-mac {
+  position: relative;
+  width: min(100%, 255px);
+}
+.home-frame-mac-lid {
+  position: relative;
+  width: 92%;
+  height: 160px;
+  margin-inline: auto;
+  padding: 8px 7px 6px;
+  background: #121519;
+  border: 2px solid #858c93;
+  border-radius: 9px 9px 3px 3px;
+  box-shadow: inset 0 0 0 1px #050608;
+}
+.home-frame-mac-camera {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 3px;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #526a89;
+}
+.home-device-frame--mac .home-frame-screen {
+  border-radius: 2px;
+}
+.home-device-frame--mac .home-frame-wallpaper {
+  background:
+    radial-gradient(ellipse 65% 35% at 50% 100%, #b8c9da 0%, transparent 90%),
+    linear-gradient(128deg, #111d32, #596c9a 40%, #b889ad 72%, #f7b68c 110%);
+}
+.home-frame-mac-base {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 13px;
+  background: linear-gradient(#b5bcc3, #7c858e 58%, #333942);
+  clip-path: polygon(8% 0, 92% 0, 100% 80%, 98% 100%, 2% 100%, 0 80%);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 14px rgb(0 0 0 / 0.16);
+}
+.home-frame-mac-notch {
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin: auto;
+  background: #7b8389;
+  border-radius: 0 0 5px 5px;
+}
+.home-frame-ipad {
+  position: relative;
+  width: min(100%, 248px);
+  height: 185px;
+  padding: 9px;
+  border: 3px solid #93989c;
+  border-radius: 17px;
+  background: #121519;
+  box-shadow:
+    inset 0 0 0 2px #080b0e,
+    8px 17px 26px rgb(0 0 0 / 0.2);
+}
+.home-frame-ipad-camera {
+  position: absolute;
+  z-index: 2;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #4c5e77;
+}
+.home-device-frame--ipad .home-frame-screen {
+  border-radius: 8px;
+}
+.home-device-frame--ipad .home-frame-wallpaper {
+  background:
+    radial-gradient(ellipse 55% 70% at 17% 80%, #725caa 0%, transparent 94%),
+    radial-gradient(ellipse 60% 90% at 90% 40%, #d5c1d9 0%, transparent 85%),
+    linear-gradient(115deg, #163047, #a16d91 55%, #d2a7ba);
+}
+.home-frame-watch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 188px;
+  height: 275px;
+}
+.home-frame-watch-band {
+  display: block;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72px;
+  height: 90px;
+  background: linear-gradient(90deg, #485b57, #82938c 35%, #43534d);
+  border: 2px solid rgb(220 238 230 / 0.15);
+  box-shadow: inset 8px 0 10px rgb(0 0 0 / 0.13);
+}
+.home-frame-watch-band-top {
+  top: 0;
+  border-radius: 18px 18px 5px 5px;
+}
+.home-frame-watch-band-bottom {
+  bottom: 0;
+  border-radius: 5px 5px 18px 18px;
+}
+.home-frame-watch-case {
+  position: relative;
+  z-index: 1;
+  width: 156px;
+  height: 166px;
+  padding: 9px;
+  border: 3px solid #a6b0af;
+  border-radius: 39px;
+  background: linear-gradient(120deg, #1b2023, #586361, #161c1e);
+  box-shadow:
+    inset 0 0 0 3px #080a0b,
+    7px 14px 25px rgb(0 0 0 / 0.25);
+}
+.home-device-frame--watch .home-frame-screen {
+  border-radius: 26px;
+}
+.home-device-frame--watch .home-frame-wallpaper {
+  background: radial-gradient(circle at 50% 52%, #18363a, #050c13 85%);
+}
+.home-frame-watch-crown {
+  position: absolute;
+  z-index: 0;
+  left: calc(50% + 77px);
+  top: 102px;
+  width: 9px;
+  height: 20px;
+  border: 2px solid #7c8581;
+  background: #4a5552;
+  border-radius: 5px;
+}
+.home-frame-watch-dial {
+  position: absolute;
+  inset: 21px 16px;
+  border-radius: 50%;
+  border: 10px solid transparent;
+  background:
+    linear-gradient(#101c25, #101c25) padding-box,
+    conic-gradient(
+        #dc8e75 0 120deg,
+        transparent 120deg 132deg,
+        #9bd2bf 132deg 267deg,
+        transparent 267deg 276deg,
+        #d4b87b 276deg 355deg,
+        transparent 355deg
+      )
+      border-box;
+  transform: rotate(-12deg);
+}
+.home-frame-watch-dial-inner {
+  display: block;
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 48% 45%, #a2b6b4, #2b4448 70%);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.3);
+}
+.home-device-family-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+.home-device-family-details .eyebrow {
+  font-size: 0.57rem;
+  letter-spacing: 0.13em;
+  color: var(--accent-text);
+}
+.home-device-family-details h3 {
+  font-family: var(--font-ui);
+  font-size: clamp(1.35rem, 1.8vw, 1.65rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  margin: 0.6rem 0 0.55rem;
+}
+.home-device-family-details p {
+  font-size: 0.8rem;
+  line-height: 1.65;
+  margin: 0 0 1.1rem;
+}
+.home-device-family-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+.home-device-family-price {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+.home-device-family-action {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #11181a;
+  transition:
+    transform 200ms ease,
+    background 200ms ease;
+}
+.home-device-family-action:hover,
+.home-device-family-action:focus-visible {
+  background: var(--gold-start);
+  transform: rotate(-35deg);
+}
+@media (min-width: 600px) {
+  .home-device-showcase-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  .home-device-showcase-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .home-device-family-frame-link {
+    min-height: 310px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-device-family,
+  .home-device-frame,
+  .home-device-family-action {
+    transition: none;
+  }
+  .home-device-family:hover,
+  .home-device-family:focus-within,
+  .home-device-family:hover .home-device-frame,
+  .home-device-family:focus-within .home-device-frame,
+  .home-device-family-action:hover {
+    transform: none;
+  }
+}
