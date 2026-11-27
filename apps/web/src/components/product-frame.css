@@ -3,7 +3,11 @@
   padding: 1.4rem 0.8rem 0.65rem;
   min-height: 310px;
   background:
-    radial-gradient(ellipse 60% 54% at 50% 50%, color-mix(in srgb, var(--gold) 13%, var(--warm)), var(--surface)),
+    radial-gradient(
+      ellipse 60% 54% at 50% 50%,
+      color-mix(in srgb, var(--gold) 13%, var(--warm)),
+      var(--surface)
+    ),
     var(--surface);
   border-radius: var(--radius-panel) var(--radius-panel) 0 0;
 }
@@ -90,7 +94,9 @@
   color: #101719;
   font-size: 0.84rem;
   font-weight: 700;
-  transition: background var(--motion), transform var(--motion);
+  transition:
+    background var(--motion),
+    transform var(--motion);
 }
 .device-card-buy-button:hover,
 .device-card-buy-button:focus-visible {
@@ -120,8 +126,14 @@
   border: 2px solid #7c858a;
   border-radius: 18px 18px 12px 12px;
 }
-.home-frame-airpods::before { left: 54px; transform: rotate(-13deg); }
-.home-frame-airpods::after { right: 54px; transform: rotate(13deg); }
+.home-frame-airpods::before {
+  left: 54px;
+  transform: rotate(-13deg);
+}
+.home-frame-airpods::after {
+  right: 54px;
+  transform: rotate(13deg);
+}
 .home-frame-airpods-lid {
   position: absolute;
   z-index: 1;
@@ -182,8 +194,13 @@
   border-radius: 4px;
   background: #5e686c;
 }
-.home-frame-accessories-header { top: 7px; }
-.home-frame-accessories-footer { bottom: 6px; width: 45px; }
+.home-frame-accessories-header {
+  top: 7px;
+}
+.home-frame-accessories-footer {
+  bottom: 6px;
+  width: 45px;
+}
 /* Category landing hero shares the same physical device silhouette. */
 .cat-hero-visual .home-device-frame {
   min-height: 290px;
@@ -194,16 +211,32 @@
   width: 100%;
 }
 @media (max-width: 550px) {
-  .device-framed-card .device-card-stage { padding-inline: 0.45rem; min-height: 256px; }
-  .device-framed-card .home-device-frame { height: 226px; transform: scale(0.78); }
-  .device-framed-card .device-card-visual-link { min-height: 218px; }
+  .device-framed-card .device-card-stage {
+    padding-inline: 0.45rem;
+    min-height: 256px;
+  }
+  .device-framed-card .home-device-frame {
+    height: 226px;
+    transform: scale(0.78);
+  }
+  .device-framed-card .device-card-visual-link {
+    min-height: 218px;
+  }
   .device-framed-card .home-device-frame--mac,
   .device-framed-card .home-device-frame--ipad,
   .device-framed-card .home-device-frame--airpods,
-  .device-framed-card .home-device-frame--accessories { transform: scale(0.72); }
-  .device-framed-card .product-card-info { padding: 0.85rem; }
+  .device-framed-card .home-device-frame--accessories {
+    transform: scale(0.72);
+  }
+  .device-framed-card .product-card-info {
+    padding: 0.85rem;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .device-card-buy-button { transition: none; }
-  .device-card-buy-button:hover { transform: none; }
+  .device-card-buy-button {
+    transition: none;
+  }
+  .device-card-buy-button:hover {
+    transform: none;
+  }
 }
