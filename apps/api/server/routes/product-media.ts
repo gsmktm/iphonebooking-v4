@@ -15,9 +15,13 @@ import {
 export const media = Router();
 export const adminMedia = Router();
 const mediaId = z.string().uuid();
-const httpsUrl = z.string().url().max(1000).refine((url) => new URL(url).protocol === 'https:', {
-  message: 'An HTTPS source link is required.',
-});
+const httpsUrl = z
+  .string()
+  .url()
+  .max(1000)
+  .refine((url) => new URL(url).protocol === 'https:', {
+    message: 'An HTTPS source link is required.',
+  });
 const sourceSchema = z
   .object({
     sourceType: z.enum(['OWNED', 'LICENSED']),
@@ -28,10 +32,7 @@ const sourceSchema = z
     altText: z.string().trim().min(3).max(250),
   })
   .superRefine((data, ctx) => {
-    if (
-      data.sourceType === 'LICENSED' &&
-      (!data.sourceUrl || !data.license || !data.licenseUrl)
-    ) {
+    if (data.sourceType === 'LICENSED' && (!data.sourceUrl || !data.license || !data.licenseUrl)) {
       ctx.addIssue({
         code: 'custom',
         path: ['license'],
@@ -184,7 +185,9 @@ adminMedia.patch('/media/:id', permit('product.update'), async (req, res) => {
 });
 
 const hasPhotoAccess = (req: Request) =>
-  Boolean(req.user?.role?.permissions.some((p) => ['*', 'product.read', 'product.update'].includes(p)));
+  Boolean(
+    req.user?.role?.permissions.some((p) => ['*', 'product.read', 'product.update'].includes(p)),
+  );
 
 async function isPublicImage(url: string) {
   const [product, historical] = await Promise.all([
@@ -203,10 +206,21 @@ async function isPublicImage(url: string) {
   return Boolean(product || historical);
 }
 media.get('/media/credits', async (req, res) => {
-  const { slug, archive } = z.object({
-    slug: z.string().max(120).regex(/^[a-z0-9-]+$/).optional(),
-    archive: z.string().max(120).regex(/^[a-z0-9-]+$/).optional(),
-  }).refine((data) => Boolean(data.slug) !== Boolean(data.archive)).parse(req.query);
+  const { slug, archive } = z
+    .object({
+      slug: z
+        .string()
+        .max(120)
+        .regex(/^[a-z0-9-]+$/)
+        .optional(),
+      archive: z
+        .string()
+        .max(120)
+        .regex(/^[a-z0-9-]+$/)
+        .optional(),
+    })
+    .refine((data) => Boolean(data.slug) !== Boolean(data.archive))
+    .parse(req.query);
   let paths: (string | null)[] = [];
   if (slug) {
     const product = await db.product.findFirst({
@@ -223,7 +237,13 @@ media.get('/media/credits', async (req, res) => {
     if (!device) throw new AppError(404, 'NOT_FOUND', 'Archival device not found.');
     paths = [device.imageUrl, ...device.gallery];
   }
-  const ids = [...new Set(paths.map((v) => v?.match(/^\/api\/v1\/media\/([0-9a-f-]{36})$/i)?.[1]).filter((id): id is string => Boolean(id)))];
+  const ids = [
+    ...new Set(
+      paths
+        .map((v) => v?.match(/^\/api\/v1\/media\/([0-9a-f-]{36})$/i)?.[1])
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ];
   const items = await db.mediaAsset.findMany({
     where: { id: { in: ids } },
     select: {
@@ -248,10 +268,7 @@ media.get('/media/:id', async (req, res) => {
   const etag = `"${asset.sha256}"`;
   res.setHeader('Content-Type', asset.mimeType);
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader(
-    'Cache-Control',
-    publiclyLinked ? 'public, max-age=86400' : 'private, no-store',
-  );
+  res.setHeader('Cache-Control', publiclyLinked ? 'public, max-age=86400' : 'private, no-store');
   res.setHeader('ETag', etag);
   if (req.get('If-None-Match') === etag) {
     res.status(304).end();
@@ -265,6 +282,10 @@ media.get('/media/:id', async (req, res) => {
       throw new Error('Stored object is larger than the permitted image size');
     res.send(Buffer.from(bytes));
   } catch {
-    throw new AppError(502, 'MEDIA_TEMPORARILY_UNAVAILABLE', 'Image delivery is temporarily unavailable.');
+    throw new AppError(
+      502,
+      'MEDIA_TEMPORARILY_UNAVAILABLE',
+      'Image delivery is temporarily unavailable.',
+    );
   }
 });
