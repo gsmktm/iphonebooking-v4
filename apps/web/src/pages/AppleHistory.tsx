@@ -1,6 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, History, ImageOff, Search } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  CalendarDays,
+  History,
+  ImageOff,
+  Search,
+} from 'lucide-react';
 import { api } from '../services/api';
 import { ErrorNotice, Loading } from '../components/ui';
 import './apple-history.css';
@@ -49,10 +57,14 @@ const validFamilies: Family[] = families.map((item) => item.slug);
 function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?: boolean }) {
   const label = `${device.name} (${device.introducedYear})`;
   return (
-    <div className={`apple-history-photo apple-history-photo--${device.family} ${large ? 'apple-history-photo--large' : ''}`}>
+    <div
+      className={`apple-history-photo apple-history-photo--${device.family} ${large ? 'apple-history-photo--large' : ''}`}
+    >
       <div className="apple-history-placeholder" aria-label="Archival photograph not yet licensed">
         <ImageOff aria-hidden="true" size={large ? 46 : 32} />
-        <span>{device.family.toUpperCase()} · {device.introducedYear}</span>
+        <span>
+          {device.family.toUpperCase()} · {device.introducedYear}
+        </span>
       </div>
       {device.imageUrl && device.imageSourceUrl ? (
         <img
@@ -60,7 +72,9 @@ function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?
           alt={`Licensed historical photograph: ${label}`}
           loading={large ? 'eager' : 'lazy'}
           decoding="async"
-          onError={(event) => { event.currentTarget.hidden = true; }}
+          onError={(event) => {
+            event.currentTarget.hidden = true;
+          }}
         />
       ) : null}
     </div>
@@ -90,14 +104,21 @@ function ArchiveCredit({ device }: { device: HistoryDevice }) {
 function HistoryCard({ device }: { device: HistoryDevice }) {
   return (
     <article className="apple-history-card">
-      <Link to={`/history/apple/device/${device.slug}`} className="apple-history-card-photo" aria-label={`View history of ${device.name}`}>
+      <Link
+        to={`/history/apple/device/${device.slug}`}
+        className="apple-history-card-photo"
+        aria-label={`View history of ${device.name}`}
+      >
         <ArchivePhoto device={device} />
       </Link>
       <div className="apple-history-card-content">
         <span className="apple-history-card-meta">
-          <CalendarDays size={13} aria-hidden="true" /> {device.introducedYear} · {device.family.toUpperCase()}
+          <CalendarDays size={13} aria-hidden="true" /> {device.introducedYear} ·{' '}
+          {device.family.toUpperCase()}
         </span>
-        <h3><Link to={`/history/apple/device/${device.slug}`}>{device.name}</Link></h3>
+        <h3>
+          <Link to={`/history/apple/device/${device.slug}`}>{device.name}</Link>
+        </h3>
         {device.modelNumbers && <p>Model ID: {device.modelNumbers}</p>}
         {device.chip && <p>Chip: {device.chip}</p>}
         {device.capacity && <p>Original capacities: {device.capacity}</p>}
@@ -155,22 +176,35 @@ export default function AppleHistory() {
       <header className="apple-history-hero">
         <div className="container">
           <span className="apple-history-eyebrow">APPLE DEVICE HISTORY · A RESEARCH ARCHIVE</span>
-          <h1>Every era has <em>its own story.</em></h1>
+          <h1>
+            Every era has <em>its own story.</em>
+          </h1>
           <p>
-            A sourced history of iPhone, Mac, iPad and iPod across generations. Find
-            introduction years, Apple model identifiers and independently licensed photographs.
+            A sourced history of iPhone, Mac, iPad and iPod across generations. Find introduction
+            years, Apple model identifiers and independently licensed photographs.
           </p>
           <div className="apple-history-hero-facts">
-            <div><strong>{summary.data?.total ?? '—'}</strong><span>DEVICE RECORDS</span></div>
-            <div><strong>{summary.data?.earliest ?? '—'}</strong><span>EARLIEST YEAR</span></div>
-            <div><strong>4</strong><span>PRODUCT FAMILIES</span></div>
+            <div>
+              <strong>{summary.data?.total ?? '—'}</strong>
+              <span>DEVICE RECORDS</span>
+            </div>
+            <div>
+              <strong>{summary.data?.earliest ?? '—'}</strong>
+              <span>EARLIEST YEAR</span>
+            </div>
+            <div>
+              <strong>4</strong>
+              <span>PRODUCT FAMILIES</span>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="container apple-history-content">
         <nav className="apple-history-family-nav" aria-label="History families">
-          <Link className={!selectedFamily ? 'selected' : ''} to="/history/apple">All devices</Link>
+          <Link className={!selectedFamily ? 'selected' : ''} to="/history/apple">
+            All devices
+          </Link>
           {families.map((item) => (
             <Link
               key={item.slug}
@@ -179,7 +213,10 @@ export default function AppleHistory() {
             >
               <strong>{item.name}</strong>
               <small>{item.era}</small>
-              <span>{summary.data?.families.find((value) => value.family === item.slug)?.count ?? '—'} models</span>
+              <span>
+                {summary.data?.families.find((value) => value.family === item.slug)?.count ?? '—'}{' '}
+                models
+              </span>
             </Link>
           ))}
         </nav>
@@ -187,10 +224,14 @@ export default function AppleHistory() {
         <div className="apple-history-controls">
           <div>
             <span className="eyebrow">THE COLLECTION</span>
-            <h2>{collectionName ? `${collectionName} through the years` : 'Browse the entire timeline.'}</h2>
+            <h2>
+              {collectionName
+                ? `${collectionName} through the years`
+                : 'Browse the entire timeline.'}
+            </h2>
             <p>
-              Historical records are for education and identification only.
-              They do not indicate stock, pricing or repair availability in Nepal.
+              Historical records are for education and identification only. They do not indicate
+              stock, pricing or repair availability in Nepal.
             </p>
           </div>
           <div className="apple-history-fields">
@@ -210,7 +251,9 @@ export default function AppleHistory() {
               <select value={selectedYear} onChange={(event) => change('year', event.target.value)}>
                 <option value="">All years</option>
                 {Array.from({ length: 2026 - 1984 + 1 }, (_, i) => 2026 - i).map((year) => (
-                  <option key={year} value={year}>{year}</option>
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
                 ))}
               </select>
             </label>
@@ -218,7 +261,9 @@ export default function AppleHistory() {
         </div>
 
         {history.isLoading && <Loading />}
-        {history.isError && <ErrorNotice error={history.error} retry={() => void history.refetch()} />}
+        {history.isError && (
+          <ErrorNotice error={history.error} retry={() => void history.refetch()} />
+        )}
         {history.isSuccess && (
           <>
             <p className="apple-history-results" role="status">
@@ -227,28 +272,50 @@ export default function AppleHistory() {
             {list.length ? (
               <div className="apple-history-timeline">
                 {years.map((year) => (
-                  <section key={year} className="apple-history-year" aria-labelledby={`year-${year}`}>
+                  <section
+                    key={year}
+                    className="apple-history-year"
+                    aria-labelledby={`year-${year}`}
+                  >
                     <div className="apple-history-year-heading">
                       <span className="apple-history-year-rule" aria-hidden="true" />
                       <h3 id={`year-${year}`}>{year}</h3>
-                      <span>{list.filter((device) => device.introducedYear === year).length} devices</span>
+                      <span>
+                        {list.filter((device) => device.introducedYear === year).length} devices
+                      </span>
                     </div>
                     <div className="apple-history-grid">
-                      {list.filter((device) => device.introducedYear === year).map((device) => (
-                        <HistoryCard key={device.id} device={device} />
-                      ))}
+                      {list
+                        .filter((device) => device.introducedYear === year)
+                        .map((device) => (
+                          <HistoryCard key={device.id} device={device} />
+                        ))}
                     </div>
                   </section>
                 ))}
               </div>
-            ) : <p className="apple-history-empty">No archived models match these filters. Try another year or model name.</p>}
+            ) : (
+              <p className="apple-history-empty">
+                No archived models match these filters. Try another year or model name.
+              </p>
+            )}
             {history.data.pageCount > 1 && (
               <div className="apple-history-pagination">
-                <button type="button" disabled={page <= 1} onClick={() => change('page', String(page - 1))}>
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => change('page', String(page - 1))}
+                >
                   <ArrowLeft size={17} /> Previous
                 </button>
-                <span>Page {page} of {history.data.pageCount}</span>
-                <button type="button" disabled={page >= history.data.pageCount} onClick={() => change('page', String(page + 1))}>
+                <span>
+                  Page {page} of {history.data.pageCount}
+                </span>
+                <button
+                  type="button"
+                  disabled={page >= history.data.pageCount}
+                  onClick={() => change('page', String(page + 1))}
+                >
                   Next <ArrowRight size={17} />
                 </button>
               </div>
@@ -260,14 +327,18 @@ export default function AppleHistory() {
           <div>
             <h3>Independent historical research</h3>
             <p>
-              Model names and introduction years follow Apple's product identification records.
-              The GSMArena Apple archive is linked as an additional reading reference for phones
-              and tablets; its product photographs and descriptions have not been republished.
-              Photos shown here come from individually licensed Wikimedia Commons files, with
-              the author and license displayed on each detailed entry. Missing images are marked
-              rather than replaced with unrelated or AI-generated device pictures.
+              Model names and introduction years follow Apple's product identification records. The
+              GSMArena Apple archive is linked as an additional reading reference for phones and
+              tablets; its product photographs and descriptions have not been republished. Photos
+              shown here come from individually licensed Wikimedia Commons files, with the author
+              and license displayed on each detailed entry. Missing images are marked rather than
+              replaced with unrelated or AI-generated device pictures.
             </p>
-            <a href="https://www.gsmarena.com/apple-phones-48.php" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://www.gsmarena.com/apple-phones-48.php"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               GSMArena Apple model index <ArrowUpRight size={16} />
             </a>
           </div>
@@ -284,8 +355,18 @@ export function AppleHistoryDetail() {
     queryFn: () => api<HistoryDevice>(`/apple-history/${encodeURIComponent(slug ?? '')}`),
     enabled: Boolean(slug),
   });
-  if (result.isLoading) return <div className="container page"><Loading /></div>;
-  if (!result.data || result.error) return <div className="container page"><ErrorNotice error={result.error ?? new Error('Historical device not found')} /></div>;
+  if (result.isLoading)
+    return (
+      <div className="container page">
+        <Loading />
+      </div>
+    );
+  if (!result.data || result.error)
+    return (
+      <div className="container page">
+        <ErrorNotice error={result.error ?? new Error('Historical device not found')} />
+      </div>
+    );
   const device = result.data;
   return (
     <article className="container page apple-history-detail">
@@ -294,15 +375,38 @@ export function AppleHistoryDetail() {
       </Link>
       <div className="apple-history-detail-grid">
         <div>
-          <span className="apple-history-eyebrow">{device.family.toUpperCase()} ARCHIVE · {device.introducedYear}</span>
+          <span className="apple-history-eyebrow">
+            {device.family.toUpperCase()} ARCHIVE · {device.introducedYear}
+          </span>
           <h1>{device.name}</h1>
           <p>Historical model reference, independently curated from Apple documentation.</p>
           <dl>
-            <div><dt>Introduced</dt><dd>{device.introducedYear}</dd></div>
-            {device.modelNumbers && <div><dt>Model identifiers</dt><dd>{device.modelNumbers}</dd></div>}
-            {device.capacity && <div><dt>Original capacity</dt><dd>{device.capacity}</dd></div>}
-            {device.chip && <div><dt>Chip</dt><dd>{device.chip}</dd></div>}
-            <div><dt>Status</dt><dd>Historical reference · not a local retail offer</dd></div>
+            <div>
+              <dt>Introduced</dt>
+              <dd>{device.introducedYear}</dd>
+            </div>
+            {device.modelNumbers && (
+              <div>
+                <dt>Model identifiers</dt>
+                <dd>{device.modelNumbers}</dd>
+              </div>
+            )}
+            {device.capacity && (
+              <div>
+                <dt>Original capacity</dt>
+                <dd>{device.capacity}</dd>
+              </div>
+            )}
+            {device.chip && (
+              <div>
+                <dt>Chip</dt>
+                <dd>{device.chip}</dd>
+              </div>
+            )}
+            <div>
+              <dt>Status</dt>
+              <dd>Historical reference · not a local retail offer</dd>
+            </div>
           </dl>
           <div className="apple-history-detail-links">
             <a href={device.sourceUrl} target="_blank" rel="noopener noreferrer">
@@ -314,7 +418,11 @@ export function AppleHistoryDetail() {
               </a>
             )}
             {!device.imageSourceUrl && (
-              <a href={`https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(device.name)}&title=Special:MediaSearch&type=image`} target="_blank" rel="noopener noreferrer">
+              <a
+                href={`https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(device.name)}&title=Special:MediaSearch&type=image`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Search licensed archive photos <ArrowUpRight size={17} />
               </a>
             )}
