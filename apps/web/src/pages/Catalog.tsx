@@ -5,6 +5,7 @@ import { SlidersHorizontal, Search, X } from 'lucide-react';
 import { api } from '../services/api';
 import type { Product, Category } from '../services/types';
 import { ProductCard } from '../components/ProductCard';
+import { DeviceCollectionStrip } from '../components/DeviceCollectionStrip';
 import { PageIntro, Loading, ErrorNotice, Empty, ArrowLink, Dialog } from '../components/ui';
 import { useShop } from '../store/shop';
 type CatalogResponse = {
@@ -228,14 +229,28 @@ export default function Catalog() {
           ))}
         </div>
       ) : (
-        <Empty
-          title={mode === 'wishlist' ? 'Save something you love.' : 'No matching devices.'}
-          description={
-            mode === 'wishlist'
-              ? 'Use the heart on a product to add it to your wishlist.'
-              : 'Try another filter or explore the full collection.'
-          }
-        />
+        <>
+          {mode !== 'wishlist' && mode !== 'search' && (
+            <DeviceCollectionStrip
+              title={
+                mode === 'prebook'
+                  ? 'Pre-book the next generation.'
+                  : mode === 'deals'
+                    ? 'Discover our device families.'
+                    : 'Choose your device family.'
+              }
+              description="Real product images, prices and Buy Now links appear as soon as published inventory is available."
+            />
+          )}
+          <Empty
+            title={mode === 'wishlist' ? 'Save something you love.' : 'No matching devices.'}
+            description={
+              mode === 'wishlist'
+                ? 'Use the heart on a product to add it to your wishlist.'
+                : 'Try another filter or explore the full collection.'
+            }
+          />
+        </>
       )}
       {data && data.pageCount > 1 && (
         <nav className="panel-actions" aria-label="Catalog pages">

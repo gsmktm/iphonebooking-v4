@@ -1,0 +1,265 @@
+/* Shared storefront product frames — all pricing is provided by the catalog. */
+.device-framed-card .device-card-stage {
+  padding: 1.4rem 0.8rem 0.65rem;
+  min-height: 310px;
+  background:
+    radial-gradient(
+      ellipse 60% 54% at 50% 50%,
+      color-mix(in srgb, var(--gold) 13%, var(--warm)),
+      var(--surface)
+    ),
+    var(--surface);
+  border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+}
+.device-framed-card .device-card-visual-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 265px;
+  width: 100%;
+  border-radius: 0.7rem;
+}
+.device-framed-card .device-card-visual-link:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -2px;
+}
+.device-framed-card .home-device-frame {
+  height: 270px;
+  max-width: 100%;
+}
+.device-framed-card .product-badge,
+.device-framed-card .wishlist-button {
+  z-index: 4;
+}
+.device-framed-card .color-dots {
+  position: relative;
+  z-index: 3;
+}
+.device-framed-card .home-frame-screen .product-visual,
+.home-device-family .home-frame-screen .product-visual,
+.device-family-placeholder .home-frame-screen .product-visual,
+.cat-hero-visual .home-frame-screen .product-visual {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  object-fit: contain;
+  aspect-ratio: auto;
+  background-color: #f1f1ed;
+  border-radius: inherit;
+  mix-blend-mode: normal;
+  transform: none;
+}
+.device-framed-card .home-frame-screen .product-visual:not(img),
+.home-device-family .home-frame-screen .product-visual:not(img),
+.device-family-placeholder .home-frame-screen .product-visual:not(img),
+.cat-hero-visual .home-frame-screen .product-visual:not(img) {
+  background-image: url('/images/catalog.webp');
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+}
+.device-framed-card .product-card-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.device-framed-card .product-card-info > p {
+  margin-bottom: 0.85rem;
+}
+.device-framed-card .product-card-bottom {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  align-items: center;
+}
+.device-framed-card .product-card-bottom strong {
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.device-card-buy-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 0.85rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-control);
+  background: var(--gold);
+  color: #101719;
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition:
+    background var(--motion),
+    transform var(--motion);
+}
+.device-card-buy-button:hover,
+.device-card-buy-button:focus-visible {
+  background: var(--gold-start);
+  transform: translateY(-1px);
+}
+.device-framed-card .product-quick-look {
+  margin-top: 0.65rem;
+}
+/* AirPods case: the sprite or uploaded product sits in a ceramic capsule. */
+.home-frame-airpods {
+  position: relative;
+  width: 210px;
+  height: 200px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
+.home-frame-airpods::before,
+.home-frame-airpods::after {
+  position: absolute;
+  content: '';
+  top: 6px;
+  width: 26px;
+  height: 86px;
+  background: linear-gradient(135deg, #fbfbf8, #acb5b9);
+  border: 2px solid #7c858a;
+  border-radius: 18px 18px 12px 12px;
+}
+.home-frame-airpods::before {
+  left: 54px;
+  transform: rotate(-13deg);
+}
+.home-frame-airpods::after {
+  right: 54px;
+  transform: rotate(13deg);
+}
+.home-frame-airpods-lid {
+  position: absolute;
+  z-index: 1;
+  top: 70px;
+  width: 186px;
+  height: 62px;
+  border: 2px solid #aeb5b8;
+  background: linear-gradient(135deg, #fcfdfa, #c4cacf);
+  border-radius: 42px 42px 13px 13px;
+}
+.home-frame-airpods-body {
+  z-index: 2;
+  position: relative;
+  width: 194px;
+  height: 119px;
+  padding: 11px 13px;
+  border: 2px solid #aeb5b8;
+  border-radius: 28px 28px 60px 60px;
+  background: linear-gradient(130deg, #f7f8f6, #9ea9b1);
+  box-shadow: 5px 16px 22px rgb(0 0 0 / 0.18);
+}
+.home-frame-airpods .home-frame-screen {
+  border-radius: 18px 18px 43px 43px;
+}
+.home-frame-airpods-status {
+  position: absolute;
+  z-index: 3;
+  bottom: 5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #74877c;
+}
+/* Accessories: framed product display, deliberately not represented as a phone. */
+.home-frame-accessories {
+  position: relative;
+  width: 225px;
+  height: 208px;
+  padding: 17px;
+  border: 3px solid #87949c;
+  border-radius: 21px;
+  background: linear-gradient(135deg, #e2e2db, #727f86);
+  box-shadow: 7px 16px 26px rgb(0 0 0 / 0.2);
+}
+.home-frame-accessories .home-frame-screen {
+  border-radius: 8px;
+  background: #f1f1ed;
+}
+.home-frame-accessories-header,
+.home-frame-accessories-footer {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 33px;
+  height: 3px;
+  border-radius: 4px;
+  background: #5e686c;
+}
+.home-frame-accessories-header {
+  top: 7px;
+}
+.home-frame-accessories-footer {
+  bottom: 6px;
+  width: 45px;
+}
+/* Category landing hero shares the same physical device silhouette. */
+.cat-hero-visual .home-device-frame {
+  min-height: 290px;
+  height: 320px;
+}
+.cat-hero-visual .home-frame-screen .product-visual {
+  max-width: none;
+  width: 100%;
+}
+@media (max-width: 550px) {
+  .device-framed-card .device-card-stage {
+    padding-inline: 0.45rem;
+    min-height: 256px;
+  }
+  .device-framed-card .home-device-frame {
+    height: 226px;
+    transform: scale(0.78);
+  }
+  .device-framed-card .device-card-visual-link {
+    min-height: 218px;
+  }
+  .device-framed-card .home-device-frame--mac,
+  .device-framed-card .home-device-frame--ipad,
+  .device-framed-card .home-device-frame--airpods,
+  .device-framed-card .home-device-frame--accessories {
+    transform: scale(0.72);
+  }
+  .device-framed-card .product-card-info {
+    padding: 0.85rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .device-card-buy-button {
+    transition: none;
+  }
+  .device-card-buy-button:hover {
+    transform: none;
+  }
+}
+
+/* Explicit purchase action beneath the four homepage frames. */
+.home-v2 .home-device-family-bottom {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.home-v2 .home-device-action-wide {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: auto;
+  min-width: 100px;
+  height: auto;
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 0.6rem 0.75rem;
+  white-space: nowrap;
+  border-radius: var(--radius-control);
+  font-size: 0.72rem;
+  font-weight: 700;
+}

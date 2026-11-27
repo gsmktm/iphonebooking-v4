@@ -5,6 +5,7 @@ import { RefreshCw, Wrench, ArrowRight, Check, ShieldCheck } from 'lucide-react'
 import { api, post, money, track } from '../services/api';
 import type { User, Device, TradeIn, Repair as RepairType } from '../services/types';
 import { PageIntro, ErrorNotice, ButtonLink, ProductVisual, Loading } from '../components/ui';
+import { ServiceDeviceShelf } from '../components/ServiceDeviceShelf';
 export function TradeInPage() {
   const location = useLocation();
   const [params] = useSearchParams();
@@ -216,6 +217,7 @@ export function TradeInPage() {
           </aside>
         </div>
       )}
+      <ServiceDeviceShelf context="trade-in" />
       <section className="steps-section">
         {[
           ['01', 'A little about your device', 'Tell us the model, configuration, and condition.'],
@@ -440,6 +442,7 @@ export function RepairPage() {
           </aside>
         </div>
       )}
+      <ServiceDeviceShelf context="repair" />
     </div>
   );
 }

@@ -5,14 +5,9 @@ import { BadgeCheck, Layers, Tag } from 'lucide-react';
 import { api, money } from '../../services/api';
 import type { Product } from '../../services/types';
 import { ProductCard } from '../../components/ProductCard';
-import {
-  ButtonLink,
-  ArrowLink,
-  ProductVisual,
-  Loading,
-  ErrorNotice,
-  Empty,
-} from '../../components/ui';
+import { DeviceCollectionStrip } from '../../components/DeviceCollectionStrip';
+import { DeviceFrame } from '../home/HomeDeviceFrames';
+import { ButtonLink, ArrowLink, Loading, ErrorNotice, Empty } from '../../components/ui';
 import { FeatureBand, SpecTable, ServicesBand, Faq } from './sections';
 import { CONFIGS, type CategorySlug } from './config';
 import './category.css';
@@ -175,7 +170,10 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
               </ul>
             </div>
             <div className="cat-hero-visual">
-              <ProductVisual image={activeVariant?.image ?? hero.image} name={hero.name} />
+              <DeviceFrame
+                kind={slug === 'store' ? 'iphone' : slug}
+                image={activeVariant?.image ?? hero.image}
+              />
               {hero.badge && <span className="cat-hero-badge">{hero.badge}</span>}
             </div>
           </div>
@@ -196,11 +194,22 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
         ) : products.error ? (
           <ErrorNotice error={products.error} retry={() => void products.refetch()} />
         ) : !lineup.length ? (
-          <Empty
-            title="This collection is being updated."
-            link="/store"
-            action="Explore the store"
-          />
+          <>
+            <DeviceCollectionStrip
+              kinds={slug === 'store' ? undefined : [slug]}
+              title={
+                slug === 'store'
+                  ? 'Choose your device family.'
+                  : `Explore the ${slug === 'watch' ? 'Watch' : slug} frame.`
+              }
+              description="Product images, live NPR prices and purchase options appear when catalog inventory is published."
+            />
+            <Empty
+              title="This collection is being updated."
+              link="/store"
+              action="Explore the store"
+            />
+          </>
         ) : (
           <div className="product-grid">
             {lineup.map((p) => (
