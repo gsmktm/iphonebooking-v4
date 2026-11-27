@@ -25,9 +25,13 @@ import Dashboard from './admin/Dashboard';
 import ResourcePage from './admin/ResourcePage';
 import { RetailerApplications } from './Retailer';
 import { PriceIntelligenceAdmin } from './Intelligence';
+import ProductStudio from './admin/ProductStudio';
 const customResources: Record<string, { title: string; permission: string }> = {
   'retailer-applications': { title: 'Retailer applications', permission: 'retailer.read' },
   'price-intelligence': { title: 'World price observations', permission: 'product.read' },
+  'product-studio': { title: 'Retail Product Studio', permission: 'product.read' },
+  'history-studio': { title: 'Apple History Studio', permission: 'product.read' },
+  'media-library': { title: 'Product Media Library', permission: 'product.read' },
 };
 const allResources = { ...resources, ...customResources };
 const groups = [
@@ -38,6 +42,9 @@ const groups = [
       ['orders', 'Orders'],
       ['bookings', 'Pre-bookings'],
       ['products', 'Products'],
+      ['product-studio', 'Product Studio'],
+      ['history-studio', 'Apple History Studio'],
+      ['media-library', 'Image Library'],
       ['categories', 'Categories'],
       ['variants', 'Configurations'],
       ['payments', 'Payments'],
@@ -225,6 +232,12 @@ export default function Admin() {
             <RetailerApplications />
           ) : resource === 'price-intelligence' && can('product.read') ? (
             <PriceIntelligenceAdmin />
+          ) : resource === 'product-studio' && can('product.read') ? (
+            <ProductStudio mode="retail" user={user} />
+          ) : resource === 'history-studio' && can('product.read') ? (
+            <ProductStudio mode="history" user={user} />
+          ) : resource === 'media-library' && can('product.read') ? (
+            <ProductStudio mode="media" user={user} />
           ) : resources[resource] && can(resources[resource].permission) ? (
             <ResourcePage key={resource} resource={resource} user={user} />
           ) : (
