@@ -1,3 +1,4 @@
+import { displaySpecValue } from '../../services/product-spec';
 import { useState } from 'react';
 import { RefreshCw, Wrench, ArrowLeftRight, ChevronDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -75,7 +76,7 @@ export function SpecTable({ products, copy }: { products: Product[]; copy: Copy 
               <tr key={k}>
                 <th scope="row">{k}</th>
                 {cols.map((p) => (
-                  <td key={p.id}>{p.specs[k] ?? '—'}</td>
+                  <td key={p.id}>{displaySpecValue(p.specs[k] ?? '—')}</td>
                 ))}
               </tr>
             ))}
