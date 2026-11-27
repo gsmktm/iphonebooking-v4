@@ -280,6 +280,17 @@ auth.delete('/sessions/:id', requireUser, async (req, res) => {
   res.json({ ok: true });
 });
 auth.post('/password', requireUser, async (req, res) => {
+  if (
+    await db.supabaseIdentity.findUnique({
+      where: { userId: req.user!.id },
+      select: { userId: true },
+    })
+  )
+    throw new AppError(
+      409,
+      'EXTERNAL_AUTH_PASSWORD',
+      'This password is managed by Supabase Auth. Contact support for recovery.',
+    );
   const data = z
     .object({ currentPassword: z.string().min(1).max(128), newPassword })
     .parse(req.body);
