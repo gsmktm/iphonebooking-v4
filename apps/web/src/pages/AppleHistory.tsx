@@ -77,7 +77,9 @@ function ArchivePhoto({ device, large = false }: { device: HistoryDevice; large?
         <div
           className="apple-history-placeholder"
           aria-label={
-            device.imageUrl ? 'Historical photograph temporarily unavailable' : 'Archival photograph not yet licensed'
+            device.imageUrl
+              ? 'Historical photograph temporarily unavailable'
+              : 'Archival photograph not yet licensed'
           }
         >
           <ImageOff aria-hidden="true" size={large ? 46 : 32} />
