@@ -10,13 +10,18 @@ const families = [
 ] as const;
 
 for (const [route, eyebrow, heading] of families) {
-  test(`/${route}: distinctive black-gold hero with genuine-photo-only policy`, async ({ page }) => {
+  test(`/${route}: distinctive black-gold hero with genuine-photo-only policy`, async ({
+    page,
+  }) => {
     await page.goto(`/${route}`);
     const hero = page.locator(`.cinematic-category--${route}`);
     await expect(hero).toBeVisible();
     await expect(hero.getByText(eyebrow, { exact: true })).toBeVisible();
     await expect(hero.getByRole('heading', { level: 1 })).toContainText(heading);
-    await expect(hero.getByRole('link', { name: 'Compare devices' })).toHaveAttribute('href', '/compare');
+    await expect(hero.getByRole('link', { name: 'Compare devices' })).toHaveAttribute(
+      'href',
+      '/compare',
+    );
     const realPhoto = hero.locator('.cinematic-category-real-photo img');
     if (await realPhoto.count()) {
       const src = await realPhoto.getAttribute('src');
@@ -25,7 +30,9 @@ for (const [route, eyebrow, heading] of families) {
       expect(await realPhoto.getAttribute('alt')).toBeTruthy();
     } else {
       await expect(hero.locator(`.home-device-frame--${route}`)).toBeVisible();
-      await expect(hero.getByText('Product photograph available with published listings')).toBeVisible();
+      await expect(
+        hero.getByText('Product photograph available with published listings'),
+      ).toBeVisible();
       await expect(hero.locator('.cinematic-category-price-tag')).toHaveCount(0);
     }
   });
