@@ -1,0 +1,25 @@
+name: Format final frame buttons (temporary)
+on: [push]
+jobs:
+  format:
+    if: github.ref == 'refs/heads/design/product-frames-all-shop-services-2026-11-27'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Output formatted source
+        run: |
+          pnpm exec prettier --write apps/web/src/features/home/HomeDeviceFrames.tsx apps/web/src/components/product-frame.css
+          for file in apps/web/src/features/home/HomeDeviceFrames.tsx apps/web/src/components/product-frame.css; do
+            echo "FORMATTED_BEGIN:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
