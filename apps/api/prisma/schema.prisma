@@ -109,7 +109,7 @@ model Category {
 }
 
 /// Read-only editorial references, verified against Apple.com.
- /// Never mix these records with merchant stock, prices, bookings, or orders.
+/// Never mix these records with merchant stock, prices, bookings, or orders.
 model AppleReferenceModel {
   id              String   @id
   category        String
@@ -118,7 +118,7 @@ model AppleReferenceModel {
   officialUrl     String
   sourceCheckedAt DateTime
   sortOrder       Int      @default(0)
-  updatedAt       DateTime @updatedAt
+  updatedAt       DateTime @default(now()) @updatedAt
 
   @@index([category, sortOrder])
 }
