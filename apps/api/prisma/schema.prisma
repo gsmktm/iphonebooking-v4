@@ -154,6 +154,7 @@ model AppleHistoryDevice {
   gallery        String[] @default([])
   checkedAt      DateTime
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
 
   @@index([family, introducedYear])
   @@index([introducedYear])
@@ -187,6 +188,7 @@ model Product {
   active              Boolean                  @default(true)
   featured            Boolean                  @default(false)
   createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @default(now()) @updatedAt
   variants            ProductVariant[]
   wishlist            Wishlist[]
   compatibleWith      AccessoryCompatibility[] @relation("Accessory")
