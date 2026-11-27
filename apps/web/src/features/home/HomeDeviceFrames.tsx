@@ -58,7 +58,9 @@ export function DeviceFrame({
   // product art is contained within the frame rather than cropped into a fake UI.
   const verifiedPhoto =
     image &&
-    (image.startsWith('/images/') || image.startsWith('/uploads/') || image.startsWith('/api/v1/media/')) &&
+    (image.startsWith('/images/') ||
+      image.startsWith('/uploads/') ||
+      image.startsWith('/api/v1/media/')) &&
     !/\/(?:catalog|hero|himalayas|himalayan-banner)\.(?:webp|png|jpe?g)$/i.test(image);
   const artwork = verifiedPhoto ? (
     <img src={image} alt="" loading="lazy" />
