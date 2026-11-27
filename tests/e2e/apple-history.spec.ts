@@ -39,7 +39,9 @@ for (const family of families) {
     const cards = page.locator('.apple-history-card');
     await expect(cards.first()).toBeVisible();
     await expect(cards.first().getByText(/ARCHIVE · NOT FOR SALE/i)).toBeVisible();
-    await expect(cards.first().locator('.apple-history-card-bottom').getByRole('link', { name: 'View history' })).toBeVisible();
+    await expect(
+      cards.first().locator('.apple-history-card-bottom').getByRole('link', { name: 'View history' }),
+    ).toBeVisible();
     await expect(cards.first().getByRole('link', { name: /buy now|add to bag/i })).toHaveCount(0);
   });
 }
