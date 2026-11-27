@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { db } from '../db.js';
 import { updateContentSchema } from '../schemas/content.js';
 import { AppError, owned, permit, hash } from '../core.js';
+import { checkMediaReferences } from './product-studio.js';
 export const admin = Router();
 const paging = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -527,8 +528,10 @@ const productSchema = z.object({
   tagline: z.string().max(200),
   description: z.string().max(4000),
   categoryId: z.string(),
-  image: z.string().regex(/^\/images\/[a-zA-Z0-9._-]+$/),
-  gallery: z.array(z.string()).default([]),
+  image: z.string().regex(/^\/(?:images\/[a-zA-Z0-9._-]+|api\/v1\/media\/[0-9a-f-]{36})$/i),
+  gallery: z.array(
+    z.string().regex(/^\/(?:images\/[a-zA-Z0-9._-]+|api\/v1\/media\/[0-9a-f-]{36})$/i),
+  ).max(16).default([]),
   specs: z.record(z.string(), z.string()).default({}),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
@@ -536,6 +539,7 @@ const productSchema = z.object({
 });
 admin.post('/products', permit('product.create'), async (req, res) => {
   const data = productSchema.parse(req.body);
+  await checkMediaReferences([data.image, ...data.gallery]);
   const result = await db.$transaction(async (tx) => {
     const result = await tx.product.create({ data });
     await tx.auditLog.create({
@@ -553,11 +557,26 @@ admin.post('/products', permit('product.create'), async (req, res) => {
   res.status(201).json(result);
 });
 admin.patch('/products/:id', permit('product.update'), async (req, res) => {
-  const data = productSchema.partial().parse(req.body);
+  const { expectedUpdatedAt, ...data } = productSchema
+    .partial()
+    .extend({ expectedUpdatedAt: z.string().datetime().optional() })
+    .parse(req.body);
+  if (!Object.keys(data).length)
+    throw new AppError(422, 'NO_CHANGES', 'Choose a product field to update.');
+  await checkMediaReferences([data.image, ...(data.gallery ?? [])]);
   res.json(
     await db.$transaction(async (tx) => {
       const before = owned(await tx.product.findUnique({ where: { id: String(req.params.id) } }));
-      const after = await tx.product.update({ where: { id: before.id }, data });
+      const changed = await tx.product.updateMany({
+        where: {
+          id: before.id,
+          ...(expectedUpdatedAt ? { updatedAt: new Date(expectedUpdatedAt) } : {}),
+        },
+        data,
+      });
+      if (!changed.count)
+        throw new AppError(409, 'PRODUCT_EDIT_CONFLICT', 'This product changed elsewhere. Reload and try again.');
+      const after = owned(await tx.product.findUnique({ where: { id: before.id } }));
       await tx.auditLog.create({
         data: {
           actorId: req.user!.id,
@@ -579,9 +598,11 @@ admin.patch('/variants/:id', permit('product.update'), async (req, res) => {
       price: z.number().int().min(100).max(1000000000),
       deposit: z.number().int().min(0).max(1000000000),
       preorder: z.boolean(),
+      image: z.string().regex(/^\/api\/v1\/media\/[0-9a-f-]{36}$/i).nullable().optional(),
     })
     .refine((v) => v.deposit <= v.price)
     .parse(req.body);
+  await checkMediaReferences([data.image]);
   res.json(
     await db.$transaction(async (tx) => {
       const before = owned(
