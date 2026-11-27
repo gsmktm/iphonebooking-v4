@@ -24,14 +24,7 @@ const categoryLabels: Record<Category, string> = {
   accessories: 'Accessories',
 };
 
-const categories: Category[] = [
-  'iphone',
-  'mac',
-  'ipad',
-  'watch',
-  'airpods',
-  'accessories',
-];
+const categories: Category[] = ['iphone', 'mac', 'ipad', 'watch', 'airpods', 'accessories'];
 
 function checkedDate(iso: string) {
   const date = new Date(iso);
@@ -77,15 +70,23 @@ export function OfficialAppleModels({
             <BadgeCheck size={15} aria-hidden="true" /> SOURCE: APPLE.COM
           </span>
           <h2 id={category ? `official-${category}-title` : 'official-apple-models-title'}>
-            {category ? `Explore ${categoryLabels[category]} models.` : 'Discover the Apple line-up.'}
+            {category
+              ? `Explore ${categoryLabels[category]} models.`
+              : 'Discover the Apple line-up.'}
           </h2>
           <p>
-            Model names and product information are checked against Apple’s website. This is
-            an independent reference, not an Apple Store or a claim of Nepal availability.
+            Model names and product information are checked against Apple’s website. This is an
+            independent reference, not an Apple Store or a claim of Nepal availability.
           </p>
         </div>
         <a
-          href={category ? (category === 'accessories' ? 'https://www.apple.com/shop/accessories/all' : `https://www.apple.com/${category === 'watch' ? 'watch' : category}/`) : 'https://www.apple.com/'}
+          href={
+            category
+              ? category === 'accessories'
+                ? 'https://www.apple.com/shop/accessories/all'
+                : `https://www.apple.com/${category === 'watch' ? 'watch' : category}/`
+              : 'https://www.apple.com/'
+          }
           className="official-apple-category-link"
           target="_blank"
           rel="noopener noreferrer"
@@ -95,10 +96,7 @@ export function OfficialAppleModels({
       </header>
       {references.isLoading && <Loading />}
       {references.error && (
-        <ErrorNotice
-          error={references.error}
-          retry={() => void references.refetch()}
-        />
+        <ErrorNotice error={references.error} retry={() => void references.refetch()} />
       )}
       {models.length > 0 && (
         <div className="official-apple-models-grid">
@@ -112,7 +110,9 @@ export function OfficialAppleModels({
                 <span className="official-apple-model-index">
                   {String(index + 1).padStart(2, '0')}
                 </span>
-                <span className="official-apple-model-category">{categoryLabels[model.category]}</span>
+                <span className="official-apple-model-category">
+                  {categoryLabels[model.category]}
+                </span>
               </div>
               <div className="official-apple-model-body">
                 <h3>{model.name}</h3>
@@ -138,10 +138,9 @@ export function OfficialAppleModels({
       )}
       {models.length > 0 && (
         <p className="official-apple-models-legal">
-          Source pages reviewed {checkedDate(models[0].sourceCheckedAt)}.
-          Apple product names belong to Apple Inc. iPhoneBooking is an independent service;
-          Apple.com information is not a Nepal retail offer. Product photos require
-          permission or independently licensed originals.
+          Source pages reviewed {checkedDate(models[0].sourceCheckedAt)}. Apple product names belong
+          to Apple Inc. iPhoneBooking is an independent service; Apple.com information is not a
+          Nepal retail offer. Product photos require permission or independently licensed originals.
         </p>
       )}
     </section>
