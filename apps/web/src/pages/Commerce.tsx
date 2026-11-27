@@ -1,3 +1,4 @@
+import { displaySpecValue } from '../services/product-spec';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -24,6 +25,9 @@ import {
   Status,
   Loading,
 } from '../components/ui';
+const specValuesDiffer = (products: Product[], key: string) =>
+  new Set(products.map((product) => displaySpecValue(product.specs[key]))).size > 1;
+
 export function Cart() {
   const { cart, quantity } = useShop();
   const total = cart.reduce((sum, i) => sum + i.quantity * i.price, 0);
@@ -548,13 +552,10 @@ export function Compare() {
                   ))}
                 </tr>
                 {[...new Set(list.flatMap((p) => Object.keys(p.specs)))].map((key) => (
-                  <tr
-                    key={key}
-                    className={new Set(list.map((p) => p.specs[key])).size > 1 ? 'different' : ''}
-                  >
+                  <tr key={key} className={specValuesDiffer(list, key) ? 'different' : ''}>
                     <th>{key}</th>
                     {list.map((p) => (
-                      <td key={p.id}>{p.specs[key] ?? 'Not specified'}</td>
+                      <td key={p.id}>{displaySpecValue(p.specs[key] ?? 'Not specified')}</td>
                     ))}
                   </tr>
                 ))}

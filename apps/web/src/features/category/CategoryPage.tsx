@@ -1,3 +1,4 @@
+import { displaySpecValue } from '../../services/product-spec';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -110,7 +111,7 @@ export function CategoryPage({ slug }: { slug: CategorySlug }) {
               .map(([key, value], index) => ({
                 Icon: config.features.items[index % config.features.items.length].Icon,
                 tag: key,
-                name: value,
+                name: displaySpecValue(value),
                 body: `${key} for ${hero.name}. Configuration-specific details are shown on the product page.`,
               }))}
           />
