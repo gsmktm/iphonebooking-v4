@@ -6,6 +6,7 @@ import { api } from '../services/api';
 import type { Product, Category } from '../services/types';
 import { ProductCard } from '../components/ProductCard';
 import { DeviceCollectionStrip } from '../components/DeviceCollectionStrip';
+import { OfficialAppleModels } from '../features/apple/OfficialAppleModels';
 import { PageIntro, Loading, ErrorNotice, Empty, ArrowLink, Dialog } from '../components/ui';
 import { useShop } from '../store/shop';
 type CatalogResponse = {
@@ -169,6 +170,9 @@ export default function Catalog() {
           </Link>
         ))}
       </div>
+      {['store', 'catalog', 'prebook', 'deals'].includes(mode) && (
+        <OfficialAppleModels compact />
+      )}
       <form
         className="catalog-search"
         key={filters.get('q') ?? ''}
