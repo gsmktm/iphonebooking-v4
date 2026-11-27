@@ -119,7 +119,7 @@ export default function Product() {
           </div>
           <div className="gallery-caption">
             <span>{p.name}</span>
-            <span>Illustrative studio render</span>
+            <span>{gallery[galleryIndex]?.startsWith('/api/v1/media/') ? 'Original device photograph' : 'Illustrative studio render'}</span>
           </div>
           <div className="product-benefits">
             <span>
