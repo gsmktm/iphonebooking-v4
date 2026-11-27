@@ -117,7 +117,10 @@ export function CategoryCinematicHero({
         : 'Check availability';
 
   return (
-    <section className={`cinematic-category cinematic-category--${family}`} aria-labelledby="cinematic-title">
+    <section
+      className={`cinematic-category cinematic-category--${family}`}
+      aria-labelledby="cinematic-title"
+    >
       <div className="cinematic-category-grid" aria-hidden="true" />
       <div className="container cinematic-category-inner">
         <div className="cinematic-category-copy">
@@ -171,7 +174,10 @@ export function CategoryCinematicHero({
                         aria-pressed={variant?.id === option.id}
                         onClick={() => setColor(option.color)}
                       >
-                        <span className="cinematic-category-swatch" style={{ background: option.colorHex }} />
+                        <span
+                          className="cinematic-category-swatch"
+                          style={{ background: option.colorHex }}
+                        />
                         {option.color}
                       </button>
                     ))}
@@ -206,7 +212,9 @@ export function CategoryCinematicHero({
                   <span>CATALOG PRICE</span>
                 </div>
                 <div>
-                  <strong>{variant?.preorder ? 'Pre-book' : hasStock ? 'Available' : 'Check stock'}</strong>
+                  <strong>
+                    {variant?.preorder ? 'Pre-book' : hasStock ? 'Available' : 'Check stock'}
+                  </strong>
                   <span>FULFILMENT</span>
                 </div>
               </>
@@ -255,7 +263,11 @@ export function CategoryCinematicHero({
             {!photo && <small>Product photograph available with published listings</small>}
           </div>
           {product && variant && (
-            <Link to={destination} className="cinematic-category-price-tag" aria-label={`View ${product.name} from ${money(variant.price)}`}>
+            <Link
+              to={destination}
+              className="cinematic-category-price-tag"
+              aria-label={`View ${product.name} from ${money(variant.price)}`}
+            >
               <small>{variant.preorder ? 'PRE-BOOK' : 'FROM'}</small>
               <strong>{money(variant.price)}</strong>
             </Link>
