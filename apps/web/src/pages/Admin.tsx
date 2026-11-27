@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppearanceControl } from '../features/appearance/AppearanceControl';
 import { Link, NavLink, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ArrowUpRight,
   Menu,
+  X,
 } from 'lucide-react';
 import { api } from '../services/api';
 import type { User } from '../services/types';
@@ -105,6 +106,14 @@ export default function Admin() {
   const me = useQuery({ queryKey: ['me'], queryFn: () => api<User | null>('/auth/me') });
   const { resource = '' } = useParams();
   const [navOpen, setNavOpen] = useState(false);
+  useEffect(() => {
+    if (!navOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setNavOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [navOpen]);
   if (me.isLoading)
     return (
       <div className="container page">
@@ -133,7 +142,15 @@ export default function Admin() {
     );
   return (
     <div className="admin-app">
-      <aside className={`admin-sidebar ${navOpen ? 'open' : ''}`}>
+      {navOpen && (
+        <button
+          type="button"
+          className="admin-nav-backdrop"
+          aria-label="Close administration menu"
+          onClick={() => setNavOpen(false)}
+        />
+      )}
+      <aside id="admin-sidebar-navigation" className={`admin-sidebar ${navOpen ? 'open' : ''}`}>
         <Brand />
         <div className="workspace-label">
           <span className="availability-dot" />
@@ -175,9 +192,11 @@ export default function Admin() {
           <button
             className="icon-button admin-menu-toggle"
             onClick={() => setNavOpen(!navOpen)}
-            aria-label="Toggle admin navigation"
+            aria-label={navOpen ? 'Close admin navigation' : 'Open admin navigation'}
+            aria-expanded={navOpen}
+            aria-controls="admin-sidebar-navigation"
           >
-            <Menu />
+            {navOpen ? <X /> : <Menu />}
           </button>
           <span>
             Workspace{' '}
