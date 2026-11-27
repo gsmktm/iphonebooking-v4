@@ -77,14 +77,15 @@ SELECT
     'Finish','Not provided',
     'Secondary supplied figures',
       COALESCE((
-        SELECT jsonb_object_agg(
-          v."config",
-          'NPR ' || to_char(v."secondaryNpr",'FM999,999,999') ||
-          ' — type unspecified; not used as compare-at price'
+        SELECT string_agg(
+          v."config" || ': NPR ' ||
+          to_char(v."secondaryNpr",'FM999,999,999') ||
+          ' — type unspecified; not used as compare-at price',
+          '; ' ORDER BY v."config"
         )
         FROM _macbook_price_import v
         WHERE v."slug"=source."slug" AND v."secondaryNpr" IS NOT NULL
-      ), '{}'::jsonb)
+      ), 'None')
   ),
   'Merchant quote',
   true,
