@@ -29,15 +29,17 @@ export default function Product() {
   const credits = useQuery({
     queryKey: ['product-photo-credits', slug],
     queryFn: () =>
-      api<{
-        url: string;
-        sourceType: string;
-        sourceCredit: string;
-        sourceUrl: string | null;
-        license: string | null;
-        licenseUrl: string | null;
-        altText: string;
-      }[]>('/media/credits?slug=' + encodeURIComponent(slug ?? '')),
+      api<
+        {
+          url: string;
+          sourceType: string;
+          sourceCredit: string;
+          sourceUrl: string | null;
+          license: string | null;
+          licenseUrl: string | null;
+          altText: string;
+        }[]
+      >('/media/credits?slug=' + encodeURIComponent(slug ?? '')),
     enabled: Boolean(slug),
   });
   const p = result.data;
@@ -98,7 +100,9 @@ export default function Product() {
     track('variant_selected', next?.id ?? v.id);
   };
   const gallery = [...new Set([v.image ?? p.image, ...p.gallery])];
-  const currentPhotoCredit = credits.data?.find((credit) => credit.url === (gallery[galleryIndex] ?? gallery[0]));
+  const currentPhotoCredit = credits.data?.find(
+    (credit) => credit.url === (gallery[galleryIndex] ?? gallery[0]),
+  );
   const addToBag = () => {
     add(p, v);
     setAdded(true);
@@ -135,7 +139,11 @@ export default function Product() {
           </div>
           <div className="gallery-caption">
             <span>{p.name}</span>
-            <span>{gallery[galleryIndex]?.startsWith('/api/v1/media/') ? 'Original device photograph' : 'Illustrative studio render'}</span>
+            <span>
+              {gallery[galleryIndex]?.startsWith('/api/v1/media/')
+                ? 'Original device photograph'
+                : 'Illustrative studio render'}
+            </span>
           </div>
           {currentPhotoCredit && (
             <div className="product-photo-attribution">
@@ -152,7 +160,11 @@ export default function Product() {
                 <>
                   {' · '}
                   {currentPhotoCredit.licenseUrl ? (
-                    <a href={currentPhotoCredit.licenseUrl} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={currentPhotoCredit.licenseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {currentPhotoCredit.license}
                     </a>
                   ) : (
