@@ -69,9 +69,16 @@
   border-radius: 1rem;
   padding: clamp(1.15rem, 2vw, 1.7rem);
   background:
-    radial-gradient(ellipse 70% 65% at 95% 0%, color-mix(in srgb, var(--gold) 8%, transparent), transparent 100%),
+    radial-gradient(
+      ellipse 70% 65% at 95% 0%,
+      color-mix(in srgb, var(--gold) 8%, transparent),
+      transparent 100%
+    ),
     var(--surface);
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 .official-apple-model:hover,
 .official-apple-model:focus-within {
@@ -84,7 +91,11 @@
   justify-content: space-between;
   gap: 1rem;
   align-items: center;
-  font: 600 0.66rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font:
+    600 0.66rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
   letter-spacing: 0.12em;
   color: var(--muted);
 }
@@ -168,7 +179,11 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .official-apple-model { transition: none; }
+  .official-apple-model {
+    transition: none;
+  }
   .official-apple-model:hover,
-  .official-apple-model:focus-within { transform: none; }
+  .official-apple-model:focus-within {
+    transform: none;
+  }
 }
