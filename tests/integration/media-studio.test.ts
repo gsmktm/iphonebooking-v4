@@ -58,7 +58,10 @@ beforeAll(async () => {
   process.env.MEDIA_S3_REGION = 'auto';
 
   const role = await db.role.create({
-    data: { name: `${prefix}-staff`, permissions: ['product.read', 'product.update', 'product.create'] },
+    data: {
+      name: `${prefix}-staff`,
+      permissions: ['product.read', 'product.update', 'product.create'],
+    },
   });
   const user = await db.user.create({
     data: {
@@ -74,7 +77,12 @@ beforeAll(async () => {
   });
   staffCookie = `session=${raw}`;
   const category = await db.category.create({
-    data: { slug: prefix, name: 'Media test category', description: 'Isolated test', image: 'phone' },
+    data: {
+      slug: prefix,
+      name: 'Media test category',
+      description: 'Isolated test',
+      image: 'phone',
+    },
   });
   const product = await db.product.create({
     data: {
