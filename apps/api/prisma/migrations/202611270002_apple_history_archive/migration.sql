@@ -326,3 +326,68 @@ VALUES
   ('hmac-macbook-air-original-2008', 'mac-macbook-air-original-2008', 'mac', 'MacBook Air (original)', 2008, NULL, NULL, NULL, 'https://support.apple.com/en-us/102869', NULL, NULL, NULL, NULL, NULL, NULL, TIMESTAMP '2026-11-27 00:00:00'),
   ('hipod-ipod-original-2001-2001', 'ipod-ipod-original-2001-2001', 'ipod', 'iPod (original 2001)', 2001, 'M8541', '5 GB', NULL, 'https://www.apple.com/newsroom/2001/10/23Apple-Presents-iPod/', NULL, NULL, NULL, NULL, NULL, NULL, TIMESTAMP '2026-11-27 00:00:00')
 ON CONFLICT ("slug") DO NOTHING;
+
+-- Additional Apple-identified models with introduction years in nearby Apple identification context.
+INSERT INTO "AppleHistoryDevice" ("id","slug","family","name","introducedYear","sourceUrl","checkedAt")
+VALUES
+  ('hipad-ipad-air-2-2014','ipad-ipad-air-2-2014','ipad','iPad Air 2',2014,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hipad-ipad-air-2013','ipad-ipad-air-2013','ipad','iPad Air',2013,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hipad-ipad-mini-4-2015','ipad-ipad-mini-4-2015','ipad','iPad mini 4',2015,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hipad-ipad-mini-3-2014','ipad-ipad-mini-3-2014','ipad','iPad mini 3',2014,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hipad-ipad-mini-2-2013','ipad-ipad-mini-2-2013','ipad','iPad mini 2',2013,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hipad-ipad-mini-2012','ipad-ipad-mini-2012','ipad','iPad mini',2012,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hipad-ipad-4th-generation-2012','ipad-ipad-4th-generation-2012','ipad','iPad (4th generation)',2012,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hipad-ipad-3rd-generation-2012','ipad-ipad-3rd-generation-2012','ipad','iPad (3rd generation)',2012,'https://support.apple.com/en-us/108043',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hmac-imac-24-inch-m6-four-ports-2026','mac-imac-24-inch-m6-four-ports-2026','mac','iMac (24-inch, M6, Four ports)',2026,'https://support.apple.com/en-us/108054',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hmac-imac-24-inch-m6-two-ports-2026','mac-imac-24-inch-m6-two-ports-2026','mac','iMac (24-inch, M6, Two ports)',2026,'https://support.apple.com/en-us/108054',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hmac-mac-mini-m6-2026','mac-mac-mini-m6-2026','mac','Mac mini (M6)',2026,'https://support.apple.com/en-us/102852',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hmac-mac-mini-m5-pro-2026','mac-mac-mini-m5-pro-2026','mac','Mac mini (M5 Pro)',2026,'https://support.apple.com/en-us/102852',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hmac-mac-studio-m5-max-2026','mac-mac-studio-m5-max-2026','mac','Mac Studio (M5 Max)',2026,'https://support.apple.com/en-us/102231',TIMESTAMP '2026-11-27 00:00:00'),
+  ('hmac-mac-studio-m5-ultra-2026','mac-mac-studio-m5-ultra-2026','mac','Mac Studio (M5 Ultra)',2026,'https://support.apple.com/en-us/102231',TIMESTAMP '2026-11-27 00:00:00')
+ON CONFLICT ("slug") DO NOTHING;
+
+-- Verified Wikimedia Commons photographs only; exact attribution and license attached.
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Original_iPhone_docked.jpg/500px-Original_iPhone_docked.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:Original_iPhone_docked.jpg',
+"imageCredit"='Andrew from London, UK', "imageLicense"='CC BY-SA 2.0', "imageLicenseUrl"='https://creativecommons.org/licenses/by-sa/2.0'
+WHERE "slug"='iphone-iphone-2007';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/IPhone_3G_%28White%29_-_06.jpg/500px-IPhone_3G_%28White%29_-_06.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:IPhone_3G_(White)_-_06.jpg',
+"imageCredit"='David JAFRA from Toulouse, France', "imageLicense"='CC BY 2.0', "imageLicenseUrl"='https://creativecommons.org/licenses/by/2.0'
+WHERE "slug"='iphone-iphone-3g-2008';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/IPad-WiFi-1stGen.jpg/500px-IPad-WiFi-1stGen.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:IPad-WiFi-1stGen.jpg',
+"imageCredit"='Evan-Amos', "imageLicense"='Public domain', "imageLicenseUrl"='https://creativecommons.org/publicdomain/mark/1.0/'
+WHERE "slug"='ipad-ipad-2010';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://upload.wikimedia.org/wikipedia/commons/e/ef/Lightmatter_ipod_1G.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:Lightmatter_ipod_1G.jpg',
+"imageCredit"='Aaron Logan', "imageLicense"='CC BY 2.5', "imageLicenseUrl"='https://creativecommons.org/licenses/by/2.5'
+WHERE "slug"='ipod-ipod-original-2001-2001';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://upload.wikimedia.org/wikipedia/commons/e/ef/Lightmatter_ipod_1G.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:Lightmatter_ipod_1G.jpg',
+"imageCredit"='Aaron Logan', "imageLicense"='CC BY 2.5', "imageLicenseUrl"='https://creativecommons.org/licenses/by/2.5'
+WHERE "slug"='ipod-ipod-scroll-wheel-2001';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Ipod-classic-6th-gen.jpg/500px-Ipod-classic-6th-gen.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:Ipod-classic-6th-gen.jpg',
+"imageCredit"='Evan-Amos', "imageLicense"='Public domain', "imageLicenseUrl"='https://creativecommons.org/publicdomain/mark/1.0/'
+WHERE "slug"='ipod-ipod-classic-2007';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/IPod_nano_alongside_pack_of_gum_-_Flickr_-_dan_taylor.jpg/500px-IPod_nano_alongside_pack_of_gum_-_Flickr_-_dan_taylor.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:IPod_nano_alongside_pack_of_gum_-_Flickr_-_dan_taylor.jpg',
+"imageCredit"='Dan Taylor-Watt', "imageLicense"='CC BY 2.0', "imageLicenseUrl"='https://creativecommons.org/licenses/by/2.0'
+WHERE "slug"='ipod-ipod-nano-2005';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/IPod_Touch_%283G%29.jpg/500px-IPod_Touch_%283G%29.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:IPod_Touch_(3G).jpg',
+"imageCredit"='Editor182 (Wikipedia)', "imageLicense"='Public domain', "imageLicenseUrl"='https://creativecommons.org/publicdomain/mark/1.0/'
+WHERE "slug"='ipod-ipod-touch-3rd-generation-2009';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/MacBook_Pro%2C_Late-2008.jpg/500px-MacBook_Pro%2C_Late-2008.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:MacBook_Pro,_Late-2008.jpg',
+"imageCredit"='Ashley Pomeroy', "imageLicense"='CC BY-SA 4.0', "imageLicenseUrl"='https://creativecommons.org/licenses/by-sa/4.0'
+WHERE "slug"='mac-macbook-pro-15-inch-late-2008-2008';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/IMac_G3_Bondi_Blue%2C_three-quarters_view.png/500px-IMac_G3_Bondi_Blue%2C_three-quarters_view.png', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:IMac_G3_Bondi_Blue,_three-quarters_view.png',
+"imageCredit"='David Fuchs; original photo by Rama', "imageLicense"='CC BY-SA 4.0', "imageLicenseUrl"='https://creativecommons.org/licenses/by-sa/4.0'
+WHERE "slug"='mac-imac-g3-1998';
+UPDATE "AppleHistoryDevice" SET
+"imageUrl"='https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Apple_Mac_Mini_%28March_2009%29_02.jpg/500px-Apple_Mac_Mini_%28March_2009%29_02.jpg', "imageSourceUrl"='https://commons.wikimedia.org/wiki/File:Apple_Mac_Mini_(March_2009)_02.jpg',
+"imageCredit"='Bernie Kohl', "imageLicense"='CC0', "imageLicenseUrl"='https://creativecommons.org/publicdomain/zero/1.0/'
+WHERE "slug"='mac-mac-mini-early-2009-2009';
