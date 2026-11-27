@@ -51,7 +51,11 @@ export function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string 
   const artwork = image?.startsWith('/images/') ? (
     <img src={image} alt="" loading="lazy" />
   ) : (
-    <ProductVisual image={image || (kind === 'iphone' ? 'phone' : kind)} name="" className="home-frame-product-artwork" />
+    <ProductVisual
+      image={image || (kind === 'iphone' ? 'phone' : kind)}
+      name=""
+      className="home-frame-product-artwork"
+    />
   );
   return (
     <div className={`home-device-frame home-device-frame--${kind}`} aria-hidden="true">
