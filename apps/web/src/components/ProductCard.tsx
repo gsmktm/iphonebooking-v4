@@ -62,6 +62,7 @@ export function ProductCard({
           <DeviceFrame
             kind={frameKind(product.category.slug)}
             image={preferred?.image || product.image}
+            realOnly
           />
         </Link>
         <div className="color-dots">

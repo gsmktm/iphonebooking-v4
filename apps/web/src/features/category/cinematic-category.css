@@ -1,0 +1,478 @@
+/* iPhoneBooking cinematic category pages. Reference: supplied iPhone black/gold layout.
+ * Device photography is shown only when it comes from a managed catalog image.
+ * No generated device photos, fabricated products, or hardcoded Nepal prices.
+ */
+.cinematic-category {
+  --cinema-glow: rgb(192 152 64 / 0.2);
+  --cinema-border: rgb(199 162 78 / 0.33);
+  --cinema-gold: #c6a348;
+  --cinema-silver: #ece9e2;
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 52% 65% at 86% 48%, var(--cinema-glow), transparent 78%),
+    linear-gradient(130deg, #07090d 15%, #0b0e13 63%, #111012 100%);
+  color: var(--cinema-silver);
+  border-bottom: 1px solid var(--cinema-border);
+}
+.cinematic-category--mac {
+  --cinema-glow: rgb(88 125 183 / 0.18);
+}
+.cinematic-category--ipad {
+  --cinema-glow: rgb(137 106 163 / 0.2);
+}
+.cinematic-category--watch {
+  --cinema-glow: rgb(82 140 124 / 0.19);
+}
+.cinematic-category--airpods {
+  --cinema-glow: rgb(156 172 192 / 0.17);
+}
+.cinematic-category--accessories {
+  --cinema-glow: rgb(157 111 77 / 0.2);
+}
+.cinematic-category::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.45;
+  background-image:
+    radial-gradient(circle at 8% 7%, #a58736 0 1px, transparent 2px),
+    radial-gradient(circle at 43% 12%, #a58736 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 38%, #a58736 0 1px, transparent 2px),
+    radial-gradient(circle at 15% 78%, #a58736 0 1px, transparent 2px),
+    radial-gradient(circle at 92% 83%, #a58736 0 1px, transparent 2px),
+    radial-gradient(circle at 57% 89%, #a58736 0 1px, transparent 2px);
+}
+.cinematic-category-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: linear-gradient(to right, transparent 0%, black 28%, black 100%);
+  pointer-events: none;
+}
+.cinematic-category-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  align-items: center;
+  gap: clamp(1.25rem, 3.5vw, 4rem);
+  max-width: 1450px;
+  min-height: clamp(620px, 50vw, 820px);
+  padding-block: clamp(3rem, 5.5vw, 6rem);
+}
+.cinematic-category-copy {
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+}
+.cinematic-category-eyebrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.05rem;
+  margin-bottom: clamp(1.7rem, 3vw, 3rem);
+  color: var(--cinema-gold);
+  font:
+    500 0.72rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  letter-spacing: 0.34em;
+}
+.cinematic-category-dash {
+  width: 46px;
+  height: 1px;
+  background: var(--cinema-gold);
+}
+.cinematic-category-diamond {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--cinema-gold);
+  transform: rotate(45deg);
+}
+.cinematic-category h1 {
+  font-family: var(--font-display), 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  font-size: clamp(3.55rem, 6.5vw, 7.4rem);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+  text-wrap: balance;
+  margin: 0 0 clamp(1.45rem, 2.8vw, 2.6rem);
+  color: #f0efec;
+}
+.cinematic-category h1 span,
+.cinematic-category h1 em {
+  display: block;
+}
+.cinematic-category h1 em {
+  font-weight: 400;
+  color: var(--cinema-gold);
+  font-style: italic;
+}
+.cinematic-category-description {
+  max-width: 47rem;
+  color: #b3b5bd;
+  font-size: clamp(0.95rem, 1.33vw, 1.2rem);
+  font-weight: 400;
+  line-height: 1.9;
+  margin: 0 0 1.7rem;
+  text-wrap: pretty;
+}
+.cinematic-category-config {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0 0 1.6rem;
+  padding-block: 0.55rem;
+}
+.cinematic-category-config-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+.cinematic-category-config-row > span {
+  width: 8rem;
+  color: #adb0b7;
+  font-size: 0.72rem;
+}
+.cinematic-category-config-row > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.cinematic-category-config-row button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.48rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgb(204 200 186 / 0.3);
+  background: rgb(255 255 255 / 0.035);
+  color: #d9dadc;
+  font-size: 0.75rem;
+  min-height: 42px;
+}
+.cinematic-category-config-row button[aria-pressed='true'] {
+  border-color: var(--cinema-gold);
+  background: rgb(198 163 72 / 0.16);
+  color: #f7e8bb;
+}
+.cinematic-category-swatch {
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 50%;
+}
+.cinematic-category-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.2rem;
+}
+.cinematic-category-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  min-height: 50px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  border-radius: 5px;
+  padding: 0.8rem 1.25rem;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+.cinematic-category-primary {
+  background: #c6a348;
+  color: #101115;
+  border: 1px solid #c6a348;
+}
+.cinematic-category-primary:hover,
+.cinematic-category-primary:focus-visible {
+  background: #e1c579;
+}
+.cinematic-category-secondary {
+  background: transparent;
+  color: #ededea;
+  border: 1px solid rgb(255 255 255 / 0.32);
+}
+.cinematic-category-secondary:hover,
+.cinematic-category-secondary:focus-visible {
+  border-color: #c6a348;
+}
+.cinematic-category-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.1rem, 2.8vw, 3.6rem);
+  margin-top: clamp(2rem, 3.4vw, 3.7rem);
+  padding-top: 1.2rem;
+  border-top: 1px solid rgb(214 189 105 / 0.16);
+}
+.cinematic-category-facts > div {
+  display: grid;
+  align-content: start;
+  gap: 0.22rem;
+  min-width: 5.3rem;
+}
+.cinematic-category-facts strong,
+.cinematic-category-facts svg {
+  color: var(--cinema-gold);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.2rem, 2.15vw, 2.1rem);
+  line-height: 1.25;
+  font-weight: 400;
+}
+.cinematic-category-facts span {
+  font:
+    500 0.63rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  letter-spacing: 0.065em;
+  color: #92959e;
+}
+.cinematic-category-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 560px;
+  isolation: isolate;
+}
+.cinematic-category-halo {
+  position: absolute;
+  z-index: -1;
+  width: min(90%, 590px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(198 163 72 / 0.11);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 60px rgb(198 163 72 / 0.012),
+    0 0 0 140px rgb(198 163 72 / 0.008);
+}
+.cinematic-category-outline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 550px;
+  filter: drop-shadow(12px 28px 30px rgb(0 0 0 / 0.45));
+}
+.cinematic-category-outline .home-device-frame {
+  width: 350px;
+  height: 290px;
+  transform: scale(1.8);
+  transform-origin: center;
+}
+.cinematic-category--iphone .cinematic-category-outline .home-device-frame {
+  transform: scale(1.9);
+}
+.cinematic-category--mac .cinematic-category-outline .home-device-frame,
+.cinematic-category--ipad .cinematic-category-outline .home-device-frame {
+  transform: scale(1.55);
+}
+.cinematic-category--airpods .cinematic-category-outline .home-device-frame,
+.cinematic-category--accessories .cinematic-category-outline .home-device-frame {
+  transform: scale(1.65);
+}
+.cinematic-category-real-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 500px;
+}
+.cinematic-category-real-photo img {
+  display: block;
+  max-width: 100%;
+  max-height: 540px;
+  object-fit: contain;
+  filter: drop-shadow(10px 28px 24px rgb(0 0 0 / 0.32));
+}
+.cinematic-category-photo-caption {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  color: #a6a9b1;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+.cinematic-category-photo-caption small {
+  max-width: 20rem;
+  color: #747783;
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+}
+.cinematic-category-price-tag {
+  position: absolute;
+  z-index: 3;
+  top: 24%;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 230px;
+  padding: 1rem 1.3rem;
+  background: linear-gradient(130deg, #d1af59, #9b731e);
+  color: #11100b;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.23);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 11px) 0,
+    100% 11px,
+    100% 100%,
+    11px 100%,
+    0 calc(100% - 11px)
+  );
+}
+.cinematic-category-price-tag small {
+  font:
+    600 0.64rem ui-monospace,
+    monospace;
+  letter-spacing: 0.22em;
+}
+.cinematic-category-price-tag strong {
+  font-weight: 750;
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  font-variant-numeric: tabular-nums;
+}
+.cinematic-category-price-tag:hover,
+.cinematic-category-price-tag:focus-visible {
+  filter: brightness(1.13);
+}
+@media (max-width: 1060px) {
+  .cinematic-category-inner {
+    gap: 1.3rem;
+    min-height: 630px;
+  }
+  .cinematic-category h1 {
+    font-size: clamp(3.2rem, 6vw, 5.4rem);
+  }
+  .cinematic-category-stage {
+    min-height: 430px;
+  }
+  .cinematic-category-outline {
+    height: 425px;
+  }
+  .cinematic-category-outline .home-device-frame {
+    transform: scale(1.45);
+  }
+  .cinematic-category--iphone .cinematic-category-outline .home-device-frame {
+    transform: scale(1.55);
+  }
+}
+@media (max-width: 780px) {
+  .cinematic-category-inner {
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: 3rem 2.3rem;
+    gap: 1.5rem;
+  }
+  .cinematic-category h1 {
+    max-width: 11.5ch;
+    font-size: clamp(3.1rem, 9.6vw, 5.8rem);
+  }
+  .cinematic-category-description {
+    max-width: 40rem;
+  }
+  .cinematic-category-stage {
+    min-height: 380px;
+  }
+  .cinematic-category-outline {
+    height: 395px;
+  }
+  .cinematic-category-outline .home-device-frame {
+    transform: scale(1.5);
+  }
+  .cinematic-category-price-tag {
+    top: 12%;
+    right: 10%;
+  }
+  .cinematic-category-real-photo {
+    min-height: 360px;
+  }
+  .cinematic-category-real-photo img {
+    max-height: 350px;
+  }
+}
+@media (max-width: 420px) {
+  .cinematic-category-inner {
+    padding-block: 2.4rem 2rem;
+  }
+  .cinematic-category h1 {
+    font-size: clamp(3rem, 12vw, 4.25rem);
+  }
+  .cinematic-category-eyebrow {
+    letter-spacing: 0.14em;
+    font-size: 0.67rem;
+    margin-bottom: 1.6rem;
+  }
+  .cinematic-category-description {
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+  .cinematic-category-actions {
+    align-items: stretch;
+  }
+  .cinematic-category-primary,
+  .cinematic-category-secondary {
+    flex: 1 1 100%;
+  }
+  .cinematic-category-facts {
+    gap: 1.1rem;
+  }
+  .cinematic-category-facts > div {
+    min-width: 42%;
+  }
+  .cinematic-category-stage {
+    min-height: 310px;
+  }
+  .cinematic-category-outline {
+    height: 305px;
+  }
+  .cinematic-category-outline .home-device-frame {
+    transform: scale(1.08);
+  }
+  .cinematic-category--iphone .cinematic-category-outline .home-device-frame {
+    transform: scale(1.17);
+  }
+  .cinematic-category--mac .cinematic-category-outline .home-device-frame,
+  .cinematic-category--ipad .cinematic-category-outline .home-device-frame,
+  .cinematic-category--airpods .cinematic-category-outline .home-device-frame,
+  .cinematic-category--accessories .cinematic-category-outline .home-device-frame {
+    transform: scale(1.05);
+  }
+  .cinematic-category-real-photo {
+    min-height: 280px;
+  }
+  .cinematic-category-real-photo img {
+    max-height: 290px;
+  }
+  .cinematic-category-price-tag {
+    top: 5%;
+    right: 0;
+    padding: 0.65rem 0.8rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-category-actions a {
+    transition: none;
+  }
+}

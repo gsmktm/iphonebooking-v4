@@ -45,12 +45,24 @@ const families: {
   },
 ];
 
-export function DeviceFrame({ kind, image }: { kind: DeviceKind; image?: string }) {
+export function DeviceFrame({
+  kind,
+  image,
+  realOnly = false,
+}: {
+  kind: DeviceKind;
+  image?: string;
+  realOnly?: boolean;
+}) {
   // Product pictures may already show the whole device. In that case the
   // product art is contained within the frame rather than cropped into a fake UI.
-  const artwork = image?.startsWith('/images/') ? (
+  const verifiedPhoto =
+    image &&
+    (image.startsWith('/images/') || image.startsWith('/uploads/')) &&
+    !/\/(?:catalog|hero|himalayas|himalayan-banner)\.(?:webp|png|jpe?g)$/i.test(image);
+  const artwork = verifiedPhoto ? (
     <img src={image} alt="" loading="lazy" />
-  ) : (
+  ) : realOnly ? null : (
     <ProductVisual
       image={image || (kind === 'iphone' ? 'phone' : kind)}
       name=""
@@ -179,7 +191,11 @@ export default function HomeDeviceFrames({
                   className="home-device-family-frame-link"
                   aria-label={product ? `View ${product.name}` : `Explore ${family.label}`}
                 >
-                  <DeviceFrame kind={family.kind} image={variant?.image || product?.image} />
+                  <DeviceFrame
+                    kind={family.kind}
+                    image={variant?.image || product?.image}
+                    realOnly
+                  />
                 </Link>
                 <div className="home-device-family-details">
                   <span className="eyebrow">{family.eyebrow}</span>
