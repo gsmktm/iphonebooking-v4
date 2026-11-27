@@ -1,4 +1,4 @@
-import { Router, express } from 'express';
+import express, { Router } from 'express';
 import type { Request } from 'express';
 import { z } from 'zod';
 import { db } from '../db.js';
