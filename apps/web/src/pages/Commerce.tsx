@@ -1,3 +1,4 @@
+import { displaySpecValue } from '../services/product-spec';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -550,11 +551,11 @@ export function Compare() {
                 {[...new Set(list.flatMap((p) => Object.keys(p.specs)))].map((key) => (
                   <tr
                     key={key}
-                    className={new Set(list.map((p) => p.specs[key])).size > 1 ? 'different' : ''}
+                    className={new Set(list.map((p) => displaySpecValue(p.specs[key]))).size > 1 ? 'different' : ''}
                   >
                     <th>{key}</th>
                     {list.map((p) => (
-                      <td key={p.id}>{p.specs[key] ?? 'Not specified'}</td>
+                      <td key={p.id}>{displaySpecValue(p.specs[key] ?? 'Not specified')}</td>
                     ))}
                   </tr>
                 ))}
