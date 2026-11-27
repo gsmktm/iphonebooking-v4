@@ -110,6 +110,31 @@ model Category {
 
 /// Read-only editorial references, verified against Apple.com.
 /// Never mix these records with merchant stock, prices, bookings, or orders.
+/// Independent editorial archive of factual Apple product history.
+/// No orders, stock, local prices, checkout or customer relations.
+model AppleHistoryDevice {
+  id             String   @id
+  slug           String   @unique
+  family         String
+  name           String
+  introducedYear Int
+  modelNumbers   String?
+  capacity       String?
+  chip           String?
+  sourceUrl      String
+  referenceUrl   String?
+  imageUrl       String?
+  imageSourceUrl String?
+  imageCredit    String?
+  imageLicense   String?
+  imageLicenseUrl String?
+  checkedAt      DateTime
+  createdAt      DateTime @default(now())
+
+  @@index([family, introducedYear])
+  @@index([introducedYear])
+}
+
 model AppleReferenceModel {
   id              String   @id
   category        String
