@@ -5,7 +5,11 @@ import { z } from 'zod';
 import { db } from '../db.js';
 import { AppError, hash, token, safeUser, requireUser, type Identity } from '../core.js';
 import { accountMailConfig } from '../services/account-mail.js';
-import { registerSupabaseAccount, supabaseAuthAvailable, verifySupabaseCredentials } from '../services/supabase-auth.js';
+import {
+  registerSupabaseAccount,
+  supabaseAuthAvailable,
+  verifySupabaseCredentials,
+} from '../services/supabase-auth.js';
 import {
   queueAccountEmail,
   requestAccountEmail,
@@ -94,7 +98,11 @@ auth.use(
 
 auth.get('/capabilities', (_req, res) => {
   const available = Boolean(accountMailConfig());
-  res.json({ passwordReset: available, emailVerification: available, supabaseAuth: supabaseAuthAvailable() });
+  res.json({
+    passwordReset: available,
+    emailVerification: available,
+    supabaseAuth: supabaseAuthAvailable(),
+  });
 });
 auth.post('/register', async (req, res) => {
   const data = z
@@ -189,7 +197,11 @@ auth.post('/supabase/login', async (req, res) => {
     let linkedUser: Identity;
     if (link) {
       if (link.user.status !== 'ACTIVE' || link.user.email !== profile.email)
-        throw new AppError(403, 'ACCOUNT_ACCESS_DENIED', 'This account is unavailable. Contact support.');
+        throw new AppError(
+          403,
+          'ACCOUNT_ACCESS_DENIED',
+          'This account is unavailable. Contact support.',
+        );
       linkedUser = link.user;
     } else {
       // Do not auto-link to an existing local user by email. Such a shortcut
